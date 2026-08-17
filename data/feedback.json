@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1786861964613,
+    "userId": "10",
+    "userName": "Nuriddin Sayfiddion",
+    "userPhone": "998951629252",
+    "message": "adsdasdasd",
+    "read": true,
+    "createdAt": "2026-08-16T06:32:44.613Z"
+  },
+  {
+    "id": 1786857754917,
+    "userId": "6",
+    "userName": "Nuriddin saf",
+    "userPhone": "998111111111",
+    "message": "asdasdasdasdasdsad",
+    "read": true,
+    "createdAt": "2026-08-16T05:22:34.917Z"
+  },
+  {
+    "id": 1786775874660,
+    "userId": "6",
+    "userName": "Nuriddin saf",
+    "userPhone": "998111111111",
+    "message": "asd",
+    "read": true,
+    "createdAt": "2026-08-15T06:37:54.660Z"
+  },
+  {
+    "id": 1786775571380,
+    "userId": "6",
+    "userName": "Nuriddin saf",
+    "userPhone": "998111111111",
+    "message": "ads",
+    "read": true,
+    "createdAt": "2026-08-15T06:32:51.380Z"
+  },
+  {
+    "id": 1786773160900,
+    "userId": "6",
+    "userName": "Nuriddin saf",
+    "userPhone": "998111111111",
+    "message": "asdsadasd",
+    "read": true,
+    "createdAt": "2026-08-15T05:52:40.900Z"
+  }
+]

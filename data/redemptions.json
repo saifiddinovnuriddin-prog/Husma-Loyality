@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1786861956722,
+    "userId": "10",
+    "giftId": 1,
+    "giftName": "Xush kelibsiz meva savati",
+    "coinsSpent": 30,
+    "status": "pending",
+    "createdAt": "2026-08-16T06:32:36.722Z"
+  },
+  {
+    "id": 1786775578425,
+    "userId": "6",
+    "giftId": 1,
+    "giftName": "Xush kelibsiz meva savati",
+    "coinsSpent": 30,
+    "status": "pending",
+    "createdAt": "2026-08-15T06:32:58.425Z"
+  },
+  {
+    "id": 1786771130812,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-15T05:18:50.812Z",
+    "updatedAt": "2026-08-15T05:21:08.704Z"
+  },
+  {
+    "id": 1786725633006,
+    "userId": "6",
+    "giftId": 1,
+    "giftName": "Xush kelibsiz meva savati",
+    "coinsSpent": 30,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:40:33.006Z",
+    "updatedAt": "2026-08-14T16:53:03.120Z"
+  },
+  {
+    "id": 1786725364244,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:36:04.244Z",
+    "updatedAt": "2026-08-15T05:20:56.816Z"
+  },
+  {
+    "id": 1786724283227,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:18:03.227Z",
+    "updatedAt": "2026-08-14T16:53:05.424Z"
+  },
+  {
+    "id": 1786724204565,
+    "userId": "6",
+    "giftId": 1,
+    "giftName": "Xush kelibsiz meva savati",
+    "coinsSpent": 30,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:16:44.565Z",
+    "updatedAt": "2026-08-14T16:53:06.096Z"
+  },
+  {
+    "id": 1786724197243,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:16:37.243Z",
+    "updatedAt": "2026-08-14T16:53:07.677Z"
+  },
+  {
+    "id": 1786723855497,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-14T16:10:55.497Z",
+    "updatedAt": "2026-08-14T16:53:08.347Z"
+  },
+  {
+    "id": 1786722617533,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "completed",
+    "createdAt": "2026-08-14T15:50:17.533Z",
+    "updatedAt": "2026-08-14T16:53:09.135Z"
+  },
+  {
+    "id": 1786718251489,
+    "userId": "6",
+    "giftId": 6,
+    "giftName": "SPA va basseyn kirish",
+    "coinsSpent": 180,
+    "status": "cancelled",
+    "createdAt": "2026-08-14T14:37:31.489Z"
+  },
+  {
+    "id": 1786717226126,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-14T14:20:26.126Z"
+  },
+  {
+    "id": 1786715277107,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-14T13:47:57.107Z"
+  },
+  {
+    "id": 1786714118429,
+    "userId": "6",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-14T13:28:38.429Z"
+  },
+  {
+    "id": 1786607666948,
+    "userId": "5",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-13T07:54:26.948Z"
+  },
+  {
+    "id": 1786607568260,
+    "userId": "4",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-13T07:52:48.260Z"
+  },
+  {
+    "id": 1786607461080,
+    "userId": "3",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-13T07:51:01.080Z"
+  },
+  {
+    "id": 1786606513149,
+    "userId": "2",
+    "giftId": 2,
+    "giftName": "Bepul nonushta (1 kishi)",
+    "coinsSpent": 50,
+    "status": "cancelled",
+    "createdAt": "2026-08-13T07:35:13.149Z"
+  }
+]
