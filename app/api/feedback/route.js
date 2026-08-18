@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, createFeedback } from "@/lib/db";
-import { notifyTelegram } from "@/lib/telegram";
 
 export async function POST(req) {
   try {
