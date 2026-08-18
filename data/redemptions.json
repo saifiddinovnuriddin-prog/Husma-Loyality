@@ -5,8 +5,9 @@
     "giftId": 1,
     "giftName": "Xush kelibsiz meva savati",
     "coinsSpent": 30,
-    "status": "pending",
-    "createdAt": "2026-08-16T06:32:36.722Z"
+    "status": "completed",
+    "createdAt": "2026-08-16T06:32:36.722Z",
+    "updatedAt": "2026-08-18T06:11:27.607Z"
   },
   {
     "id": 1786775578425,

@@ -1277,7 +1277,7 @@ export default function AdminPage() {
                         >
                           <option value="pending">Kutilmoqda</option>
                           <option value="completed">Bajarildi</option>
-                          <option value="cancelled">Bekor qilindi</option>
+                          <option value="rejected">Bekor qilindi</option>
                         </select>
                       </div>
                     </div>

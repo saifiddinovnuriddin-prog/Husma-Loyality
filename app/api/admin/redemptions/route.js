@@ -1,72 +1,24 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
-import { getUserById } from "@/lib/db";
-import fs from "fs";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
 
-const REDEMPTIONS_FILE = path.join(
-  process.cwd(),
-  "data",
-  "redemptions.json"
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
-
-function loadRedemptions() {
-  try {
-    if (!fs.existsSync(REDEMPTIONS_FILE)) {
-      return [];
-    }
-
-    const raw = fs.readFileSync(REDEMPTIONS_FILE, "utf-8");
-
-    if (!raw.trim()) {
-      return [];
-    }
-
-    const data = JSON.parse(raw);
-
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error("loadRedemptions error:", error);
-    return [];
-  }
-}
-
-function saveRedemptions(list) {
-  const dir = path.dirname(REDEMPTIONS_FILE);
-
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  fs.writeFileSync(
-    REDEMPTIONS_FILE,
-    JSON.stringify(list, null, 2),
-    "utf-8"
-  );
-}
 
 /* =========================
    ADMIN TEKSHIRUVI
 ========================= */
-
 async function getAdmin() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
 
-  if (!token) {
-    return null;
-  }
+  if (!token) return null;
 
   const session = parseSessionToken(token);
-
-  if (!session?.id) {
-    return null;
-  }
-
-  if (session.role !== "admin") {
-    return null;
-  }
+  if (!session?.id || session.role !== "admin") return null;
 
   return session;
 }
@@ -74,51 +26,43 @@ async function getAdmin() {
 /* =========================
    GET — BARCHA BUYURTMALAR
 ========================= */
-
 export async function GET() {
   try {
     const admin = await getAdmin();
-
     if (!admin) {
-      return NextResponse.json(
-        { error: "Admin ruxsati kerak" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Admin ruxsati kerak" }, { status: 403 });
     }
 
-    const redemptions = loadRedemptions();
+    const { data, error } = await supabase
+      .from("redemptions")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    // Har bir buyurtmaga foydalanuvchi ism/telefonini biriktiramiz
-    const enriched = redemptions.map((r) => {
-      const u = getUserById(r.userId);
-      return {
-        ...r,
-        userName: u?.name || r.userName || "",
-        userPhone: u?.phone || r.userPhone || "",
-        giftTitle: r.giftTitle || r.giftName || "",
-        cost: r.cost ?? r.coinsSpent ?? r.coins ?? 0,
-      };
-    });
+    if (error) {
+      console.error("REDEMPTIONS GET ERROR:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    const sorted = [...enriched].sort((a, b) => {
-      const dateA = new Date(a.createdAt || 0).getTime();
-      const dateB = new Date(b.createdAt || 0).getTime();
+    // Frontendga mos format
+    const redemptions = (data || []).map((r) => ({
+      id: r.id,
+      userId: r.user_id,
+      userName: r.user_name || r.user_id || "",
+      userPhone: r.user_phone || "",
+      giftTitle: r.gift_name || r.gift_title || "",
+      giftName: r.gift_name || "",
+      cost: r.coins_spent || r.cost || r.coins || 0,
+      coins: r.coins_spent || r.coins || 0,
+      status: r.status || "pending",
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    }));
 
-      return dateB - dateA;
-    });
-
-    return NextResponse.json({
-      redemptions: sorted,
-    });
+    return NextResponse.json({ redemptions });
   } catch (error) {
     console.error("ADMIN REDEMPTIONS GET ERROR:", error);
-
     return NextResponse.json(
-      {
-        error:
-          "Server xatosi: " +
-          (error?.message || "Noma'lum"),
-      },
+      { error: "Server xatosi: " + (error?.message || "Noma'lum") },
       { status: 500 }
     );
   }
@@ -127,64 +71,49 @@ export async function GET() {
 /* =========================
    PATCH — STATUS O'ZGARTIRISH
 ========================= */
-
 export async function PATCH(req) {
   try {
     const admin = await getAdmin();
-
     if (!admin) {
-      return NextResponse.json(
-        { error: "Admin ruxsati kerak" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Admin ruxsati kerak" }, { status: 403 });
     }
 
     const body = await req.json();
-
     const { id, status } = body;
 
-    // Frontend "completed" / "rejected" / "pending" yuboradi
-    const allowedStatuses = ["pending", "completed", "rejected"];
+    const allowedStatuses = ["pending", "completed", "rejected", "cancelled"];
 
     if (!allowedStatuses.includes(status)) {
-      return NextResponse.json(
-        { error: "Noto'g'ri status" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Noto'g'ri status" }, { status: 400 });
     }
 
-    const list = loadRedemptions();
+    const { data, error } = await supabase
+      .from("redemptions")
+      .update({
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
 
-    const index = list.findIndex(
-      (item) =>
-        String(item.id) === String(id)
-    );
-
-    if (index === -1) {
-      return NextResponse.json(
-        { error: "Buyurtma topilmadi" },
-        { status: 404 }
-      );
+    if (error) {
+      console.error("REDEMPTIONS PATCH ERROR:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    list[index].status = status;
-    list[index].updatedAt = new Date().toISOString();
-
-    saveRedemptions(list);
+    if (!data) {
+      return NextResponse.json({ error: "Buyurtma topilmadi" }, { status: 404 });
+    }
 
     return NextResponse.json({
       success: true,
-      redemption: list[index],
+      redemption: data,
     });
   } catch (error) {
     console.error("ADMIN REDEMPTIONS PATCH ERROR:", error);
-
     return NextResponse.json(
-      {
-        error:
-          "Server xatosi: " +
-          (error?.message || "Noma'lum"),
-      },
+      { error: "Server xatosi: " + (error?.message || "Noma'lum") },
       { status: 500 }
     );
   }
