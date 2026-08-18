@@ -13,6 +13,7 @@ const LANGS = [
 
 const NAV_LINKS = [
   { href: "/xonalar", label: "Sovg'alar" },
+  { href: "https://husmahotel.uz/booking?date=2026-08-17&nights=1&adults=2&children-age=", label: "Xona olish" },
   { href: "/karta", label: "Mening kartam" },
 ];
 

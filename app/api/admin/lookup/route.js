@@ -1,3 +1,5 @@
+// FAYL: app/api/admin/lookup/route.js
+
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
@@ -17,7 +19,8 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const admin = getUserById(session.id);
+    // MUHIM: await qo'shildi
+    const admin = await getUserById(session.id);
     if (!admin || admin.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -32,7 +35,8 @@ export async function GET(req) {
       );
     }
 
-    const target = getUserByCardNumber(card);
+    // MUHIM: await qo'shildi
+    const target = await getUserByCardNumber(card);
     if (!target) {
       return NextResponse.json(
         { error: "Bu karta raqami bo'yicha foydalanuvchi topilmadi" },

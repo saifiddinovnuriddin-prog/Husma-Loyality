@@ -41,15 +41,15 @@ const cards = [
     gradient: 'linear-gradient(135deg, #E8C547 0%, #C9A227 45%, #8B6914 100%)',
     text: '#1F1500',
   },
-  {
-    id: 4,
-    name: 'HUSMA',
-    level: 'DIAMOND',
-    short: 'DIAMOND',
-    number: '•••• 8743',
-    gradient: 'linear-gradient(135deg, #E8C547 0%, #C9A227 45%, #8B6914 100%)',
-    text: '#1F1500',
-  },
+{
+  id: 4,
+  name: 'HUSMA',
+  level: 'DIAMOND',
+  short: 'DIAMOND',
+  number: '•••• 8743',
+  gradient: 'linear-gradient(135deg, #E0F7FA 0%, #80DEEA 45%, #00838F 100%)',
+  text: '#002B36',
+},
 ]
 
 export default function HeroSection() {

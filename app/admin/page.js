@@ -11,7 +11,6 @@ import {
   LogOut,
   Home,
   Search,
-  Crown,
   Gift,
   Bell,
   Menu,
@@ -27,6 +26,8 @@ import {
   Trash2,
   ShieldCheck,
   MessageSquare,
+  MinusCircle,
+  PlusCircle,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -37,15 +38,44 @@ const NAV_ITEMS = [
   { id: "settings", icon: Settings, label: "Sozlamalar" },
 ];
 
-// 4 TA DARAJA UCHUN STIL:
+const LEVELS = [
+  { key: "Standard", name: "Standard", minCoins: 0 },
+  { key: "Bronze",   name: "Bronze",   minCoins: 99000 },
+  { key: "Silver",   name: "Silver",   minCoins: 199000 },
+  { key: "Gold",     name: "Gold",     minCoins: 399000 },
+  { key: "Platinum", name: "Platinum", minCoins: 599000 },
+  { key: "Diamond",  name: "Diamond",  minCoins: 799000 },
+  { key: "VIP",      name: "VIP",      minCoins: 999000 },
+];
+
 const TIER_STYLES = {
-  Bronza: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-  Platina: "bg-slate-400/15 text-slate-300 border-slate-400/30",
-  Gold: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-  Diamond: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+  Standard: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
+  Bronze:   "bg-amber-600/15 text-amber-400 border-amber-600/30",
+  Silver:   "bg-slate-400/15 text-slate-300 border-slate-400/30",
+  Gold:     "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+  Platinum: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+  Diamond:  "bg-sky-500/15 text-sky-300 border-sky-400/40",
+  VIP:      "bg-purple-500/15 text-purple-300 border-purple-400/40",
 };
 
-const QUICK_AMOUNTS = [20, 50, 100, 200];
+// 1 coin necha so'mga teng — kassada to'lov summasini hisoblash uchun.
+// Bu qiymat /api/admin/coins/spend endpointidagi SOM_PER_COIN bilan bir xil bo'lishi shart.
+const SOM_PER_COIN = 10000;
+
+function getLevelByCoins(coins) {
+  const amount = Number(coins) || 0;
+  return (
+    [...LEVELS].reverse().find((l) => amount >= l.minCoins) || LEVELS[0]
+  );
+}
+
+// Endi daraja foizi ishlatilmaydi — coin qo'shish faqat SOM_PER_COIN
+// nisbati bo'yicha hisoblanadi (masalan 100 so'm = 1 coin).
+function calcCoinsFromPurchase(sum) {
+  const s = Number(sum) || 0;
+  if (s <= 0) return 0;
+  return Math.floor(s / SOM_PER_COIN);
+}
 
 function initials(name = "") {
   return name
@@ -81,30 +111,33 @@ export default function AdminPage() {
   const router = useRouter();
 
   const topRef = useRef(null);
-  const usersRef = useRef(null);
 
-  // ===== Skaner holati =====
+  // Skaner
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scanActive, setScanActive] = useState(false);
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState(null);
   const [scannedUser, setScannedUser] = useState(null);
   const [manualCard, setManualCard] = useState("");
-  const [customAmount, setCustomAmount] = useState("");
+  const [spentAmount, setSpentAmount] = useState("");
   const [scanSubmitting, setScanSubmitting] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(null);
 
-  // ===== Sovg'alar (Redemptions) =====
+  // YANGI: rejim — "earn" (coin qo'shish) yoki "spend" (coin bilan to'lash)
+  const [scanMode, setScanMode] = useState("earn");
+  const [coinsToUse, setCoinsToUse] = useState("");
+
+  // Sovg'alar
   const [redemptions, setRedemptions] = useState([]);
   const [redemptionsLoading, setRedemptionsLoading] = useState(false);
   const [redemptionActionLoading, setRedemptionActionLoading] = useState(null);
 
-  // ===== Bildirishnomalar (feedback) =====
+  // Bildirishnomalar
   const [feedbackList, setFeedbackList] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackActionLoading, setFeedbackActionLoading] = useState(null);
 
-  // ===== Profil (parol / telefon) =====
+  // Profil
   const [profilePhone, setProfilePhone] = useState("");
   const [profileCurrentPassword, setProfileCurrentPassword] = useState("");
   const [profilePassword, setProfilePassword] = useState("");
@@ -148,11 +181,8 @@ export default function AdminPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // user yuklangach telefon inputini joriy qiymat bilan to'ldiramiz
   useEffect(() => {
-    if (user?.phone) {
-      setProfilePhone(user.phone);
-    }
+    if (user?.phone) setProfilePhone(user.phone);
   }, [user]);
 
   const loadRedemptions = async () => {
@@ -160,15 +190,9 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/redemptions");
       const data = await res.json();
-
-      if (res.ok) {
-        setRedemptions(data.redemptions || []);
-      } else {
-        console.error("Redemptions error:", data);
-        setToast(data.error || "Buyurtmalarni yuklashda xatolik");
-      }
-    } catch (e) {
-      console.error(e);
+      if (res.ok) setRedemptions(data.redemptions || []);
+      else setToast(data.error || "Buyurtmalarni yuklashda xatolik");
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setRedemptionsLoading(false);
@@ -191,8 +215,7 @@ export default function AdminPage() {
         const data = await res.json();
         setToast(data.error || "Xatolik yuz berdi");
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setRedemptionActionLoading(null);
@@ -203,15 +226,9 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/feedback");
       const data = await res.json();
-
-      if (res.ok) {
-        setFeedbackList(data.feedback || []);
-      } else {
-        console.error("Feedback error:", data);
-        setToast(data.error || "Bildirishnomalarni yuklashda xatolik");
-      }
-    } catch (e) {
-      console.error(e);
+      if (res.ok) setFeedbackList(data.feedback || []);
+      else setToast(data.error || "Bildirishnomalarni yuklashda xatolik");
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setFeedbackLoading(false);
@@ -233,8 +250,7 @@ export default function AdminPage() {
         const data = await res.json();
         setToast(data.error || "Xatolik yuz berdi");
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setFeedbackActionLoading(null);
@@ -266,57 +282,26 @@ export default function AdminPage() {
       } else {
         setToast(data.error || "Xatolik yuz berdi");
       }
-    } catch (err) {
-      console.error(err);
-      setToast("Server bilan bog'lanishda xatolik");
-    }
-    setActionLoading(null);
-  };
-
-  const changeTier = async (userId, tier) => {
-    setActionLoading(userId);
-    try {
-      const res = await fetch("/api/admin/tier", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, tier }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsers((prev) =>
-          prev.map((u) => (u.id === userId ? { ...u, tier: data.tier } : u))
-        );
-      } else {
-        setToast(data.error || "Xatolik yuz berdi");
-      }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setActionLoading(null);
   };
 
   const deleteUser = async (userId, userName, isProtected) => {
-    // Admin o'zini o'chira olmasin
     if (userId === user?.id) {
       setToast("O'zingizni o'chira olmaysiz");
       return;
     }
-
     if (isProtected) {
       setToast("Bu foydalanuvchi Save qilingan! Uni o'chira olmaysiz.");
       return;
     }
-
-    if (!confirm(`${userName} nomli foydalanuvchini o'chirishni tasdiqlaysizmi?`)) {
-      return;
-    }
+    if (!confirm(`${userName} nomli foydalanuvchini o'chirishni tasdiqlaysizmi?`)) return;
 
     setActionLoading(userId);
     try {
-      const res = await fetch(`/api/admin/users?id=${userId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/admin/users?id=${userId}`, { method: "DELETE" });
       if (res.ok) {
         setUsers((prev) => prev.filter((u) => u.id !== userId));
         setToast("Foydalanuvchi o'chirildi");
@@ -324,20 +309,17 @@ export default function AdminPage() {
         const data = await res.json();
         setToast(data.error || "O'chirishda xatolik");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setActionLoading(null);
   };
 
   const toggleSaveUser = async (userId, currentProtected) => {
-    // Admin o'zini Save qila olmasin (o'ziga nisbatan bu tugma ma'nosiz)
     if (userId === user?.id) {
       setToast("O'zingizni Save qila olmaysiz");
       return;
     }
-
     setActionLoading(userId);
     const newStatus = !currentProtected;
     try {
@@ -350,17 +332,12 @@ export default function AdminPage() {
         setUsers((prev) =>
           prev.map((u) => (u.id === userId ? { ...u, isProtected: newStatus } : u))
         );
-        setToast(
-          newStatus
-            ? "Foydalanuvchi Saqlandi (Endi o'chmaydi!)"
-            : "Himoya olib tashlandi"
-        );
+        setToast(newStatus ? "Foydalanuvchi Saqlandi" : "Himoya olib tashlandi");
       } else {
         const data = await res.json();
         setToast(data.error || "Xatolik yuz berdi");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setToast("Server bilan bog'lanishda xatolik");
     }
     setActionLoading(null);
@@ -379,7 +356,9 @@ export default function AdminPage() {
     setScanError(null);
     setScanSuccess(null);
     setManualCard("");
-    setCustomAmount("");
+    setSpentAmount("");
+    setCoinsToUse("");
+    setScanMode("earn");
   };
 
   const closeScanner = () => {
@@ -389,7 +368,9 @@ export default function AdminPage() {
     setScanError(null);
     setScanSuccess(null);
     setManualCard("");
-    setCustomAmount("");
+    setSpentAmount("");
+    setCoinsToUse("");
+    setScanMode("earn");
   };
 
   const lookupCard = async (rawCard) => {
@@ -402,17 +383,11 @@ export default function AdminPage() {
     setScanSuccess(null);
 
     try {
-      const res = await fetch(
-        `/api/admin/lookup?card=${encodeURIComponent(card)}`
-      );
+      const res = await fetch(`/api/admin/lookup?card=${encodeURIComponent(card)}`);
       const data = await res.json();
-      if (res.ok) {
-        setScannedUser(data.user);
-      } else {
-        setScanError(data.error || "Foydalanuvchi topilmadi");
-      }
-    } catch (err) {
-      console.error(err);
+      if (res.ok) setScannedUser(data.user);
+      else setScanError(data.error || "Foydalanuvchi topilmadi");
+    } catch {
       setScanError("Server bilan bog'lanishda xatolik");
     }
     setScanLoading(false);
@@ -423,15 +398,27 @@ export default function AdminPage() {
     setScanError(null);
     setScanSuccess(null);
     setManualCard("");
-    setCustomAmount("");
+    setSpentAmount("");
+    setCoinsToUse("");
+    setScanMode("earn");
     setScanActive(true);
   };
 
-  const submitScanCoins = async (amount) => {
-    if (!scannedUser || !amount) return;
+  // ===== Coin QO'SHISH (xarid qilinganda) =====
+  const submitScanSpent = async () => {
+    if (!scannedUser) return;
+    const spent = Number(spentAmount);
+    if (!spent || spent <= 0) return;
 
     if (scannedUser.id === user?.id) {
       setScanError("O'zingizga coin qo'sha olmaysiz");
+      return;
+    }
+
+    const coinsToAdd = calcCoinsFromPurchase(spent);
+
+    if (coinsToAdd <= 0) {
+      setScanError(`Hisoblangan coin 0 dan katta bo'lishi kerak (minimal ${SOM_PER_COIN} so'm kerak)`);
       return;
     }
 
@@ -441,9 +428,76 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/coins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: scannedUser.id, amount }),
+        body: JSON.stringify({
+          userId: scannedUser.id,
+          amount: coinsToAdd,
+          spent: spent,
+        }),
       });
       const data = await res.json();
+      if (res.ok) {
+        setScannedUser((prev) => ({
+          ...prev,
+          coins: data.coins,
+          totalSpent: data.totalSpent ?? (prev.totalSpent || 0) + spent,
+        }));
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === scannedUser.id
+              ? {
+                  ...u,
+                  coins: data.coins,
+                  totalSpent: data.totalSpent ?? (u.totalSpent || 0) + spent,
+                }
+              : u
+          )
+        );
+        setScanSuccess(
+          `+${coinsToAdd} coin qo'shildi (${spent.toLocaleString()} so'm ÷ ${SOM_PER_COIN})`
+        );
+        setSpentAmount("");
+      } else {
+        setScanError(data.error || "Xatolik yuz berdi");
+      }
+    } catch {
+      setScanError("Server bilan bog'lanishda xatolik");
+    }
+    setScanSubmitting(false);
+  };
+
+  // ===== YANGI: Coin BILAN TO'LASH (kassada, Korzinka kartadagidek) =====
+  const submitSpendCoins = async () => {
+    if (!scannedUser) return;
+    const spend = Number(coinsToUse);
+
+    if (!spend || spend <= 0) {
+      setScanError("Coin miqdorini kiriting");
+      return;
+    }
+
+    if (spend > (scannedUser.coins || 0)) {
+      setScanError(`Balansda yetarli coin yo'q. Mavjud: ${scannedUser.coins}`);
+      return;
+    }
+
+    if (scannedUser.id === user?.id) {
+      setScanError("O'zingizga amal bajara olmaysiz");
+      return;
+    }
+
+    setScanSubmitting(true);
+    setScanError(null);
+    try {
+      const res = await fetch("/api/admin/coins/spend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: scannedUser.id,
+          coinsToSpend: spend,
+        }),
+      });
+      const data = await res.json();
+
       if (res.ok) {
         setScannedUser((prev) => ({ ...prev, coins: data.coins }));
         setUsers((prev) =>
@@ -451,13 +505,14 @@ export default function AdminPage() {
             u.id === scannedUser.id ? { ...u, coins: data.coins } : u
           )
         );
-        setScanSuccess(`+${amount} coin qo'shildi`);
-        setCustomAmount("");
+        setScanSuccess(
+          `−${data.spent} coin ishlatildi (${(data.spent * SOM_PER_COIN).toLocaleString()} so'mga teng). Qolgan balans: ${data.coins}`
+        );
+        setCoinsToUse("");
       } else {
         setScanError(data.error || "Xatolik yuz berdi");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setScanError("Server bilan bog'lanishda xatolik");
     }
     setScanSubmitting(false);
@@ -483,7 +538,6 @@ export default function AdminPage() {
       loadFeedback();
       return;
     }
-
     if (item.id === "settings") {
       setProfileError(null);
       setProfileSuccess(null);
@@ -502,7 +556,6 @@ export default function AdminPage() {
     );
   }, [users, query]);
 
-  // ===== Profilni yangilash (parol / telefon raqami) =====
   const updateProfile = async (e) => {
     e.preventDefault();
     setProfileError(null);
@@ -557,8 +610,7 @@ export default function AdminPage() {
       } else {
         setProfileError(data.error || "Xatolik yuz berdi");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setProfileError("Server bilan bog'lanishda xatolik");
     }
     setProfileLoading(false);
@@ -594,13 +646,13 @@ export default function AdminPage() {
           <button
             key={item.id}
             onClick={() => handleNavClick(item)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-left relative ${
+            className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition text-left relative ${
               activeNav === item.id
                 ? "bg-red-600/15 text-red-400 border border-red-500/20"
                 : "text-neutral-400 hover:bg-neutral-900 hover:text-white"
             }`}
           >
-            <item.icon size={17} />
+            <item.icon size={18} />
             <span className="flex-1">{item.label}</span>
             {item.id === "notifications" && unreadFeedbackCount > 0 && (
               <span className="flex items-center justify-center h-5 min-w-[20px] px-1 rounded-full bg-red-600 text-white text-[10px] font-bold">
@@ -614,16 +666,16 @@ export default function AdminPage() {
       <div className="mt-auto pt-4 border-t border-neutral-800 flex flex-col gap-1">
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-400 hover:bg-neutral-900 hover:text-white transition"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-neutral-400 hover:bg-neutral-900 hover:text-white transition"
         >
-          <Home size={17} />
+          <Home size={18} />
           Bosh sahifa
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
         >
-          <LogOut size={17} />
+          <LogOut size={18} />
           Chiqish
         </button>
       </div>
@@ -631,83 +683,73 @@ export default function AdminPage() {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex overflow-x-hidden">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-2.5 text-sm text-white shadow-2xl shadow-black/40">
+        <div className="fixed top-4 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-sm text-white shadow-2xl shadow-black/40 text-center sm:text-left max-w-sm sm:max-w-none mx-auto sm:mx-0">
           {toast}
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-neutral-800 bg-black/40 px-4 py-6">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-neutral-800 bg-black/40 px-4 py-6 sticky top-0 h-screen">
         {SidebarContent}
       </aside>
 
-      {/* Mobile sidebar drawer */}
+      {/* Mobile sidebar */}
       {mobileNavOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setMobileNavOpen(false)}
-          />
-          <aside className="relative flex flex-col w-64 bg-neutral-950 border-r border-neutral-800 px-4 py-6 z-50">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setMobileNavOpen(false)} />
+          <aside className="relative flex flex-col w-[min(300px,88vw)] bg-neutral-950 border-r border-neutral-800 px-4 py-6 z-50 h-full">
             <button
               onClick={() => setMobileNavOpen(false)}
-              className="absolute top-4 right-4 text-neutral-500 hover:text-white transition"
+              className="absolute top-4 right-4 p-2 text-neutral-500 hover:text-white transition rounded-lg hover:bg-neutral-900"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
             {SidebarContent}
           </aside>
         </div>
       )}
 
-      {/* ===== QR SKANER MODAL ===== */}
+      {/* ===================== QR SKANER MODAL ===================== */}
       {scannerOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={closeScanner}
-          />
-          <div className="relative w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-950 shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-800">
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={closeScanner} />
+          <div className="relative w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-neutral-800 bg-neutral-950 shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-5 py-4 border-b border-neutral-800 bg-neutral-950">
               <div className="flex items-center gap-2">
                 <ScanLine size={18} className="text-red-400" />
-                <h3 className="font-semibold text-white">Mijozni skanerlash</h3>
+                <h3 className="font-semibold text-white text-base">Mijozni skanerlash</h3>
               </div>
               <button
                 onClick={closeScanner}
-                className="text-neutral-500 hover:text-white transition"
+                className="text-neutral-500 hover:text-white transition p-2 -mr-1 rounded-lg hover:bg-neutral-900"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="p-5">
+            <div className="p-4 sm:p-5">
               {!scannedUser && !scanLoading && (
                 <>
-                  <QrScanner
-                    active={scanActive}
-                    onResult={(text) => lookupCard(text)}
-                    onError={() => {}}
-                  />
+                  <QrScanner active={scanActive} onResult={(text) => lookupCard(text)} onError={() => {}} />
 
                   <div className="mt-4">
                     <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
-                      Yoki karta raqamini qo'lda kiriting
+                      Yoki karta raqamini qo&apos;lda kiriting
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <input
                         value={manualCard}
                         onChange={(e) => setManualCard(e.target.value)}
                         placeholder="0000 0000 0000"
-                        className="flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
+                        className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
                       />
                       <button
                         onClick={() => lookupCard(manualCard)}
                         disabled={!manualCard.trim()}
-                        className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="w-full rounded-xl bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         Qidirish
                       </button>
@@ -715,8 +757,8 @@ export default function AdminPage() {
                   </div>
 
                   {scanError && (
-                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-300">
-                      <AlertCircle size={14} className="shrink-0" />
+                    <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-3 text-sm text-red-300">
+                      <AlertCircle size={16} className="shrink-0" />
                       {scanError}
                     </div>
                   )}
@@ -724,36 +766,40 @@ export default function AdminPage() {
               )}
 
               {scanLoading && (
-                <div className="py-16 text-center text-sm text-neutral-500">
-                  Qidirilmoqda...
-                </div>
+                <div className="py-16 text-center text-sm text-neutral-500">Qidirilmoqda...</div>
               )}
 
               {scannedUser && !scanLoading && (
                 <div>
-                  <div className="flex items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 py-3 mb-5">
-                    <div className="h-11 w-11 shrink-0 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-sm font-bold text-neutral-300">
+                  {/* Mijoz kartasi */}
+                  <div className="flex items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 sm:px-4 py-3.5 mb-5">
+                    <div className="h-12 w-12 shrink-0 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-sm font-bold text-neutral-300">
                       {initials(scannedUser.name)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-white truncate">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-medium text-white truncate text-base">
                           {scannedUser.name}
                         </span>
-                        <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${
-                            TIER_STYLES[scannedUser.tier] || TIER_STYLES.Bronza
-                          }`}
-                        >
-                          {scannedUser.tier || "Bronza"}
-                        </span>
+                        {(() => {
+                          const lvl = getLevelByCoins(scannedUser.coins);
+                          return (
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${
+                                TIER_STYLES[lvl.key] || TIER_STYLES.Bronza
+                              }`}
+                            >
+                              {lvl.name}
+                            </span>
+                          );
+                        })()}
                       </div>
-                      <p className="text-xs text-neutral-500">
-                        {scannedUser.phone}
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        {scannedUser.phone || scannedUser.card}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-lg font-bold text-amber-400">
+                      <p className="text-xl font-bold text-amber-400">
                         {(scannedUser.coins || 0).toLocaleString()}
                       </p>
                       <p className="text-[10px] text-neutral-500">coin</p>
@@ -761,63 +807,163 @@ export default function AdminPage() {
                   </div>
 
                   {scannedUser.id === user.id ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/60 px-3 py-2.5 text-xs text-neutral-400">
-                      <Lock size={14} className="shrink-0" />
-                      O'zingizga coin qo'sha olmaysiz
+                    <div className="flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900/60 px-3 py-3 text-sm text-neutral-400">
+                      <Lock size={16} className="shrink-0" />
+                      O&apos;zingizga amal bajara olmaysiz
                     </div>
                   ) : (
                     <>
-                      <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
-                        Necha coin qo'shamiz?
-                      </label>
-                      <div className="grid grid-cols-4 gap-2 mb-3">
-                        {QUICK_AMOUNTS.map((amt) => (
-                          <button
-                            key={amt}
-                            onClick={() => submitScanCoins(amt)}
-                            disabled={scanSubmitting}
-                            className="rounded-lg bg-red-600/20 border border-red-500/30 text-red-400 text-sm font-medium py-2.5 hover:bg-red-600/30 transition disabled:opacity-50"
-                          >
-                            +{amt}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          value={customAmount}
-                          onChange={(e) => setCustomAmount(e.target.value)}
-                          placeholder="Boshqa miqdor"
-                          className="flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
-                        />
+                      {/* YANGI: rejim tanlash — Coin qo'shish / Coin bilan to'lash */}
+                      <div className="grid grid-cols-2 gap-2 mb-4">
                         <button
-                          onClick={() => submitScanCoins(Number(customAmount))}
-                          disabled={!customAmount || scanSubmitting}
-                          className="rounded-lg bg-neutral-800 border border-neutral-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                          onClick={() => {
+                            setScanMode("earn");
+                            setScanError(null);
+                            setScanSuccess(null);
+                          }}
+                          className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-medium border transition ${
+                            scanMode === "earn"
+                              ? "border-amber-500/40 bg-amber-600/15 text-amber-400"
+                              : "border-neutral-700 bg-neutral-900 text-neutral-400 hover:bg-neutral-800"
+                          }`}
                         >
-                          Qo'shish
+                          <PlusCircle size={15} />
+                          Coin qo&apos;shish
+                        </button>
+                        <button
+                          onClick={() => {
+                            setScanMode("spend");
+                            setScanError(null);
+                            setScanSuccess(null);
+                          }}
+                          className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-medium border transition ${
+                            scanMode === "spend"
+                              ? "border-red-500/40 bg-red-600/15 text-red-400"
+                              : "border-neutral-700 bg-neutral-900 text-neutral-400 hover:bg-neutral-800"
+                          }`}
+                        >
+                          <MinusCircle size={15} />
+                          Coin bilan to&apos;lash
                         </button>
                       </div>
+
+                      {scanMode === "earn" ? (
+                        <>
+                          {/* Xarid summasi */}
+                          <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
+                            Xarid summasi (so&apos;m)
+                          </label>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            value={spentAmount}
+                            onChange={(e) => setSpentAmount(e.target.value)}
+                            placeholder="Masalan: 800000"
+                            className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition mb-3"
+                          />
+
+                          {/* Avtomatik hisoblangan coin */}
+                          {spentAmount && Number(spentAmount) > 0 && (() => {
+                            const coins = calcCoinsFromPurchase(spentAmount);
+                            return (
+                              <div className="mb-4 rounded-xl bg-neutral-900/80 border border-neutral-800 px-4 py-3 flex items-center justify-between">
+                                <div>
+                                  <p className="text-xs text-neutral-500">Qo&apos;shiladigan coin</p>
+                                  <p className="text-lg font-bold text-amber-400">
+                                    +{coins.toLocaleString()} coin
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[10px] text-neutral-500">Nisbat</p>
+                                  <p className="text-sm font-semibold text-white">
+                                    {SOM_PER_COIN} so&apos;m = 1 coin
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          <button
+                            onClick={submitScanSpent}
+                            disabled={!spentAmount || Number(spentAmount) <= 0 || scanSubmitting}
+                            className="w-full rounded-xl bg-red-600 px-4 py-3.5 text-sm font-medium text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {scanSubmitting ? "Qo'shilmoqda..." : "Qo'shish"}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {/* YANGI: coin bilan to'lash (kassada) */}
+                          <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
+                            Ishlatiladigan coin
+                          </label>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            value={coinsToUse}
+                            onChange={(e) => setCoinsToUse(e.target.value)}
+                            placeholder={`Maksimal: ${scannedUser.coins || 0}`}
+                            max={scannedUser.coins || 0}
+                            className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition mb-3"
+                          />
+
+                          {coinsToUse && Number(coinsToUse) > 0 && (
+                            <div className="mb-4 rounded-xl bg-neutral-900/80 border border-neutral-800 px-4 py-3 space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-neutral-500">Ishlatiladi</span>
+                                <span className="text-lg font-bold text-red-400">
+                                  −{Number(coinsToUse).toLocaleString()} coin
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-neutral-500">
+                                <span>Chekdan ayiriladi</span>
+                                <span className="text-neutral-300 font-medium">
+                                  ≈ {(Number(coinsToUse) * SOM_PER_COIN).toLocaleString()} so&apos;m
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between pt-1.5 border-t border-neutral-800">
+                                <span className="text-xs text-neutral-500">Qoladigan balans</span>
+                                <span className="text-sm font-semibold text-white">
+                                  {((scannedUser.coins || 0) - Number(coinsToUse)).toLocaleString()} coin
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          <button
+                            onClick={submitSpendCoins}
+                            disabled={
+                              !coinsToUse ||
+                              Number(coinsToUse) <= 0 ||
+                              Number(coinsToUse) > (scannedUser.coins || 0) ||
+                              scanSubmitting
+                            }
+                            className="w-full rounded-xl bg-red-600 px-4 py-3.5 text-sm font-medium text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {scanSubmitting ? "Bajarilmoqda..." : "To'lovni tasdiqlash"}
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
 
                   {scanSuccess && (
-                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-xs text-emerald-300">
-                      <CheckCircle2 size={14} className="shrink-0" />
+                    <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-300">
+                      <CheckCircle2 size={16} className="shrink-0" />
                       {scanSuccess}
                     </div>
                   )}
+
                   {scanError && (
-                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-300">
-                      <AlertCircle size={14} className="shrink-0" />
+                    <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-3 text-sm text-red-300">
+                      <AlertCircle size={16} className="shrink-0" />
                       {scanError}
                     </div>
                   )}
 
                   <button
                     onClick={scanNext}
-                    className="mt-5 w-full rounded-lg border border-neutral-700 py-2.5 text-sm font-medium text-neutral-300 hover:bg-neutral-900 transition"
+                    className="mt-5 w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-sm font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white transition"
                   >
                     Boshqa mijozni skanerlash
                   </button>
@@ -828,142 +974,159 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 min-w-0">
-        <div ref={topRef} className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-10">
-          {/* Top bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setMobileNavOpen(true)}
-                className="lg:hidden h-9 w-9 rounded-lg border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white transition shrink-0"
-              >
-                <Menu size={17} />
-              </button>
-              <div>
-                <p className="text-sm text-neutral-500 mb-1">Admin panel</p>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">
-                  Salom, {user.name}
-                </h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={openScanner}
-                className="hidden sm:flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 transition shadow-lg shadow-red-600/20"
-              >
-                <QrCode size={16} />
-                Mijozni skanerlash
-              </button>
-              <div className="hidden sm:flex items-center justify-center gap-2 rounded-full h-9 w-9 bg-neutral-900 border border-neutral-800 text-red-400 font-bold text-xs">
-                {initials(user.name)}
-              </div>
-              <div className="lg:hidden flex items-center gap-2">
-                <Link
-                  href="/"
-                  className="text-xs text-neutral-400 hover:text-white transition px-3 py-2"
-                >
-                  Bosh sahifa
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-xs text-red-400 hover:text-red-300 transition px-3 py-2"
-                >
-                  Chiqish
-                </button>
-              </div>
-            </div>
-          </div>
-
+      {/* ===================== MAIN CONTENT ===================== */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile top bar */}
+        <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between gap-3 px-4 py-3 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
           <button
-            onClick={openScanner}
-            className="sm:hidden w-full mb-6 flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-500 transition shadow-lg shadow-red-600/20"
+            onClick={() => setMobileNavOpen(true)}
+            className="p-2 -ml-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-900 transition"
           >
-            <QrCode size={16} />
-            Mijozni skanerlash
+            <Menu size={22} />
           </button>
+          <span className="font-bold text-white text-sm">
+            HUSMA <span className="text-red-500">Admin</span>
+          </span>
+          <div className="w-9" />
+        </div>
 
-          {/* ===== FOYDALANUVCHILAR ===== */}
+        <div ref={topRef} className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto">
+          {/* Stats */}
           {activeNav === "users" && (
             <>
-              {/* Stat cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-red-600/15 flex items-center justify-center text-red-400 shrink-0">
-                    <Users size={20} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 sm:p-5">
+                  <div className="flex items-center gap-2 text-neutral-500 text-xs mb-1">
+                    <Users size={14} />
+                    Jami foydalanuvchilar
                   </div>
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Foydalanuvchilar</p>
-                    <p className="text-2xl font-bold text-white">{totalUsers}</p>
-                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-white">{totalUsers}</p>
                 </div>
-
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
-                    <Coins size={20} />
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 sm:p-5">
+                  <div className="flex items-center gap-2 text-neutral-500 text-xs mb-1">
+                    <Coins size={14} />
+                    Jami coinlar
                   </div>
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Jami coinlar</p>
-                    <p className="text-2xl font-bold text-amber-400">
-                      {totalCoins.toLocaleString()}
-                    </p>
-                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-amber-400">
+                    {totalCoins.toLocaleString()}
+                  </p>
                 </div>
-
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 shrink-0">
-                    <Wallet size={20} />
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 sm:p-5">
+                  <div className="flex items-center gap-2 text-neutral-500 text-xs mb-1">
+                    <Wallet size={14} />
+                    Jami xarajat
                   </div>
-                  <div>
-                    <p className="text-xs text-neutral-500 mb-1">Jami xarajat</p>
-                    <p className="text-2xl font-bold text-white">
-                      {totalSpent.toLocaleString()}{" "}
-                      <span className="text-sm font-medium text-neutral-500">so&apos;m</span>
-                    </p>
-                  </div>
+                  <p className="text-2xl sm:text-3xl font-black text-white">
+                    {totalSpent.toLocaleString()} so&apos;m
+                  </p>
                 </div>
               </div>
 
-              {/* Information table */}
-              <div
-                ref={usersRef}
-                className="rounded-2xl border border-neutral-800 overflow-hidden scroll-mt-6 bg-neutral-900/30"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 py-4 border-b border-neutral-800 bg-neutral-900/50">
-                  <div>
-                    <h2 className="font-semibold text-white flex items-center gap-2">
-                      <Info size={18} className="text-red-500" />
-                      <span>Information — Foydalanuvchilar ma'lumotlari</span>
-                    </h2>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      "Save" bosilgan foydalanuvchilar hech qachon o'chirib yuborilmaydi.
-                    </p>
-                  </div>
-                  <div className="relative w-full sm:w-64">
-                    <Search
-                      size={15}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
-                    />
-                    <input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Ism, telefon, karta yoki email..."
-                      className="w-full rounded-lg border border-neutral-700 bg-neutral-950 pl-9 pr-3 py-2 text-xs text-neutral-200 placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
-                    />
-                  </div>
+              {/* Search */}
+              <div className="relative mb-4 sm:mb-6">
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Ism, telefon, karta yoki email bo'yicha qidirish..."
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-900/60 pl-10 pr-4 py-3 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/40 transition"
+                />
+              </div>
+
+              {/* Users list */}
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 overflow-hidden">
+                {/* Mobile cards */}
+                <div className="md:hidden divide-y divide-neutral-800/60">
+                  {filteredUsers.length === 0 ? (
+                    <div className="px-4 py-12 text-center text-neutral-500 text-sm">
+                      {users.length === 0
+                        ? "Foydalanuvchilar mavjud emas"
+                        : "Qidiruv bo'yicha hechnarsa topilmadi"}
+                    </div>
+                  ) : (
+                    filteredUsers.map((u) => {
+                      const isSelf = u.id === user.id;
+                      const lvl = getLevelByCoins(u.coins);
+                      return (
+                        <div key={u.id} className="p-4 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="h-11 w-11 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-sm font-bold text-neutral-300 shrink-0">
+                              {initials(u.name)}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="font-medium text-white text-base">{u.name}</p>
+                                {isSelf && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-400">
+                                    Siz
+                                  </span>
+                                )}
+                                {u.isProtected && (
+                                  <ShieldCheck size={15} className="text-emerald-400" />
+                                )}
+                              </div>
+                              <p className="text-xs text-neutral-500 truncate mt-0.5">{u.email}</p>
+                              <p className="text-xs text-neutral-400 mt-1 font-mono">{u.card || "Karta yo'q"}</p>
+                              <p className="text-xs text-neutral-500">{u.phone}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="text-lg font-bold text-amber-400">
+                                {(u.coins || 0).toLocaleString()}
+                              </p>
+                              <p className="text-[10px] text-neutral-500">coin</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 text-sm">
+                            <span
+                              className={`text-xs px-2.5 py-1.5 rounded-full border font-medium ${
+                                TIER_STYLES[lvl.key] || TIER_STYLES.Bronza
+                              }`}
+                            >
+                              {lvl.name}
+                            </span>
+                            <p className="text-neutral-400 text-xs">
+                              {(u.totalSpent || 0).toLocaleString()} so&apos;m
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 flex-wrap pt-1">
+                            <button
+                              onClick={() => toggleSaveUser(u.id, u.isProtected)}
+                              disabled={actionLoading === u.id || isSelf}
+                              className={`flex-1 min-w-[70px] rounded-xl border px-3 py-2.5 text-xs font-medium transition disabled:opacity-30 ${
+                                u.isProtected
+                                  ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300"
+                                  : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                              }`}
+                            >
+                              {u.isProtected ? "Saved" : "Save"}
+                            </button>
+                            <button
+                              onClick={() => deleteUser(u.id, u.name, u.isProtected)}
+                              disabled={actionLoading === u.id || u.isProtected || isSelf}
+                              className="rounded-xl border border-red-900/40 bg-red-950/30 p-2.5 text-red-400 hover:bg-red-900/50 active:bg-red-900/70 transition disabled:opacity-30"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full min-w-[700px] text-sm">
                     <thead>
                       <tr className="border-b border-neutral-800 text-neutral-500 text-left">
-                        <th className="px-6 py-3 font-medium">Foydalanuvchi</th>
-                        <th className="px-6 py-3 font-medium">Karta / Telefon</th>
-                        <th className="px-6 py-3 font-medium">Daraja</th>
-                        <th className="px-6 py-3 font-medium">Coin</th>
-                        <th className="px-6 py-3 font-medium">Xarajat</th>
-                        <th className="px-6 py-3 font-medium">Amallar</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Foydalanuvchi</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Karta / Telefon</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Daraja</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Coin</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Xarajat</th>
+                        <th className="px-4 sm:px-6 py-3 font-medium">Amallar</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -978,12 +1141,13 @@ export default function AdminPage() {
                       ) : (
                         filteredUsers.map((u) => {
                           const isSelf = u.id === user.id;
+                          const lvl = getLevelByCoins(u.coins);
                           return (
                             <tr
                               key={u.id}
                               className="border-b border-neutral-800/60 hover:bg-neutral-900/40 transition"
                             >
-                              <td className="px-6 py-4">
+                              <td className="px-4 sm:px-6 py-3 sm:py-4">
                                 <div className="flex items-center gap-3">
                                   <div className="h-9 w-9 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-300 shrink-0">
                                     {initials(u.name)}
@@ -997,71 +1161,37 @@ export default function AdminPage() {
                                         </span>
                                       )}
                                       {u.isProtected && (
-                                        <ShieldCheck
-                                          size={14}
-                                          className="text-emerald-400 shrink-0"
-                                        />
+                                        <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
                                       )}
                                     </p>
                                     <p className="text-xs text-neutral-500 truncate">{u.email}</p>
                                   </div>
                                 </div>
                               </td>
-                              <td className="px-6 py-4">
-                                <p className="font-mono text-xs text-neutral-300">
-                                  {u.card || "Karta yo'q"}
-                                </p>
+                              <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                <p className="font-mono text-xs text-neutral-300">{u.card || "Karta yo'q"}</p>
                                 <p className="text-xs text-neutral-500">{u.phone}</p>
                               </td>
-                              <td className="px-6 py-4">
-                                <select
-                                  value={u.tier || "Bronza"}
-                                  onChange={(e) => changeTier(u.id, e.target.value)}
-                                  disabled={actionLoading === u.id}
-                                  className={`text-xs px-2.5 py-1 rounded-full border bg-neutral-950 font-medium outline-none cursor-pointer ${
-                                    TIER_STYLES[u.tier] || TIER_STYLES.Bronza
+                              <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                <span
+                                  className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
+                                    TIER_STYLES[lvl.key] || TIER_STYLES.Bronza
                                   }`}
                                 >
-                                  <option value="Bronza" className="bg-neutral-900 text-neutral-200">
-                                    Bronza
-                                  </option>
-                                  <option value="Kumush" className="bg-neutral-900 text-neutral-200">
-                                    Kumush
-                                  </option>
-                                  <option value="Oltin" className="bg-neutral-900 text-neutral-200">
-                                    Oltin
-                                  </option>
-                                  <option value="Platina" className="bg-neutral-900 text-neutral-200">
-                                    Platina
-                                  </option>
-                                </select>
+                                  {lvl.name}
+                                </span>
                               </td>
-                              <td className="px-6 py-4 font-bold text-amber-400">
+                              <td className="px-4 sm:px-6 py-3 sm:py-4 font-bold text-amber-400">
                                 {(u.coins || 0).toLocaleString()}
                               </td>
-                              <td className="px-6 py-4 text-neutral-300">
-                                {(u.totalSpent || 0).toLocaleString()} so'm
+                              <td className="px-4 sm:px-6 py-3 sm:py-4 text-neutral-300">
+                                {(u.totalSpent || 0).toLocaleString()} so&apos;m
                               </td>
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => addCoins(u.id, 10)}
-                                    disabled={actionLoading === u.id || isSelf}
-                                    className="rounded-lg border border-red-500/30 bg-red-600/10 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-600/20 transition disabled:opacity-30"
-                                  >
-                                    +10
-                                  </button>
-                                  <button
-                                    onClick={() => addCoins(u.id, 50)}
-                                    disabled={actionLoading === u.id || isSelf}
-                                    className="rounded-lg border border-amber-500/30 bg-amber-600/10 px-2.5 py-1.5 text-xs text-amber-400 hover:bg-amber-600/20 transition disabled:opacity-30"
-                                  >
-                                    +50
-                                  </button>
+                              <td className="px-4 sm:px-6 py-3 sm:py-4">
+                                <div className="flex items-center gap-1.5 flex-wrap">
                                   <button
                                     onClick={() => toggleSaveUser(u.id, u.isProtected)}
                                     disabled={actionLoading === u.id || isSelf}
-                                    title={isSelf ? "O'zingizni Save qila olmaysiz" : undefined}
                                     className={`rounded-lg border px-2.5 py-1.5 text-xs transition disabled:opacity-30 ${
                                       u.isProtected
                                         ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300"
@@ -1073,7 +1203,6 @@ export default function AdminPage() {
                                   <button
                                     onClick={() => deleteUser(u.id, u.name, u.isProtected)}
                                     disabled={actionLoading === u.id || u.isProtected || isSelf}
-                                    title={isSelf ? "O'zingizni o'chira olmaysiz" : "O'chirish"}
                                     className="rounded-lg border border-red-900/40 bg-red-950/30 p-1.5 text-red-400 hover:bg-red-900/50 transition disabled:opacity-30"
                                   >
                                     <Trash2 size={15} />
@@ -1091,25 +1220,25 @@ export default function AdminPage() {
             </>
           )}
 
-          {/* ===== SOVG'ALAR (REDEMPTIONS) ===== */}
+          {/* ===== SOVG'ALAR ===== */}
           {activeNav === "gifts" && (
-            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Gift size={20} className="text-red-500" />
-                    Sovg'a buyurtmalari
+            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6">
+              <div className="flex items-start sm:items-center justify-between mb-5 sm:mb-6 gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                    <Gift size={20} className="text-red-500 shrink-0" />
+                    Sovg&apos;a buyurtmalari
                   </h2>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Foydalanuvchilar tomonidan almashtirilgan sovg'alarni boshqaring.
+                    Foydalanuvchilar tomonidan almashtirilgan sovg&apos;alarni boshqaring.
                   </p>
                 </div>
                 <button
                   onClick={loadRedemptions}
                   disabled={redemptionsLoading}
-                  className="p-2 rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white transition"
+                  className="p-3 rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white active:bg-neutral-800 transition shrink-0"
                 >
-                  <RefreshCw size={16} className={redemptionsLoading ? "animate-spin" : ""} />
+                  <RefreshCw size={18} className={redemptionsLoading ? "animate-spin" : ""} />
                 </button>
               </div>
 
@@ -1117,18 +1246,18 @@ export default function AdminPage() {
                 <div className="py-12 text-center text-sm text-neutral-500">Yuklanmoqda...</div>
               ) : redemptions.length === 0 ? (
                 <div className="py-12 text-center text-sm text-neutral-500">
-                  Hali sovg'a buyurtmalari mavjud emas.
+                  Hali sovg&apos;a buyurtmalari mavjud emas.
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {redemptions.map((r) => (
                     <div
                       key={r.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-neutral-800 bg-neutral-900/50"
+                      className="flex flex-col gap-3 p-4 rounded-xl border border-neutral-800 bg-neutral-900/50"
                     >
-                      <div>
-                        <p className="font-semibold text-white">{r.giftTitle || r.title || "Sovg'a"}</p>
-                        <p className="text-xs text-neutral-400 mt-0.5">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-white text-base">{r.giftTitle || r.title || "Sovg'a"}</p>
+                        <p className="text-sm text-neutral-400 mt-1">
                           Foydalanuvchi: <span className="text-white">{r.userName || r.userId}</span>
                         </p>
                         <p className="text-xs text-neutral-500 mt-0.5">
@@ -1136,15 +1265,15 @@ export default function AdminPage() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-amber-400">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-base font-bold text-amber-400">
                           {r.cost || r.coins} coin
                         </span>
                         <select
                           value={r.status || "pending"}
                           onChange={(e) => updateRedemptionStatus(r.id, e.target.value)}
                           disabled={redemptionActionLoading === r.id}
-                          className="text-xs px-3 py-1.5 rounded-lg border border-neutral-700 bg-neutral-950 text-neutral-200 outline-none cursor-pointer"
+                          className="text-sm px-3 py-2 rounded-xl border border-neutral-700 bg-neutral-950 text-neutral-200 outline-none min-w-[130px]"
                         >
                           <option value="pending">Kutilmoqda</option>
                           <option value="completed">Bajarildi</option>
@@ -1158,13 +1287,13 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* ===== BILDIRISHNOMALAR (FEEDBACK) ===== */}
+          {/* ===== BILDIRISHNOMALAR ===== */}
           {activeNav === "notifications" && (
-            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Bell size={20} className="text-red-500" />
+            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6">
+              <div className="flex items-start sm:items-center justify-between mb-5 sm:mb-6 gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                    <Bell size={20} className="text-red-500 shrink-0" />
                     Fikr-mulohazalar
                   </h2>
                   <p className="text-xs text-neutral-500 mt-1">
@@ -1174,9 +1303,9 @@ export default function AdminPage() {
                 <button
                   onClick={loadFeedback}
                   disabled={feedbackLoading}
-                  className="p-2 rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white transition"
+                  className="p-3 rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white active:bg-neutral-800 transition shrink-0"
                 >
-                  <RefreshCw size={16} className={feedbackLoading ? "animate-spin" : ""} />
+                  <RefreshCw size={18} className={feedbackLoading ? "animate-spin" : ""} />
                 </button>
               </div>
 
@@ -1187,7 +1316,7 @@ export default function AdminPage() {
                   Bildirishnomalar mavjud emas.
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {feedbackList.map((f) => (
                     <div
                       key={f.id}
@@ -1197,20 +1326,25 @@ export default function AdminPage() {
                           : "border-red-500/30 bg-red-950/10 text-neutral-200"
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="flex items-center gap-2">
-                          <MessageSquare size={16} className={f.read ? "text-neutral-500" : "text-red-400"} />
-                          <span className="font-semibold text-white">{f.userName || f.email || "Foydalanuvchi"}</span>
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MessageSquare
+                            size={16}
+                            className={f.read ? "text-neutral-500 shrink-0" : "text-red-400 shrink-0"}
+                          />
+                          <span className="font-semibold text-white truncate text-sm sm:text-base">
+                            {f.userName || f.email || "Foydalanuvchi"}
+                          </span>
                         </div>
-                        <span className="text-[11px] text-neutral-500">
+                        <span className="text-[11px] text-neutral-500 whitespace-nowrap shrink-0">
                           {formatFeedbackDate(f.createdAt)}
                         </span>
                       </div>
-                      <p className="text-sm mb-3 whitespace-pre-wrap">{f.message}</p>
+                      <p className="text-sm mb-3 whitespace-pre-wrap leading-relaxed">{f.message}</p>
                       <button
                         onClick={() => toggleFeedbackRead(f.id, f.read)}
                         disabled={feedbackActionLoading === f.id}
-                        className="text-xs text-neutral-400 hover:text-white underline transition"
+                        className="text-xs text-neutral-400 hover:text-white underline transition py-1"
                       >
                         {f.read ? "O'qilmagan deb belgilash" : "O'qildi deb belgilash"}
                       </button>
@@ -1223,34 +1357,33 @@ export default function AdminPage() {
 
           {/* ===== SOZLAMALAR ===== */}
           {activeNav === "settings" && (
-            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 max-w-xl">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+            <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 max-w-xl">
+              <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 mb-3 sm:mb-4">
                 <Settings size={20} className="text-red-500" />
                 Tizim sozlamalari
               </h2>
-              <p className="text-sm text-neutral-400 mb-6">
+              <p className="text-sm text-neutral-400 mb-5 sm:mb-6">
                 Husma loyallik kartasi tizimi va administrator profili sozlamalari.
               </p>
-              <div className="space-y-4 text-sm text-neutral-300 mb-8">
-                <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/50 flex justify-between items-center">
-                  <span>Administrator:</span>
-                  <span className="font-semibold text-white">{user.name} ({user.email})</span>
+
+              <div className="space-y-3 text-sm text-neutral-300 mb-6 sm:mb-8">
+                <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/50 flex flex-col gap-1">
+                  <span className="text-neutral-500 text-xs">Administrator</span>
+                  <span className="font-semibold text-white">{user.name}</span>
+                  <span className="text-neutral-400 text-xs">{user.email}</span>
                 </div>
                 <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/50 flex justify-between items-center">
-                  <span>Tizim versiyasi:</span>
+                  <span>Tizim versiyasi</span>
                   <span className="font-semibold text-white">v1.0.0</span>
                 </div>
               </div>
 
-              {/* Profil / xavfsizlik: telefon va parolni o'zgartirish */}
               <form
                 onSubmit={updateProfile}
-                className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 space-y-5"
+                className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-4 sm:p-5 space-y-4 sm:space-y-5"
               >
                 <div>
-                  <h3 className="text-sm font-semibold text-white mb-1">
-                    Telefon raqami va parol
-                  </h3>
+                  <h3 className="text-sm font-semibold text-white mb-1">Telefon raqami va parol</h3>
                   <p className="text-xs text-neutral-500">
                     Telefon raqamingizni yangilang yoki parolingizni almashtiring.
                   </p>
@@ -1265,7 +1398,7 @@ export default function AdminPage() {
                     value={profilePhone}
                     onChange={(e) => setProfilePhone(e.target.value)}
                     placeholder="+998 90 123 45 67"
-                    className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
+                    className="w-full rounded-xl border border-neutral-700 bg-neutral-950 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
                   />
                 </div>
 
@@ -1281,14 +1414,14 @@ export default function AdminPage() {
                     onChange={(e) => setProfileCurrentPassword(e.target.value)}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
+                    className="w-full rounded-xl border border-neutral-700 bg-neutral-950 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
                   />
                   <p className="text-[11px] text-neutral-600 mt-1.5">
-                    Faqat parolni o'zgartirmoqchi bo'lsangiz kerak.
+                    Faqat parolni o&apos;zgartirmoqchi bo&apos;lsangiz kerak.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
                       Yangi parol
@@ -1299,7 +1432,7 @@ export default function AdminPage() {
                       onChange={(e) => setProfilePassword(e.target.value)}
                       placeholder="Kamida 6 belgi"
                       autoComplete="new-password"
-                      className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
+                      className="w-full rounded-xl border border-neutral-700 bg-neutral-950 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
                     />
                   </div>
                   <div>
@@ -1312,20 +1445,20 @@ export default function AdminPage() {
                       onChange={(e) => setProfilePasswordConfirm(e.target.value)}
                       placeholder="Qayta kiriting"
                       autoComplete="new-password"
-                      className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
+                      className="w-full rounded-xl border border-neutral-700 bg-neutral-950 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition"
                     />
                   </div>
                 </div>
 
                 {profileError && (
-                  <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-300">
-                    <AlertCircle size={14} className="shrink-0" />
+                  <div className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-3 text-sm text-red-300">
+                    <AlertCircle size={16} className="shrink-0" />
                     {profileError}
                   </div>
                 )}
                 {profileSuccess && (
-                  <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-xs text-emerald-300">
-                    <CheckCircle2 size={14} className="shrink-0" />
+                  <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-300">
+                    <CheckCircle2 size={16} className="shrink-0" />
                     {profileSuccess}
                   </div>
                 )}
@@ -1333,7 +1466,7 @@ export default function AdminPage() {
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl bg-red-600 px-4 py-3.5 text-sm font-medium text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {profileLoading ? "Saqlanmoqda..." : "Saqlash"}
                 </button>

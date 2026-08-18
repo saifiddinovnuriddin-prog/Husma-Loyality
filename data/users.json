@@ -21,30 +21,30 @@
     "tier": "Bronza",
     "totalSpent": 0,
     "cardNumber": "8600460175856061",
-    "isProtected": true
+    "isProtected": false
   },
   {
-    "id": "10",
-    "name": "Nuriddin Sayfiddion",
+    "id": "12",
+    "name": "Nuriddin Sayfiddon",
     "country": "UZ",
-    "phone": "998951629252",
-    "password": "e660ced5e58b4119ba8361c37f6d291573390f32964e893af2d3fb931fd183e9",
+    "phone": "998901112233",
+    "password": "3bf4040facc304f26febc3109700baac016da3232da4b5a443739ef573d913bc",
     "role": "user",
-    "coins": 25,
+    "coins": 130,
     "tier": "Bronza",
-    "totalSpent": 0,
-    "cardNumber": "8600142115122917"
+    "totalSpent": 800000,
+    "cardNumber": "8600303650929236"
   },
   {
-    "id": "11",
-    "name": "Nuriddin S",
+    "id": "13",
+    "name": "asdad awfwf",
     "country": "UZ",
-    "phone": "998951629250",
-    "password": "e4f3f119f404cd67ee807e5aa12362012c072e095c8e3646f7f1704d6e222a32",
+    "phone": "998901111111",
+    "password": "697bbab5f18c5fff8a63cb93fd92f6fa23e0f6089b533a9898a2e82edfd24be7",
     "role": "user",
     "coins": 50,
     "tier": "Bronza",
     "totalSpent": 0,
-    "cardNumber": "8600165749076591"
+    "cardNumber": "8600997769887841"
   }
 ]
