@@ -17,14 +17,41 @@ const cards = [
   {
     id: 1,
     name: 'HUSMA',
-    level: "Bronza",
-    short: 'Bronza',
+    level: 'STANDARD',
+    short: 'STANDARD',
+    number: '•••• 1024',
+    gradient: 'linear-gradient(135deg, #A1A1AA 0%, #71717A 45%, #3F3F46 100%)',
+    text: '#18181B',
+  },
+  {
+    id: 2,
+    name: 'HUSMA',
+    level: 'BRONZE',
+    short: 'BRONZE',
     number: '•••• 4021',
     gradient: 'linear-gradient(135deg, #F0D28C 0%, #D4A24C 45%, #9C7326 100%)',
     text: '#2A1B04',
   },
   {
-    id: 2,
+    id: 3,
+    name: 'HUSMA',
+    level: 'SILVER',
+    short: 'SILVER',
+    number: '•••• 5832',
+    gradient: 'linear-gradient(135deg, #E2E8F0 0%, #94A3B8 45%, #64748B 100%)',
+    text: '#0F172A',
+  },
+  {
+    id: 4,
+    name: 'HUSMA',
+    level: 'GOLD',
+    short: 'GOLD',
+    number: '•••• 8743',
+    gradient: 'linear-gradient(135deg, #E8C547 0%, #C9A227 45%, #8B6914 100%)',
+    text: '#1F1500',
+  },
+  {
+    id: 5,
     name: 'HUSMA',
     level: 'PLATINUM',
     short: 'PLATINUM',
@@ -33,23 +60,23 @@ const cards = [
     text: '#1A1A1A',
   },
   {
-    id: 3,
+    id: 6,
     name: 'HUSMA',
-    level: 'GOLD',
-    short: 'GOLD',
-    number: '•••• 8743',
-    gradient: 'linear-gradient(135deg, #E8C547 0%, #C9A227 45%, #8B6914 100%)',
-    text: '#1F1500',
+    level: 'DIAMOND',
+    short: 'DIAMOND',
+    number: '•••• 6611',
+    gradient: 'linear-gradient(135deg, #E0F7FA 0%, #80DEEA 45%, #00838F 100%)',
+    text: '#002B36',
   },
-{
-  id: 4,
-  name: 'HUSMA',
-  level: 'DIAMOND',
-  short: 'DIAMOND',
-  number: '•••• 8743',
-  gradient: 'linear-gradient(135deg, #E0F7FA 0%, #80DEEA 45%, #00838F 100%)',
-  text: '#002B36',
-},
+  {
+    id: 7,
+    name: 'HUSMA',
+    level: 'VIP',
+    short: 'VIP',
+    number: '•••• 9999',
+    gradient: 'linear-gradient(135deg, #F472B6 0%, #DB2777 45%, #9D174D 100%)',
+    text: '#1F0A14',
+  },
 ]
 
 export default function HeroSection() {
@@ -58,25 +85,62 @@ export default function HeroSection() {
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % cards.length)
-    }, 4200)
+    }, 4000)
     return () => clearInterval(timer)
   }, [])
+
+// Oldingi va keyingi indexlarni hisoblash
+const getCardStyle = (index) => {
+  const diff = (index - activeIndex + cards.length) % cards.length
+  const normalizedDiff = diff > cards.length / 2 ? diff - cards.length : diff
+
+  if (normalizedDiff === 0) {
+    // Markaziy (faol) karta
+    return {
+      transform: 'translateX(0) translateY(0) rotate(-6deg) scale(1)',
+      opacity: 1,
+      zIndex: 30,
+      filter: 'brightness(1)',
+    }
+  }
+  if (normalizedDiff === 1 || normalizedDiff === -cards.length + 1) {
+    // Keyingi karta (o‘ngda)
+    return {
+      transform: 'translateX(42px) translateY(12px) rotate(8deg) scale(0.88)',
+      opacity: 0.55,
+      zIndex: 20,
+      filter: 'brightness(0.7)',
+    }
+  }
+  if (normalizedDiff === -1 || normalizedDiff === cards.length - 1) {
+    // Oldingi karta (chapda)
+    return {
+      transform: 'translateX(-42px) translateY(12px) rotate(-18deg) scale(0.88)',
+      opacity: 0.55,
+      zIndex: 20,
+      filter: 'brightness(0.7)',
+    }
+  }
+  // Qolganlari yashirin
+  return {
+    transform: 'translateX(0) scale(0.7)',
+    opacity: 0,
+    zIndex: 10,
+    filter: 'brightness(0.5)',
+  }
+}
 
   return (
     <section className="relative min-h-[520px] max-w-[1250px] w-full mx-auto bg-neutral-950 px-4 py-8 sm:px-6 lg:px-12 flex items-center justify-center overflow-visible">
       <style>{`
-        @keyframes husma-float {
-          0%, 100% { transform: translateY(0) rotate(-8deg); }
-          50% { transform: translateY(-10px) rotate(-6deg); }
-        }
         @keyframes husma-shine {
           0% { transform: translateX(-120%) rotate(20deg); }
           60%, 100% { transform: translateX(160%) rotate(20deg); }
         }
-        .husma-card { animation: husma-float 5.5s ease-in-out infinite; }
-        .husma-shine { animation: husma-shine 3.4s ease-in-out infinite; }
+        .husma-shine { animation: husma-shine 3.6s ease-in-out infinite; }
       `}</style>
 
+      {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-950/25 via-neutral-950 to-neutral-950 pointer-events-none" />
       <div className="absolute -top-32 -right-32 h-72 w-72 rounded-full bg-red-600/10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-red-800/10 blur-3xl pointer-events-none" />
@@ -124,7 +188,7 @@ export default function HeroSection() {
 
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-neutral-800/80 mt-2 w-full">
               <div>
-                <div className="text-xl font-semibold text-white">3</div>
+                <div className="text-xl font-semibold text-white">7</div>
                 <div className="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-wider">Daraja</div>
               </div>
               <div>
@@ -138,11 +202,11 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right – Phone + Cards */}
+          {/* Right – Phone + 3D Carousel */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end items-center pt-6 lg:pt-0">
-            <div className="relative w-[220px] mt-16 mb-10">
+            <div className="relative w-[220px] mt-20 mb-12">
               
-              {/* Phone mockup */}
+              {/* Phone */}
               <div className="relative w-[220px] h-[440px] rounded-[32px] bg-gradient-to-b from-[#2D1B24] to-[#140A10] border-[5px] border-[#0A0508] shadow-2xl overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-4 bg-[#0A0508] rounded-b-xl z-20" />
 
@@ -154,16 +218,24 @@ export default function HeroSection() {
 
                 <div className="mt-6 px-4">
                   <div className="text-[11px] font-medium text-neutral-400 mb-2">Mening kartam</div>
-                  <div className="h-28 rounded-xl bg-gradient-to-r from-red-950/40 to-neutral-900 border border-neutral-800 p-3 flex flex-col justify-between">
+                  
+                  <div
+                    className="h-28 rounded-xl border border-white/10 p-3 flex flex-col justify-between transition-all duration-500"
+                    style={{ background: cards[activeIndex].gradient }}
+                  >
                     <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-semibold text-white">
+                      <span className="text-[11px] font-semibold" style={{ color: cards[activeIndex].text }}>
                         HUSMA {cards[activeIndex].short}
                       </span>
-                      <ShieldCheck size={14} className="text-amber-400" />
+                      <ShieldCheck size={14} style={{ color: cards[activeIndex].text }} />
                     </div>
                     <div>
-                      <div className="text-[9px] text-neutral-400">Balans</div>
-                      <div className="text-sm font-semibold text-amber-400">1,250 COIN</div>
+                      <div className="text-[9px] opacity-70" style={{ color: cards[activeIndex].text }}>
+                        Balans
+                      </div>
+                      <div className="text-sm font-semibold" style={{ color: cards[activeIndex].text }}>
+                        1,250 COIN
+                      </div>
                     </div>
                   </div>
 
@@ -185,44 +257,74 @@ export default function HeroSection() {
                 </div>
               </div>
 
-              {/* Floating cards (navigatsiya tugmalari yo‘q) */}
-              <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-[190px] h-[118px] z-30">
-                {cards.map((card, index) => (
-                  <div
-                    key={card.id}
-                    className={`husma-card absolute inset-0 rounded-xl p-3 flex flex-col justify-between overflow-hidden transition-all duration-500 ${
-                      index === activeIndex
-                        ? 'opacity-100 scale-100 translate-x-0'
-                        : 'opacity-0 scale-95 translate-x-4 pointer-events-none'
-                    }`}
-                    style={{
-                      background: card.gradient,
-                      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.8)',
-                    }}
-                  >
-                    <div className="husma-shine absolute -top-10 -left-10 w-12 h-[260%] bg-white/40 blur-md pointer-events-none" />
-
-                    <div className="flex items-center justify-between">
-                      <span className="font-serif font-bold text-xs tracking-wider" style={{ color: card.text }}>
-                        {card.name}
-                      </span>
-                      <Crown size={15} style={{ color: card.text }} strokeWidth={2.5} />
-                    </div>
-
+              {/* ===== 3D CARD CAROUSEL ===== */}
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[200px] h-[130px] z-30">
+                {cards.map((card, index) => {
+                  const style = getCardStyle(index)
+                  return (
                     <div
-                      className="h-4 w-7 rounded border"
-                      style={{ backgroundColor: `${card.text}20`, borderColor: `${card.text}10` }}
-                    />
+                      key={card.id}
+                      className="absolute inset-0 rounded-xl p-3.5 flex flex-col justify-between overflow-hidden transition-all duration-500 ease-out cursor-pointer"
+                      style={{
+                        background: card.gradient,
+                        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.7)',
+                        ...style,
+                      }}
+                      onClick={() => setActiveIndex(index)}
+                    >
+                      {/* Shine */}
+                      <div className="husma-shine absolute -top-10 -left-10 w-14 h-[280%] bg-white/35 blur-md pointer-events-none" />
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-semibold tracking-[0.15em]" style={{ color: card.text }}>
-                        {card.number}
-                      </span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: `${card.text}cc` }}>
-                        {card.level}
-                      </span>
+                      <div className="flex items-center justify-between relative z-10">
+                        <span
+                          className="font-serif font-bold text-xs tracking-wider"
+                          style={{ color: card.text }}
+                        >
+                          {card.name}
+                        </span>
+                        <Crown size={15} style={{ color: card.text }} strokeWidth={2.5} />
+                      </div>
+
+                      {/* Chip */}
+                      <div
+                        className="h-4 w-7 rounded border relative z-10"
+                        style={{
+                          backgroundColor: `${card.text}22`,
+                          borderColor: `${card.text}33`,
+                        }}
+                      />
+
+                      <div className="flex items-center justify-between relative z-10">
+                        <span
+                          className="text-[10px] font-mono font-semibold tracking-[0.15em]"
+                          style={{ color: card.text }}
+                        >
+                          {card.number}
+                        </span>
+                        <span
+                          className="text-[9px] font-bold uppercase tracking-wider"
+                          style={{ color: `${card.text}cc` }}
+                        >
+                          {card.level}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )
+                })}
+              </div>
+
+              {/* Dots */}
+              <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {cards.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveIndex(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === activeIndex
+                        ? 'w-5 bg-red-500'
+                        : 'w-1.5 bg-neutral-600 hover:bg-neutral-400'
+                    }`}
+                  />
                 ))}
               </div>
             </div>

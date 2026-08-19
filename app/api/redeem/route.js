@@ -3,29 +3,46 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUserCoins, createRedemption } from "@/lib/db";
 
+// MUHIM: bu ro'yxat frontenddagi (app/sovgalar/page.js) GIFTS ro'yxati
+// bilan AYNAN bir xil bo'lishi kerak — id va coins mos kelmasa,
+// "Sovg'a topilmadi" xatosi chiqadi.
 const GIFTS = [
-  { id: 1, name: "Xush kelibsiz meva savati", coins: 30 },
-  { id: 2, name: "Bepul nonushta (1 kishi)", coins: 50 },
-  { id: 3, name: "Kech chiqish (Late checkout)", coins: 60 },
-  { id: 4, name: "Kir yuvish xizmati", coins: 70 },
-  { id: 5, name: "Aeroportdan olib ketish (Transfer)", coins: 150 },
-  { id: 6, name: "SPA va basseyn kirish", coins: 180 },
-  { id: 7, name: "Kechki ovqat 2 kishiga", coins: 220 },
-  { id: 8, name: "Xona darajasini oshirish", coins: 300 },
-  { id: 9, name: "1 kecha bepul turar joy", coins: 500 },
-  { id: 10, name: "Butler (shaxsiy xizmatkor) kuni", coins: 700 },
-  { id: 11, name: "Deluxe xonada 2 kecha", coins: 1100 },
-  { id: 12, name: "Presidential Suite — 1 kecha", coins: 2000 },
+  // --- SPA VA BASSEYN ---
+  { id: 101, name: "Fitnes zal (1 kunlik)", coins: 100000 },
+  { id: 102, name: "Basseyn (1 kunlik)", coins: 140000 },
+  { id: 103, name: "Fitnes + Basseyn (1 kunlik)", coins: 200000 },
+  { id: 104, name: "To'liq SPA Kompleks", coins: 250000 },
+  { id: 105, name: "Ozdorovitelny massaj (60 min)", coins: 450000 },
+  { id: 106, name: "Aroma terapiya massaji (60 min)", coins: 500000 },
+  { id: 107, name: "Sport massaji (45 min)", coins: 400000 },
+  { id: 108, name: "Ognenniy (Olovli) massaj (50 min)", coins: 400000 },
+  { id: 109, name: "Orqa massaji (30 min)", coins: 250000 },
+  { id: 110, name: "Asalli (Medovyy) massaj (40 min)", coins: 400000 },
+  { id: 111, name: "Shokoladli massaj (40 min)", coins: 400000 },
+  { id: 112, name: "Piling + Skrab + Yuvinish (30 min)", coins: 400000 },
+  { id: 113, name: "Ko'pikli yuvinish (30 min)", coins: 250000 },
+  { id: 114, name: "Kompleks massaj (90 min)", coins: 850000 },
+  { id: 115, name: "Bolalar suzishi (12 marta)", coins: 600000 },
+  { id: 116, name: "SPA Abonement (1 Oy)", coins: 1600000 },
+
+  // --- MAVI RESTORANT ---
+  { id: 201, name: "Xush kelibsiz meva savati", coins: 50000 },
+  { id: 202, name: "Bepul nonushta (1 kishi)", coins: 80000 },
+  { id: 203, name: "Kechki ovqat 2 kishiga", coins: 400000 },
+
+  // --- HUSMA HOTEL ---
+  { id: 301, name: "Kech chiqish (Late checkout)", coins: 100000 },
+  { id: 302, name: "Kir yuvish xizmati", coins: 60000 },
+  { id: 303, name: "Aeroportdan olib ketish (Transfer)", coins: 250000 },
+  { id: 304, name: "Xona darajasini oshirish", coins: 500000 },
+  { id: 305, name: "1 kecha bepul turar joy", coins: 900000 },
+  { id: 306, name: "Presidential Suite — 1 kecha", coins: 5000000 },
 ];
 
 export async function POST(req) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE)?.value;
-
-setTimeout(() => {
-  router.push("/karta");
-}, 1500);
 
     if (!token) {
       return NextResponse.json({ error: "Kirish talab qilinadi" }, { status: 401 });

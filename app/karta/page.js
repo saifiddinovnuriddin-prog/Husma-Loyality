@@ -18,6 +18,13 @@ import {
   X,
   CheckCircle2,
   LogOut,
+  Medal,
+  Award,
+  Trophy,
+  Gem,
+  Diamond as DiamondIcon,
+  Star,
+  ChevronDown,
 } from "lucide-react";
 
 function formatCoins(n) {
@@ -44,6 +51,7 @@ const LEVELS = [
   {
     key: "Standard",
     name: "Standard",
+    icon: Sparkles,
     minCoins: 0,
     color: "from-neutral-700/40 to-neutral-900/20",
     border: "border-neutral-500/40",
@@ -51,12 +59,13 @@ const LEVELS = [
     badge: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
     perks: [
       "Ilovani o'rnatganda 50 000 so'mlik chegirma (Husma fit, Mavi restoranda ham)",
-      "Har 1000 so'm xariddan 1 coin",
+      "Har bir xariddan 1% coin qaytariladi (1 coin = 1 so'm)",
     ],
   },
   {
     key: "Bronze",
     name: "Bronze",
+    icon: Medal,
     minCoins: 99000,
     color: "from-amber-800/40 to-amber-950/20",
     border: "border-amber-600/40",
@@ -71,6 +80,7 @@ const LEVELS = [
   {
     key: "Silver",
     name: "Silver",
+    icon: Award,
     minCoins: 199000,
     color: "from-slate-500/20 to-slate-800/20",
     border: "border-slate-400/40",
@@ -86,6 +96,7 @@ const LEVELS = [
   {
     key: "Gold",
     name: "Gold",
+    icon: Trophy,
     minCoins: 399000,
     color: "from-yellow-700/30 to-yellow-950/20",
     border: "border-yellow-500/40",
@@ -104,6 +115,7 @@ const LEVELS = [
   {
     key: "Platinum",
     name: "Platinum",
+    icon: Gem,
     minCoins: 599000,
     color: "from-neutral-400/20 to-neutral-800/20",
     border: "border-neutral-300/40",
@@ -124,6 +136,7 @@ const LEVELS = [
   {
     key: "Diamond",
     name: "Diamond",
+    icon: DiamondIcon,
     minCoins: 799000,
     color: "from-cyan-700/30 to-sky-950/20",
     border: "border-cyan-400/50",
@@ -144,6 +157,7 @@ const LEVELS = [
   {
     key: "VIP",
     name: "VIP",
+    icon: Star,
     minCoins: 999000,
     color: "from-purple-700/30 to-fuchsia-950/20",
     border: "border-purple-400/50",
@@ -163,12 +177,14 @@ const LEVELS = [
   },
 ];
 
+const LEVEL_PERKS_PREVIEW = 3;
+
 /* ===================== BARABAN ===================== */
 const WHEEL_SEGMENTS = [
-  { prize: 0,  label: "Yutuqsiz", short: "0",  color: "#3f3f46" },
-  { prize: 5,  label: "5 coin",   short: "5",  color: "#f59e0b" },
-  { prize: 10, label: "10 coin",  short: "10", color: "#eab308" },
-  { prize: 15, label: "15 coin",  short: "15", color: "#dc2626" },
+  { prize: 0, label: "Yutuqsiz", short: "0", color: "#3f3f46" },
+  { prize: 5, label: "5 coin", short: "5", color: "#f59e0b" },
+  { prize: 10, label: "10 coin", short: "10", color: "#eab308" },
+  { prize: 15, label: "15 coin", short: "15", color: "#dc2626" },
 ];
 
 const WHEEL_LABEL_POS = [
@@ -235,6 +251,7 @@ export default function KartaPage() {
   const [highestCoins, setHighestCoins] = useState(0);
 
   const [showReceipt, setShowReceipt] = useState(false);
+  const [expandedLevels, setExpandedLevels] = useState(() => new Set());
 
   const [spinStatus, setSpinStatus] = useState(null);
   const [spinStatusLoading, setSpinStatusLoading] = useState(true);
@@ -260,6 +277,15 @@ export default function KartaPage() {
       router.refresh();
     }
   };
+
+  function toggleLevelExpanded(key) {
+    setExpandedLevels((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -646,7 +672,6 @@ export default function KartaPage() {
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
-            {/* Wheel – juda kichik ekranlar uchun xavfsiz */}
             <div
               className="relative shrink-0 mx-auto"
               style={{
@@ -752,23 +777,29 @@ export default function KartaPage() {
           </div>
         </div>
 
-        {/* DARAJALAR */}
+        {/* DARAJALAR — ixcham, ikonkali, yig'iladigan */}
         <div className="mb-6 sm:mb-10">
           <div className="flex items-center gap-1.5 mb-3.5 sm:mb-5">
             <Crown size={15} className="text-amber-400 shrink-0" />
             <h2 className="text-base sm:text-xl font-bold text-white">Darajalar</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5 items-start">
             {LEVELS.map((level) => {
               const isUnlocked = levelCoins >= level.minCoins;
               const isCurrent = level.key === currentKey;
+              const isExpanded = expandedLevels.has(level.key);
+              const LevelIcon = level.icon;
+              const hasMore = level.perks.length > LEVEL_PERKS_PREVIEW;
+              const displayedPerks = isExpanded
+                ? level.perks
+                : level.perks.slice(0, LEVEL_PERKS_PREVIEW);
 
               return (
                 <div
                   key={level.key}
                   className={`
-                    relative rounded-xl border p-3.5 sm:p-5 transition-all
+                    rounded-xl border p-3 sm:p-4 transition-all
                     ${
                       isCurrent
                         ? `${level.border} bg-gradient-to-br ${level.color} ring-1 ring-amber-500/30`
@@ -778,16 +809,34 @@ export default function KartaPage() {
                     }
                   `}
                 >
-                  {isCurrent && (
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950">
-                      Hozirgi
-                    </span>
-                  )}
+                  {/* Sarlavha qatori: ikonka + nom + (Hozirgi) chap tomonda, coin talabi o'ngda */}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className={`flex items-center justify-center w-7 h-7 rounded-lg border shrink-0 ${
+                          isUnlocked ? level.badge : "border-neutral-700 text-neutral-600"
+                        }`}
+                      >
+                        <LevelIcon size={14} />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h3
+                            className={`text-sm font-semibold truncate ${
+                              isUnlocked ? level.text : "text-neutral-500"
+                            }`}
+                          >
+                            {level.name}
+                          </h3>
+                          {isCurrent && (
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-neutral-950 shrink-0">
+                              HOZIRGI
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="flex items-center justify-between mb-2.5 sm:mb-4 gap-2">
-                    <h3 className={`text-sm font-semibold ${isUnlocked ? level.text : "text-neutral-500"}`}>
-                      {level.name}
-                    </h3>
                     <span
                       className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border shrink-0 ${
                         isUnlocked ? level.badge : "border-neutral-700 text-neutral-600"
@@ -797,13 +846,14 @@ export default function KartaPage() {
                     </span>
                   </div>
 
+                  {/* Imtiyozlar ro'yxati (qisqartirilgan) */}
                   <ul className="space-y-1.5">
-                    {level.perks.map((perk) => (
-                      <li key={perk} className="flex items-start gap-1.5 text-[11px] sm:text-sm">
+                    {displayedPerks.map((perk) => (
+                      <li key={perk} className="flex items-start gap-1.5 text-[11px] sm:text-[12.5px] leading-snug">
                         {isUnlocked ? (
                           <Check size={12} className="text-emerald-400 mt-0.5 shrink-0" />
                         ) : (
-                          <Lock size={12} className="text-neutral-600 mt-0.5 shrink-0" />
+                          <Lock size={11} className="text-neutral-600 mt-0.5 shrink-0" />
                         )}
                         <span className={isUnlocked ? "text-neutral-300" : "text-neutral-600"}>
                           {perk}
@@ -811,6 +861,24 @@ export default function KartaPage() {
                       </li>
                     ))}
                   </ul>
+
+                  {/* Yig'ish / kengaytirish tugmasi */}
+                  {hasMore && (
+                    <button
+                      onClick={() => toggleLevelExpanded(level.key)}
+                      className="mt-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-neutral-400 hover:text-white transition"
+                    >
+                      {isExpanded
+                        ? "Kamroq ko'rsatish"
+                        : `Yana ${level.perks.length - LEVEL_PERKS_PREVIEW} ta imtiyoz`}
+                      <ChevronDown
+                        size={12}
+                        className={`transition-transform duration-200 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                  )}
 
                   {!isUnlocked && (
                     <p className="mt-2 text-[9px] sm:text-[11px] text-neutral-600">
@@ -892,7 +960,7 @@ export default function KartaPage() {
                     <p className="text-xs font-semibold text-red-400">
                       −{formatCoins(item.coinsSpent ?? item.coins ?? 0)} coin
                     </p>
-                    <p className={`text-[9px] sm:text-xs mt-0.5 ${getStatusClass(item.status)}`}>
+                    <p className={`text-[10px] font-medium mt-0.5 ${getStatusClass(item.status)}`}>
                       {getStatusText(item.status)}
                     </p>
                   </div>
@@ -902,130 +970,104 @@ export default function KartaPage() {
           )}
         </div>
 
-        {/* FIKR-MULOHAZA */}
-        <div className="mb-8 sm:mb-10">
-          <div className="flex items-center gap-1.5 mb-3">
+        {/* FIKR VA TAKLIFLAR */}
+        <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-6 sm:mb-10">
+          <div className="flex items-center gap-1.5 mb-1">
             <MessageSquare size={15} className="text-red-400 shrink-0" />
-            <h2 className="text-base sm:text-xl font-bold text-white">Fikr yoki savol qoldiring</h2>
+            <h2 className="text-sm sm:text-lg font-bold text-white">Fikr va takliflar</h2>
           </div>
+          <p className="text-[11px] sm:text-sm text-neutral-500 mb-3.5">
+            Xizmat sifati bo'yicha taklif va mulohazalaringizni yuboring.
+          </p>
 
-          <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6">
-            <p className="text-[11px] sm:text-sm text-neutral-500 mb-3">
-              Kamchilik ko&apos;rdingizmi yoki savolingiz bormi? Bu yerga yozing.
-            </p>
+          <form onSubmit={handleFeedbackSubmit} className="space-y-2.5">
+            <textarea
+              rows={3}
+              value={feedbackMessage}
+              onChange={(e) => setFeedbackMessage(e.target.value)}
+              placeholder="Fikringizni yozing..."
+              className="w-full rounded-xl border border-neutral-800 bg-neutral-950 p-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition resize-none"
+            />
 
-            <form onSubmit={handleFeedbackSubmit}>
-              <textarea
-                value={feedbackMessage}
-                onChange={(e) => setFeedbackMessage(e.target.value)}
-                placeholder="Fikringizni shu yerga yozing..."
-                rows={3}
-                maxLength={1000}
-                className="w-full rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition resize-none"
-              />
+            {feedbackError && (
+              <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-red-400">
+                <AlertCircle size={12} />
+                {feedbackError}
+              </p>
+            )}
 
-              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between mt-3">
-                <div className="text-[10px] sm:text-xs order-2 sm:order-1 min-h-[16px]">
-                  {feedbackError && (
-                    <span className="flex items-center gap-1 text-red-400">
-                      <AlertCircle size={12} />
-                      {feedbackError}
-                    </span>
-                  )}
-                  {feedbackSent && !feedbackError && (
-                    <span className="flex items-center gap-1 text-emerald-400">
-                      <Check size={12} />
-                      Yuborildi, rahmat!
-                    </span>
-                  )}
-                </div>
+            {feedbackSent && (
+              <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-400">
+                <CheckCircle2 size={12} />
+                Fikringiz muvaffaqiyatli yuborildi!
+              </p>
+            )}
 
-                <button
-                  type="submit"
-                  disabled={!feedbackMessage.trim() || feedbackSubmitting}
-                  className="order-1 sm:order-2 w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <Send size={13} />
-                  {feedbackSubmitting ? "Yuborilmoqda..." : "Yuborish"}
-                </button>
-              </div>
-            </form>
-          </div>
+            <button
+              type="submit"
+              disabled={feedbackSubmitting || !feedbackMessage.trim()}
+              className="flex items-center justify-center gap-1.5 w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
+            >
+              <Send size={13} />
+              {feedbackSubmitting ? "Yuborilmoqda..." : "Yuborish"}
+            </button>
+          </form>
         </div>
+
       </div>
 
-      {/* ===================== CHEK (RECEIPT) MODAL ===================== */}
+      {/* RAQAMLI CHEK MODAL */}
       {showReceipt && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setShowReceipt(false)}
-          />
-
-          <div className="relative w-full max-w-sm bg-white text-black rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6 shadow-2xl text-neutral-200">
             <button
               onClick={() => setShowReceipt(false)}
-              className="absolute top-2.5 right-2.5 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600"
+              className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-white transition rounded-lg bg-neutral-800/50"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
 
-            <div className="bg-neutral-900 text-white px-4 sm:px-6 py-4 text-center">
-              <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-2">
-                <Receipt size={18} className="sm:w-6 sm:h-6 text-amber-400" />
-              </div>
-              <h3 className="text-sm sm:text-lg font-bold tracking-wider">HUSMA CHEK</h3>
-              <p className="text-[10px] sm:text-xs text-neutral-400 mt-0.5">
-                Loyallik kartasi kvitansiyasi
-              </p>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-neutral-800">
+              <Receipt className="text-red-400 shrink-0" size={18} />
+              <h3 className="text-base font-bold text-white">Raqamli Chek</h3>
             </div>
 
-            <div className="px-4 sm:px-6 py-4 space-y-2.5 text-[11px] sm:text-sm">
-              <div className="flex justify-between border-b border-dashed border-neutral-200 pb-2 gap-2">
-                <span className="text-neutral-500 shrink-0">Egasining ismi</span>
-                <span className="font-semibold uppercase text-right truncate max-w-[55%]">{user.name}</span>
+            <div className="space-y-2.5 text-xs sm:text-sm mb-6">
+              <div className="flex justify-between py-1 border-b border-neutral-800/50">
+                <span className="text-neutral-500">Mijoz:</span>
+                <span className="font-medium text-white">{user.name}</span>
               </div>
-
-              <div className="flex justify-between border-b border-dashed border-neutral-200 pb-2 gap-2">
-                <span className="text-neutral-500 shrink-0">Karta raqami</span>
-                <span className="font-mono font-semibold text-right break-all max-w-[55%]">{cardNumber}</span>
+              <div className="flex justify-between py-1 border-b border-neutral-800/50">
+                <span className="text-neutral-500">Karta raqami:</span>
+                <span className="font-mono text-white">{cardNumber}</span>
               </div>
-
-              <div className="flex justify-between border-b border-dashed border-neutral-200 pb-2 gap-2">
-                <span className="text-neutral-500 shrink-0">Joriy darajasi</span>
-                <span className="font-semibold text-amber-600">{currentLevel.name}</span>
+              <div className="flex justify-between py-1 border-b border-neutral-800/50">
+                <span className="text-neutral-500">Joriy daraja:</span>
+                <span className={`font-semibold ${currentLevel.text}`}>{currentLevel.name}</span>
               </div>
-
-              <div className="flex justify-between border-b border-dashed border-neutral-200 pb-2 gap-2">
-                <span className="text-neutral-500 shrink-0">Mavjud coinlar</span>
-                <span className="font-semibold">{formatCoins(currentCoins)} coin</span>
+              <div className="flex justify-between py-1 border-b border-neutral-800/50">
+                <span className="text-neutral-500">Balans:</span>
+                <span className="font-bold text-emerald-400">{formatCoins(currentCoins)} coin</span>
               </div>
-
-              <div className="flex justify-between gap-2">
-                <span className="text-neutral-500 shrink-0">Status</span>
-                <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 size={13} /> Faol
-                </span>
+              <div className="flex justify-between py-1 border-b border-neutral-800/50">
+                <span className="text-neutral-500">Jami xarajat:</span>
+                <span className="font-medium text-white">{formatCoins(user.totalSpent || 0)} so'm</span>
               </div>
             </div>
 
-            <div className="px-4 sm:px-6 pb-5 pt-2 text-center border-t border-dashed border-neutral-200">
-              {qrDataUrl ? (
-                <img
-                  src={qrDataUrl}
-                  alt="QR Code"
-                  className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-2 rounded-lg border border-neutral-200"
-                />
-              ) : (
-                <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-2 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-400 text-[10px]">
-                  QR yuklanmoqda...
-                </div>
-              )}
+            {qrDataUrl && (
+              <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white mb-4">
+                <img src={qrDataUrl} alt="QR Kod" className="w-32 h-32" />
+                <span className="text-[10px] text-neutral-800 font-mono mt-1">{cardNumber}</span>
+              </div>
+            )}
 
-              <p className="text-[9px] sm:text-[11px] text-neutral-500 uppercase tracking-widest">
-                Xaridlaringiz uchun rahmat!
-              </p>
-            </div>
+            <button
+              onClick={() => setShowReceipt(false)}
+              className="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs sm:text-sm font-semibold text-white transition"
+            >
+              Yopish
+            </button>
           </div>
         </div>
       )}

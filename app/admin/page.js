@@ -58,9 +58,18 @@ const TIER_STYLES = {
   VIP:      "bg-purple-500/15 text-purple-300 border-purple-400/40",
 };
 
-// 1 coin necha so'mga teng — kassada to'lov summasini hisoblash uchun.
-// Bu qiymat /api/admin/coins/spend endpointidagi SOM_PER_COIN bilan bir xil bo'lishi shart.
-const SOM_PER_COIN = 10000;
+// ==========================================================================
+// COIN NISBATI — SODDA VA ANIQ 1% TIZIMI
+// 1 coin = 1 so'm (har doim, ham ishlab topganda, ham sarflaganda).
+// Mijoz xaridning aynan 1%ini coin sifatida oladi, va keyin o'sha coinlarni
+// TO'LIQ qiymatida (1:1) naqd chegirma sifatida sarflashi mumkin.
+// Natija: aniq 1% cashback — ortiqcha ikki bosqichli konversiya yo'q,
+// hisoblash chalkash bo'lib qolmaydi.
+// Bu qiymatlarni backend /api/admin/coins/route.js va
+// /api/admin/coins/spend/route.js fayllaridagi bilan BIR XIL qiling.
+// ==========================================================================
+const EARN_RATE = 0.01; // xaridning 1%i coin sifatida beriladi
+const COIN_VALUE_SOM = 1; // 1 coin = 1 so'm (sarflashda)
 
 function getLevelByCoins(coins) {
   const amount = Number(coins) || 0;
@@ -69,12 +78,11 @@ function getLevelByCoins(coins) {
   );
 }
 
-// Endi daraja foizi ishlatilmaydi — coin qo'shish faqat SOM_PER_COIN
-// nisbati bo'yicha hisoblanadi (masalan 100 so'm = 1 coin).
+// Coin qo'shish xaridning 1%i bo'yicha hisoblanadi (1 coin = 1 so'm).
 function calcCoinsFromPurchase(sum) {
   const s = Number(sum) || 0;
   if (s <= 0) return 0;
-  return Math.floor(s / SOM_PER_COIN);
+  return Math.floor(s * EARN_RATE);
 }
 
 function initials(name = "") {
@@ -123,7 +131,7 @@ export default function AdminPage() {
   const [scanSubmitting, setScanSubmitting] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(null);
 
-  // YANGI: rejim — "earn" (coin qo'shish) yoki "spend" (coin bilan to'lash)
+  // rejim — "earn" (coin qo'shish) yoki "spend" (coin bilan to'lash)
   const [scanMode, setScanMode] = useState("earn");
   const [coinsToUse, setCoinsToUse] = useState("");
 
@@ -418,7 +426,7 @@ export default function AdminPage() {
     const coinsToAdd = calcCoinsFromPurchase(spent);
 
     if (coinsToAdd <= 0) {
-      setScanError(`Hisoblangan coin 0 dan katta bo'lishi kerak (minimal ${SOM_PER_COIN} so'm kerak)`);
+      setScanError(`Hisoblangan coin 0 dan katta bo'lishi kerak (minimal ${Math.ceil(1 / EARN_RATE).toLocaleString()} so'm kerak)`);
       return;
     }
 
@@ -453,7 +461,7 @@ export default function AdminPage() {
           )
         );
         setScanSuccess(
-          `+${coinsToAdd} coin qo'shildi (${spent.toLocaleString()} so'm ÷ ${SOM_PER_COIN})`
+          `+${coinsToAdd} coin qo'shildi (${spent.toLocaleString()} so'mning 1%i)`
         );
         setSpentAmount("");
       } else {
@@ -465,7 +473,7 @@ export default function AdminPage() {
     setScanSubmitting(false);
   };
 
-  // ===== YANGI: Coin BILAN TO'LASH (kassada, Korzinka kartadagidek) =====
+  // ===== Coin BILAN TO'LASH (kassada, kichik chegirma sifatida) =====
   const submitSpendCoins = async () => {
     if (!scannedUser) return;
     const spend = Number(coinsToUse);
@@ -506,7 +514,7 @@ export default function AdminPage() {
           )
         );
         setScanSuccess(
-          `−${data.spent} coin ishlatildi (${(data.spent * SOM_PER_COIN).toLocaleString()} so'mga teng). Qolgan balans: ${data.coins}`
+          `−${data.spent} coin ishlatildi (${(data.spent * COIN_VALUE_SOM).toLocaleString()} so'mga teng). Qolgan balans: ${data.coins}`
         );
         setCoinsToUse("");
       } else {
@@ -813,7 +821,7 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     <>
-                      {/* YANGI: rejim tanlash — Coin qo'shish / Coin bilan to'lash */}
+                      {/* rejim tanlash — Coin qo'shish / Coin bilan to'lash */}
                       <div className="grid grid-cols-2 gap-2 mb-4">
                         <button
                           onClick={() => {
@@ -876,7 +884,7 @@ export default function AdminPage() {
                                 <div className="text-right">
                                   <p className="text-[10px] text-neutral-500">Nisbat</p>
                                   <p className="text-sm font-semibold text-white">
-                                    {SOM_PER_COIN} so&apos;m = 1 coin
+                                    1% (1 coin = 1 so&apos;m)
                                   </p>
                                 </div>
                               </div>
@@ -893,7 +901,7 @@ export default function AdminPage() {
                         </>
                       ) : (
                         <>
-                          {/* YANGI: coin bilan to'lash (kassada) */}
+                          {/* coin bilan to'lash (kassada, kichik chegirma) */}
                           <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
                             Ishlatiladigan coin
                           </label>
@@ -901,7 +909,15 @@ export default function AdminPage() {
                             type="number"
                             inputMode="numeric"
                             value={coinsToUse}
-                            onChange={(e) => setCoinsToUse(e.target.value)}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const max = scannedUser.coins || 0;
+                              if (val === "" || Number(val) <= max) {
+                                setCoinsToUse(val);
+                              } else {
+                                setCoinsToUse(String(max));
+                              }
+                            }}
                             placeholder={`Maksimal: ${scannedUser.coins || 0}`}
                             max={scannedUser.coins || 0}
                             className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-3 text-base text-white placeholder:text-neutral-600 outline-none focus:border-red-500/50 transition mb-3"
@@ -918,7 +934,7 @@ export default function AdminPage() {
                               <div className="flex items-center justify-between text-xs text-neutral-500">
                                 <span>Chekdan ayiriladi</span>
                                 <span className="text-neutral-300 font-medium">
-                                  ≈ {(Number(coinsToUse) * SOM_PER_COIN).toLocaleString()} so&apos;m
+                                  ≈ {(Number(coinsToUse) * COIN_VALUE_SOM).toLocaleString()} so&apos;m
                                 </span>
                               </div>
                               <div className="flex items-center justify-between pt-1.5 border-t border-neutral-800">
@@ -1375,6 +1391,17 @@ export default function AdminPage() {
                 <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/50 flex justify-between items-center">
                   <span>Tizim versiyasi</span>
                   <span className="font-semibold text-white">v1.0.0</span>
+                </div>
+                <div className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/50 space-y-2">
+                  <span className="text-neutral-500 text-xs uppercase tracking-wider">Coin nisbatlari</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Ishlab topish</span>
+                    <span className="font-semibold text-white">1% (xariddan)</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Sarflash (chegirma)</span>
+                    <span className="font-semibold text-white">1 coin = {COIN_VALUE_SOM.toLocaleString()} so&apos;m</span>
+                  </div>
                 </div>
               </div>
 

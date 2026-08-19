@@ -6,102 +6,285 @@ import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+// Tablar
+const TABS = [
+  { id: "spa", label: "Spa va Basseyn", icon: "💆‍♂️" },
+  { id: "restaurant", label: "Mavi Restorant", icon: "🍽️" },
+  { id: "hotel", label: "Husma Hotel", icon: "🏨" },
+];
+
+// Barcha sovg'alar va xizmatlar
+// MUHIM: endi 1 coin = 1 so'm (admin panel /api/admin/coins/route.js
+// dagi EARN_RATE va /api/admin/coins/spend/route.js dagi COIN_VALUE_SOM
+// bilan bir xil tizim). Shuning uchun har bir sovg'aning coin narxi
+// AYNAN uning haqiqiy so'm narxiga teng qilib qo'yilgan — ortiq ham,
+// kam ham emas. Eski versiyada "1 coin ≈ 5000 so'm" nisbati ishlatilgan
+// edi, bu esa sovg'alarni haqiqiy narxidan 5000 baravar arzon qilib
+// qo'ygan edi (masalan 100 000 so'mlik xizmat atigi 20 coin, ya'ni 20
+// so'm turardi).
 const GIFTS = [
+  // --- SPA VA BASSEYN (coin = tavsifdagi so'm narxi) ---
   {
-    id: 1,
-    name: "Xush kelibsiz meva savati",
-    coins: 30,
-    icon: "🍇",
-    desc: "Xonangizga kirishingiz bilan tayyor turadigan meva va shirinliklar savati.",
-    category: "Kichik e'tibor",
+    id: 101,
+    name: "Fitnes zal (1 kunlik)",
+    coins: 100000,
+    icon: "🏋️‍♂️",
+    image: "/gym.jpg",  
+    desc: "Kunlik fitnes zalga kirish (100 000 so'm)",
+    category: "spa",
   },
   {
-    id: 2,
-    name: "Bepul nonushta (1 kishi)",
-    coins: 50,
-    icon: "🥐",
-    desc: "Mehmonxona restoranida bir kishilik to'liq nonushta.",
-    category: "Ovqatlanish",
+    id: 102,
+    name: "Basseyn (1 kunlik)",
+    coins: 140000,
+    icon: "🏊‍♂️",
+    image: "/bas.jpeg",
+    desc: "Kunlik basseyn va dam olish zonasi (140 000 so'm)",
+    category: "spa",
   },
   {
-    id: 3,
-    name: "Kech chiqish (Late checkout)",
-    coins: 60,
-    icon: "🕒",
-    desc: "Standart vaqtdan 3 soatgacha kechroq xonani bo'shatish imkoniyati.",
-    category: "Qulaylik",
+    id: 103,
+    name: "Fitnes + Basseyn (1 kunlik)",
+    coins: 200000,
+    icon: "💪",
+    image:"/gym.jpg",
+    desc: "1 kunlik zal va basseyn ziyorati (200 000 so'm)",
+    category: "spa",
   },
   {
-    id: 4,
-    name: "Kir yuvish xizmati",
-    coins: 70,
-    icon: "🧺",
-    desc: "Turingiz davomida bir marta bepul kir yuvish va dazmollash xizmati.",
-    category: "Qulaylik",
+    id: 104,
+    name: "To'liq SPA Kompleks",
+    coins: 250000,
+    icon: "🧖‍♂️",
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop",
+    desc: "Fitnes, basseyn, hammam, fin saunasi, djakuzi (250 000 so'm)",
+    category: "spa",
   },
   {
-    id: 5,
-    name: "Aeroportdan olib ketish (Transfer)",
-    coins: 150,
-    icon: "🚗",
-    desc: "Aeroportdan mehmonxonagacha shaxsiy avtomobilda bepul transfer.",
-    category: "Transport",
+    id: 105,
+    name: "Ozdorovitelny massaj (60 min)",
+    coins: 450000,
+    icon: "💆‍♂️",
+    image:
+      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=800&auto=format&fit=crop",
+    desc: "Sog'lomlashtiruvchi to'liq tana massaji (450 000 so'm)",
+    category: "spa",
   },
   {
-    id: 6,
-    name: "SPA va basseyn kirish",
-    coins: 180,
-    icon: "💆",
-    desc: "Mehmonxona SPA markazi va basseyniga bir kunlik bepul kirish.",
-    category: "Dam olish",
+    id: 106,
+    name: "Aroma terapiya massaji (60 min)",
+    coins: 500000,
+    icon: "🌿",
+    image:
+      "https://images.unsplash.com/photo-1600334129128-685c5582fd35?q=80&w=800&auto=format&fit=crop",
+    desc: "Aromatik yog'lar bilan tinchlantiruvchi massaj (500 000 so'm)",
+    category: "spa",
   },
   {
-    id: 7,
-    name: "Kechki ovqat 2 kishiga",
-    coins: 220,
-    icon: "🍽️",
-    desc: "Mehmonxona restoranida romantik kechki ovqat, 2 kishi uchun.",
-    category: "Ovqatlanish",
+    id: 107,
+    name: "Sport massaji (45 min)",
+    coins: 400000,
+    icon: "🏃‍♂️",
+    image:
+      "https://images.unsplash.com/photo-1519824145371-296894a0daa9?q=80&w=800&auto=format&fit=crop",
+    desc: "Muskullarni tiklovchi intensiv sport massaji (400 000 so'm)",
+    category: "spa",
   },
   {
-    id: 8,
-    name: "Xona darajasini oshirish",
-    coins: 300,
-    icon: "⬆️",
-    desc: "Keyingi bronlashda bir daraja yuqori xonaga bepul upgrade.",
-    category: "Xona",
+    id: 108,
+    name: "Ognenniy (Olovli) massaj (50 min)",
+    coins: 400000,
+    icon: "🔥",
+    image:
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800&auto=format&fit=crop",
+    desc: "Maxsus olovli texnika orqali davolovchi massaj (400 000 so'm)",
+    category: "spa",
   },
   {
-    id: 9,
-    name: "1 kecha bepul turar joy",
-    coins: 500,
-    icon: "🏨",
-    desc: "Standart xonada bir kechalik mehmonxona bepul.",
-    category: "Xona",
+    id: 109,
+    name: "Orqa massaji (30 min)",
+    coins: 250000,
+    icon: "💆‍♂️",
+    image:
+      "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=800&auto=format&fit=crop",
+    desc: "Orqa va umurtqa sohasini bo'shashtirish (250 000 so'm)",
+    category: "spa",
   },
   {
-    id: 10,
-    name: "Butler (shaxsiy xizmatkor) kuni",
-    coins: 700,
-    icon: "🎩",
-    desc: "Turingiz davomida bir kunlik shaxsiy butler xizmati.",
-    category: "VIP",
+    id: 110,
+    name: "Asalli (Medovyy) massaj (40 min)",
+    coins: 400000,
+    icon: "🍯",
+    image:
+      "https://images.unsplash.com/photo-1519415943484-9fa1873496d4?q=80&w=800&auto=format&fit=crop",
+    desc: "Tabiiy asal bilan teri tozalovchi massaj (400 000 so'm)",
+    category: "spa",
   },
   {
-    id: 11,
-    name: "Deluxe xonada 2 kecha",
-    coins: 1100,
-    icon: "✨",
-    desc: "Deluxe xonada ikki kechalik bepul turar joy.",
-    category: "Xona",
+    id: 111,
+    name: "Shokoladli massaj (40 min)",
+    coins: 400000,
+    icon: "🍫",
+    image:
+      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=800&auto=format&fit=crop",
+    desc: "Tana uchun oziqlantiruvchi shokoladli massaj (400 000 so'm)",
+    category: "spa",
   },
   {
-    id: 12,
-    name: "Presidential Suite — 1 kecha",
-    coins: 2000,
+    id: 112,
+    name: "Piling + Skrab + Yuvinish (30 min)",
+    coins: 400000,
+    icon: "🧼",
+    image:
+      "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=800&auto=format&fit=crop",
+    desc: "Terini chuqur tozalovchi piling xizmati (400 000 so'm)",
+    category: "spa",
+  },
+  {
+    id: 113,
+    name: "Ko'pikli yuvinish (30 min)",
+    coins: 250000,
+    icon: "🫧",
+    image:
+      "https://images.unsplash.com/photo-1620733723572-11c53f73a416?q=80&w=800&auto=format&fit=crop",
+    desc: "Hammamda an'anaviy ko'pikli yuvinish (250 000 so'm)",
+    category: "spa",
+  },
+  {
+    id: 114,
+    name: "Kompleks massaj (90 min)",
+    coins: 850000,
     icon: "👑",
-    desc: "Eng yuqori darajadagi Presidential Suite'da bir kechalik bepul VIP turar joy.",
-    category: "VIP",
+    image:
+      "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=800&auto=format&fit=crop",
+    desc: "To'liq VIP kompleks massaj va parvarish (850 000 so'm)",
+    category: "spa",
+  },
+  {
+    id: 115,
+    name: "Bolalar suzishi (12 marta)",
+    coins: 600000,
+    icon: "👶",
+    image:
+      "https://images.unsplash.com/photo-1560089168-6516aa3f9dcd?q=80&w=800&auto=format&fit=crop",
+    desc: "4-12 yoshdagi bolalar uchun abonement (600 000 so'm)",
+    category: "spa",
+  },
+  {
+    id: 116,
+    name: "SPA Abonement (1 Oy)",
+    coins: 1600000,
+    icon: "🏛️",
+    image:
+      "https://images.unsplash.com/photo-1591343395902-1adc9a4d4a02?q=80&w=800&auto=format&fit=crop",
+    desc: "1 oylik to'liq SPA obunasi (1 600 000 so'm)",
+    category: "spa",
+  },
+
+
+
+
+  // --- MAVI RESTORANT ---
+  // Bu 3 tasida tavsifda so'm ko'rsatilmagan edi — taxminiy bozor narxi
+  // qo'yildi. O'zingizning haqiqiy narxlaringizga moslab o'zgartiring.
+
+
+
+  
+  {
+    id: 201,
+    name: "Xush kelibsiz meva savati",
+    coins: 50000,
+    icon: "🍇",
+    image:
+      "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?q=80&w=800&auto=format&fit=crop",
+    desc: "Xonangizga kirishingiz bilan tayyor turadigan meva va shirinliklar savati. (≈ 50 000 so'm)",
+    category: "restaurant",
+  },
+  {
+    id: 202,
+    name: "Bepul nonushta (1 kishi)",
+    coins: 80000,
+    icon: "🥐",
+    image:
+      "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=800&auto=format&fit=crop",
+    desc: "Mavi restoranida bir kishilik to'liq nonushta. (≈ 80 000 so'm)",
+    category: "restaurant",
+  },
+  {
+    id: 203,
+    name: "Kechki ovqat 2 kishiga",
+    coins: 400000,
+    icon: "🍽️",
+    image:
+      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format&fit=crop",
+    desc: "Mavi restoranida romantik kechki ovqat, 2 kishi uchun. (≈ 400 000 so'm)",
+    category: "restaurant",
+  },
+
+  // --- HUSMA HOTEL ---
+  // Bu bo'limdagi barcha narxlar ham taxminiy — haqiqiy xona/xizmat
+  // narxlaringizga moslab o'zgartirishingizni tavsiya qilamiz.
+  {
+    id: 301,
+    name: "Kech chiqish (Late checkout)",
+    coins: 100000,
+    icon: "🕒",
+    image:
+      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop",
+    desc: "Standart vaqtdan 3 soatgacha kechroq xonani bo'shatish imkoniyati. (≈ 100 000 so'm)",
+    category: "hotel",
+  },
+  {
+    id: 302,
+    name: "Kir yuvish xizmati",
+    coins: 60000,
+    icon: "🧺",
+    image:
+      "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=800&auto=format&fit=crop",
+    desc: "Turingiz davomida bir marta bepul kir yuvish va dazmollash xizmati. (≈ 60 000 so'm)",
+    category: "hotel",
+  },
+  {
+    id: 303,
+    name: "Aeroportdan olib ketish (Transfer)",
+    coins: 250000,
+    icon: "🚗",
+    image:
+      "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800&auto=format&fit=crop",
+    desc: "Aeroportdan mehmonxonagacha shaxsiy avtomobilda bepul transfer. (≈ 250 000 so'm)",
+    category: "hotel",
+  },
+  {
+    id: 304,
+    name: "Xona darajasini oshirish",
+    coins: 500000,
+    icon: "⬆️",
+    image:
+      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop",
+    desc: "Keyingi bronlashda bir daraja yuqori xonaga bepul upgrade. (≈ 500 000 so'm)",
+    category: "hotel",
+  },
+  {
+    id: 305,
+    name: "1 kecha bepul turar joy",
+    coins: 900000,
+    icon: "🏨",
+    image:
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800&auto=format&fit=crop",
+    desc: "Standart xonada bir kechalik mehmonxona bepul. (≈ 900 000 so'm)",
+    category: "hotel",
+  },
+  {
+    id: 306,
+    name: "Presidential Suite — 1 kecha",
+    coins: 5000000,
+    icon: "👑",
+    image:
+      "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=800&auto=format&fit=crop",
+    desc: "Eng yuqori darajadagi Presidential Suite'da bir kechalik bepul VIP turar joy. (≈ 5 000 000 so'm)",
+    category: "hotel",
   },
 ];
 
@@ -111,6 +294,7 @@ function formatCoins(n) {
 
 export default function SovgalarPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("spa");
   const [coins, setCoins] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [redeemedId, setRedeemedId] = useState(null);
@@ -178,11 +362,9 @@ export default function SovgalarPage() {
       );
       setTimeout(() => setMessage(""), 4000);
 
-      // Tarixni yangilash
       if (data.redemption) {
         setHistory((prev) => [data.redemption, ...prev]);
       } else {
-        // Agar backend redemption qaytarmasa, qayta yuklash
         fetch("/api/redemptions")
           .then((res) => res.json())
           .then((d) => setHistory(d.redemptions || []))
@@ -193,6 +375,8 @@ export default function SovgalarPage() {
       setTimeout(() => setMessage(""), 3000);
     }
   }
+
+  const filteredGifts = GIFTS.filter((gift) => gift.category === activeTab);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
@@ -207,10 +391,10 @@ export default function SovgalarPage() {
               Coinlaringizni sarflang
             </span>
             <h1 className="text-3xl sm:text-5xl font-bold text-white mb-3 tracking-tight">
-              Sovg&apos;alar
+              Sovg&apos;alar va Xizmatlar
             </h1>
             <p className="text-neutral-400 max-w-xl text-base sm:text-lg">
-              To&apos;plagan coinlaringizni mehmonxona xizmatlariga almashtiring.
+              To&apos;plagan coinlaringizni SPA, Restoran va Mehmonxona xizmatlariga almashtiring.
             </p>
           </div>
 
@@ -241,6 +425,24 @@ export default function SovgalarPage() {
               </>
             )}
           </div>
+        </div>
+
+        {/* Tab tugmalari */}
+        <div className="flex items-center gap-3 border-b border-neutral-800 pb-4 mb-8 overflow-x-auto">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
+                  : "bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800"
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Buyurtmalar tarixi */}
@@ -288,9 +490,9 @@ export default function SovgalarPage() {
           </div>
         )}
 
-        {/* Sovg‘alar grid */}
+        {/* Sovg‘alar grid (Filterlangan) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {GIFTS.map((gift) => {
+          {filteredGifts.map((gift) => {
             const affordable =
               isLoggedIn && coins !== null && coins >= gift.coins;
             const isRedeemed = redeemedId === gift.id;
@@ -305,14 +507,35 @@ export default function SovgalarPage() {
                     : "border-neutral-800/50 opacity-60"
                 }`}
               >
-                <div className="h-32 bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center text-5xl">
-                  {gift.icon}
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src={gift.image}
+                    alt={gift.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.parentElement.classList.add(
+                        "bg-gradient-to-br",
+                        "from-neutral-800",
+                        "to-neutral-900",
+                        "flex",
+                        "items-center",
+                        "justify-center"
+                      );
+                      const fallback = document.createElement("span");
+                      fallback.textContent = gift.icon;
+                      fallback.className = "text-5xl";
+                      e.currentTarget.parentElement.appendChild(fallback);
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0" />
+                  <span className="absolute top-3 left-3 text-2xl drop-shadow-lg">
+                    {gift.icon}
+                  </span>
                 </div>
 
                 <div className="p-6 flex flex-col flex-1">
-                  <span className="text-xs text-neutral-500 mb-2">
-                    {gift.category}
-                  </span>
                   <h2 className="text-base font-semibold text-white mb-2">
                     {gift.name}
                   </h2>
@@ -352,7 +575,7 @@ export default function SovgalarPage() {
           })}
         </div>
 
-        {/* Pastki blok */}
+        {/* Bottom Banner */}
         <div className="mt-16 rounded-3xl border border-red-500/20 bg-gradient-to-br from-red-950/60 via-neutral-900 to-neutral-950 p-8 sm:p-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
             Coin yetarli emasmi?

@@ -1,12 +1,23 @@
 [
   {
+    "id": 1787131079884,
+    "userId": "13",
+    "giftId": 101,
+    "giftName": "Fitnes zal (1 kunlik)",
+    "coinsSpent": 100000,
+    "status": "completed",
+    "createdAt": "2026-08-19T09:17:59.884Z",
+    "updatedAt": "2026-08-19T09:18:26.999Z"
+  },
+  {
     "id": 1787036109403,
     "userId": "13",
     "giftId": 2,
     "giftName": "Bepul nonushta (1 kishi)",
     "coinsSpent": 50,
-    "status": "pending",
-    "createdAt": "2026-08-18T06:55:09.403Z"
+    "status": "rejected",
+    "createdAt": "2026-08-18T06:55:09.403Z",
+    "updatedAt": "2026-08-19T09:18:28.980Z"
   },
   {
     "id": 1786861956722,

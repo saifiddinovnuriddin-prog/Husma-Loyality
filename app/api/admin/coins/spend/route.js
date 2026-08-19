@@ -3,8 +3,11 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUser } from "@/lib/db";
 
-// 1 coin necha so'mga teng — /api/admin/coins/route.js dagi bilan bir xil bo'lishi shart.
-const SOM_PER_COIN = 100;
+// Coin SARFLASH (kassada naqd chegirma sifatida): 1 coin = 1 so'm.
+// MUHIM: bu qiymat /api/admin/coins/route.js dagi EARN_RATE (1%) bilan
+// birga ishlaydi — mijoz xaridning 1%ini coin sifatida oladi va uni
+// TO'LIQ qiymatida (1:1) sarflay oladi. Natija: aniq 1% net cashback.
+const COIN_VALUE_SOM = 1;
 
 export async function POST(req) {
   try {
@@ -72,7 +75,7 @@ export async function POST(req) {
       success: true,
       coins: updated.coins,
       spent: coinsToSpend,
-      equivalentSum: coinsToSpend * SOM_PER_COIN,
+      equivalentSum: coinsToSpend * COIN_VALUE_SOM,
     });
   } catch (err) {
     console.error("ADMIN COINS SPEND ERROR:", err);

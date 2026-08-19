@@ -3,10 +3,11 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUser } from "@/lib/db";
 
-// 1 coin = 100 so'm. Xohlasangiz shu koeffitsientni o'zgartirasiz.
-// MUHIM: bu qiymat /api/admin/coins/spend/route.js dagi SOM_PER_COIN bilan
-// bir xil bo'lishi shart, aks holda qo'shish va sarflash nomuvofiq bo'ladi.
-const SOM_PER_COIN = 100;
+// Coin ISHLAB TOPISH: xaridning necha foizi coin sifatida qaytariladi.
+// 1 coin = 1 so'm (spend/route.js dagi COIN_VALUE_SOM bilan BIR XIL
+// bo'lishi shart). Shu bilan mijoz aynan EARN_RATE (1%) miqdorida
+// cashback oladi — ortiqcha emas.
+const EARN_RATE = 0.01; // xaridning 1%i coin sifatida beriladi
 
 export async function POST(req) {
   try {
@@ -45,7 +46,7 @@ export async function POST(req) {
       }
 
       spentToAdd = spent;
-      coinsToAdd = Math.floor(spent / SOM_PER_COIN);
+      coinsToAdd = Math.floor(spent * EARN_RATE);
     }
     // ===== Tayyor coin miqdorini qo'shish (+10, +50...) — foydalanuvchilar ro'yxatidan =====
     else {
