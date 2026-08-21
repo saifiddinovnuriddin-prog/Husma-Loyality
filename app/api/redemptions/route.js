@@ -1,35 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
-
-const REDEMPTIONS_FILE = path.join(
-  process.cwd(),
-  "data",
-  "redemptions.json"
-);
-
-function loadRedemptions() {
-  try {
-    if (!fs.existsSync(REDEMPTIONS_FILE)) {
-      return [];
-    }
-
-    const raw = fs.readFileSync(REDEMPTIONS_FILE, "utf-8");
-
-    if (!raw.trim()) {
-      return [];
-    }
-
-    const data = JSON.parse(raw);
-
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error("loadRedemptions error:", error);
-    return [];
-  }
-}
+import { getRedemptionsByUserId } from "@/lib/db";
 
 export async function GET() {
   try {
@@ -37,47 +9,31 @@ export async function GET() {
     const token = cookieStore.get(SESSION_COOKIE)?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const session = parseSessionToken(token);
-
     if (!session?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const redemptions = loadRedemptions();
+    const rows = await getRedemptionsByUserId(session.id);
 
-    const userRedemptions = redemptions
-      .filter(
-        (item) =>
-          String(item.userId) === String(session.id)
-      )
-      .sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
+    const redemptions = (rows || []).map((r) => ({
+      id: r.id,
+      userId: r.user_id,
+      giftId: r.gift_id,
+      giftName: r.gift_name,
+      coinsSpent: r.coins_spent,
+      status: r.status,
+      createdAt: r.created_at,
+    }));
 
-        return dateB - dateA;
-      });
-
-    return NextResponse.json({
-      redemptions: userRedemptions,
-    });
+    return NextResponse.json({ redemptions });
   } catch (error) {
     console.error("REDEMPTIONS GET ERROR:", error);
-
     return NextResponse.json(
-      {
-        error:
-          "Server xatosi: " +
-          (error?.message || "Noma'lum"),
-      },
+      { error: "Server xatosi: " + (error?.message || "Noma'lum") },
       { status: 500 }
     );
   }

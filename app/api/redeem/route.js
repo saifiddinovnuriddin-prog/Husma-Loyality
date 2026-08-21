@@ -53,7 +53,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Kirish talab qilinadi" }, { status: 401 });
     }
 
-    const user = getUserById(session.id);
+    const user = await getUserById(session.id);   // ← await qo'shildi
     if (!user) {
       return NextResponse.json({ error: "Foydalanuvchi topilmadi" }, { status: 401 });
     }
@@ -73,9 +73,9 @@ export async function POST(req) {
 
     const newCoins = currentCoins - gift.coins;
 
-    updateUserCoins(user.id, newCoins);
+    await updateUserCoins(user.id, newCoins);   // ← await qo'shildi
 
-    const redemption = createRedemption({
+    const redemption = await createRedemption({   // ← await qo'shildi
       userId: user.id,
       giftId: gift.id,
       giftName: gift.name,
@@ -83,10 +83,24 @@ export async function POST(req) {
       status: "pending",
     });
 
+    // Supabase snake_case ustunlarini frontend kutadigan camelCase
+    // shakliga o'giramiz (app/sovgalar/page.js shu nomlarni kutadi).
+    const mappedRedemption = redemption
+      ? {
+          id: redemption.id,
+          userId: redemption.user_id,
+          giftId: redemption.gift_id,
+          giftName: redemption.gift_name,
+          coinsSpent: redemption.coins_spent,
+          status: redemption.status,
+          createdAt: redemption.created_at,
+        }
+      : null;
+
     return NextResponse.json({
       success: true,
       coins: newCoins,
-      redemption,
+      redemption: mappedRedemption,
     });
   } catch (err) {
     console.error("REDEEM ERROR:", err);

@@ -16,7 +16,7 @@ async function requireAdmin() {
     return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
-  const admin = getUserById(session.id);
+  const admin = await getUserById(session.id);   // ← await
   if (!admin || admin.role !== "admin") {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   }
@@ -29,17 +29,19 @@ export async function GET() {
     const { admin, error } = await requireAdmin();
     if (error) return error;
 
-    const users = getAllUsers().map((u) => ({
+    const allUsers = await getAllUsers();   // ← await
+
+    const users = allUsers.map((u) => ({
       id: u.id,
       name: u.name,
-      email: u.email || u.phone || "", 
+      email: u.email || u.phone || "",
       phone: u.phone,
-      card: u.card || u.cardNumber || "",
+      card: u.card_number || u.cardNumber || u.card || "",
       role: u.role,
       tier: u.tier || "Bronza",
       coins: u.coins || 0,
-      totalSpent: u.totalSpent || 0,
-      isProtected: !!u.isProtected,
+      totalSpent: u.total_spent || u.totalSpent || 0,
+      isProtected: !!u.is_protected || !!u.isProtected,
     }));
 
     return NextResponse.json({ users });
@@ -68,19 +70,19 @@ export async function DELETE(req) {
       );
     }
 
-    const target = getUserById(userId);
+    const target = await getUserById(userId);   // ← await
     if (!target) {
       return NextResponse.json({ error: "Foydalanuvchi topilmadi" }, { status: 404 });
     }
 
-    if (target.isProtected) {
+    if (target.is_protected || target.isProtected) {
       return NextResponse.json(
         { error: "Bu foydalanuvchi Save qilingan, o'chirib bo'lmaydi" },
         { status: 400 }
       );
     }
 
-    deleteUserFromDb(userId);
+    await deleteUserFromDb(userId);   // ← await (agar async bo‘lsa)
 
     return NextResponse.json({ success: true });
   } catch (err) {

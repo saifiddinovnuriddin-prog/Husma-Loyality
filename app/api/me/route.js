@@ -18,7 +18,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = getUserById(session.id);
+    const user = await getUserById(session.id);   // ← await qo‘shildi
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -27,13 +27,13 @@ export async function GET() {
       id: user.id,
       name: user.name,
       phone: user.phone,
-      email: user.email || null,           // frontendda email ishlatiladi
+      email: user.email || null,
       role: user.role,
       coins: user.coins || 0,
       tier: user.tier || "Bronza",
-      totalSpent: user.totalSpent || 0,
-      cardNumber: user.cardNumber
-        ? formatCardNumber(user.cardNumber)
+      totalSpent: user.total_spent || user.totalSpent || 0,  // snake_case ham qo‘llab-quvvatlanadi
+      cardNumber: user.card_number || user.cardNumber
+        ? formatCardNumber(user.card_number || user.cardNumber)
         : null,
     });
   } catch (err) {

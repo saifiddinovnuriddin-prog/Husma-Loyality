@@ -31,7 +31,7 @@ export async function POST(req) {
       );
     }
 
-    const user = getUserByPhone(phoneCheck.e164);
+    const user = await getUserByPhone(phoneCheck.e164);
 
     // Xavfsizlik: "raqam topilmadi" va "parol noto'g'ri" holatlarini
     // bir xil xabar bilan qaytaramiz.

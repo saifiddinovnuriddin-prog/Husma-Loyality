@@ -17,7 +17,7 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const admin = getUserById(session.id);
+    const admin = await getUserById(session.id);   // ← await
     if (!admin || admin.role !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -32,7 +32,7 @@ export async function PATCH(req) {
       );
     }
 
-    const target = getUserById(userId);
+    const target = await getUserById(userId);   // ← await
     if (!target) {
       return NextResponse.json(
         { error: "Foydalanuvchi topilmadi" },
@@ -40,11 +40,15 @@ export async function PATCH(req) {
       );
     }
 
-    const updated = updateUser(userId, { isProtected });
+    // DB da is_protected deb saqlash mumkin
+    const updated = await updateUser(userId, { 
+      is_protected: isProtected,
+      isProtected: isProtected 
+    });
 
     return NextResponse.json({
       success: true,
-      isProtected: updated.isProtected,
+      isProtected: updated?.is_protected ?? updated?.isProtected ?? isProtected,
     });
   } catch (err) {
     console.error("ADMIN PROTECT ERROR:", err);

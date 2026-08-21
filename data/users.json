@@ -42,9 +42,21 @@
     "phone": "998901111111",
     "password": "697bbab5f18c5fff8a63cb93fd92f6fa23e0f6089b533a9898a2e82edfd24be7",
     "role": "user",
-    "coins": 700085,
+    "coins": 700100,
     "tier": "Bronza",
     "totalSpent": 80800000,
     "cardNumber": "8600997769887841"
+  },
+  {
+    "id": "14",
+    "name": "Nuriddin sa",
+    "country": "UZ",
+    "phone": "998900000000",
+    "password": "697bbab5f18c5fff8a63cb93fd92f6fa23e0f6089b533a9898a2e82edfd24be7",
+    "role": "user",
+    "coins": 60,
+    "tier": "Bronza",
+    "totalSpent": 0,
+    "cardNumber": "8600542204100715"
   }
 ]

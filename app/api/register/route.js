@@ -1,5 +1,3 @@
-// FAYL: app/api/register/route.js
-
 import { NextResponse } from "next/server";
 import { getUserByPhone, createUser } from "@/lib/db";
 import { validatePhone, getCountry } from "@/lib/phone";
@@ -15,7 +13,6 @@ export async function POST(req) {
     const body = await req.json();
     const { name, country, phone, password } = body;
 
-    // 1) Bo'sh maydonlar
     if (!name || !country || !phone || !password) {
       return NextResponse.json(
         { error: "Barcha maydonlarni to'ldiring" },
@@ -23,7 +20,6 @@ export async function POST(req) {
       );
     }
 
-    // 2) Ism — bo'sh joylardan tashqari kamida 2 belgi bo'lishi kerak
     if (String(name).trim().length < 2) {
       return NextResponse.json(
         { error: "Ism familiyani to'liq kiriting" },
@@ -31,7 +27,6 @@ export async function POST(req) {
       );
     }
 
-    // 3) Mamlakat ro'yxatda bormi
     const countryInfo = getCountry(country);
     if (!countryInfo) {
       return NextResponse.json(
@@ -40,8 +35,6 @@ export async function POST(req) {
       );
     }
 
-    // 4) Telefon raqamni tekshirish (uzunlik + O'zbekiston uchun haqiqiy
-    //    operator kodi: 90, 91, 93, 94, 95, 97, 98, 99, 33, 88, 20, 77, 78...)
     const dialDigits = countryInfo.dial.replace(/\D/g, "");
     const rawDigits = String(phone).replace(/\D/g, "");
     const localDigits = rawDigits.startsWith(dialDigits)
@@ -53,7 +46,6 @@ export async function POST(req) {
       return NextResponse.json({ error: phoneCheck.error }, { status: 400 });
     }
 
-    // 5) Parol
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Parol kamida 6 belgi bo'lishi kerak" },
@@ -61,8 +53,8 @@ export async function POST(req) {
       );
     }
 
-    // 6) Shu raqam bilan avval ro'yxatdan o'tilganmi
-    if (getUserByPhone(phoneCheck.e164)) {
+    const existing = await getUserByPhone(phoneCheck.e164);
+    if (existing) {
       return NextResponse.json(
         { error: "Bu raqam allaqachon ro'yxatdan o'tgan" },
         { status: 400 }
@@ -70,7 +62,7 @@ export async function POST(req) {
     }
 
     const hashed = hashPassword(password);
-    const user = createUser({
+    const user = await createUser({
       name: String(name).trim(),
       country,
       phone: phoneCheck.e164,

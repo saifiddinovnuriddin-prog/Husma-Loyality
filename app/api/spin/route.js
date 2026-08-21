@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUser, getTodaySpin, createSpinRecord } from "@/lib/db";
 
-// Yutuq ehtimoli: 0 - 45%, 5 - 30%, 10 - 18%, 15 - 7%
-// (15 ga tushish eng qiyin bo'lishi kerak edi)
 function pickPrize() {
   const r = Math.random() * 100;
   if (r < 45) return 0;
@@ -24,7 +22,6 @@ async function getSessionUser() {
   return getUserById(session.id);
 }
 
-// Bugun aylantirish mumkinmi, tekshirish uchun
 export async function GET() {
   try {
     const user = await getSessionUser();
@@ -32,7 +29,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const spin = getTodaySpin(user.id);
+    const spin = await getTodaySpin(user.id);
     return NextResponse.json({
       canSpin: !spin,
       todaySpin: spin || null,
@@ -53,24 +50,23 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const existing = getTodaySpin(user.id);
+    const existing = await getTodaySpin(user.id);
     if (existing) {
       return NextResponse.json(
         {
-          error:
-            "Bugun allaqachon aylantirgansiz. Ertaga qayta urinib ko'ring.",
+          error: "Bugun allaqachon aylantirgansiz. Ertaga qayta urinib ko'ring.",
         },
         { status: 400 }
       );
     }
 
     const prize = pickPrize();
-    createSpinRecord(user.id, prize);
+    await createSpinRecord(user.id, prize);
 
     let coins = user.coins || 0;
     if (prize > 0) {
       coins = coins + prize;
-      updateUser(user.id, { coins });
+      await updateUser(user.id, { coins });
     }
 
     return NextResponse.json({ success: true, prize, coins });

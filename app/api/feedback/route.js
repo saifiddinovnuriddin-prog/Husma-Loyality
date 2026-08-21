@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, createFeedback } from "@/lib/db";
+import { notifyTelegram } from "@/lib/telegram";
 
-// Foydalanuvchi fikr / savol / shikoyat yuboradi
 export async function POST(req) {
   try {
     const cookieStore = await cookies();
@@ -45,6 +45,10 @@ export async function POST(req) {
       userPhone: user.phone,
       message,
     });
+
+    notifyTelegram(
+      `💬 <b>Yangi fikr-mulohaza</b>\nMijoz: ${user.name}\nTelefon: ${user.phone || "—"}\nXabar: ${message}`
+    );
 
     return NextResponse.json({ success: true, feedback: item });
   } catch (err) {

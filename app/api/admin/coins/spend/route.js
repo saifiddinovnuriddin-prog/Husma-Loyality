@@ -3,10 +3,6 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUser } from "@/lib/db";
 
-// Coin SARFLASH (kassada naqd chegirma sifatida): 1 coin = 1 so'm.
-// MUHIM: bu qiymat /api/admin/coins/route.js dagi EARN_RATE (1%) bilan
-// birga ishlaydi — mijoz xaridning 1%ini coin sifatida oladi va uni
-// TO'LIQ qiymatida (1:1) sarflay oladi. Natija: aniq 1% net cashback.
 const COIN_VALUE_SOM = 1;
 
 export async function POST(req) {
@@ -39,7 +35,6 @@ export async function POST(req) {
       );
     }
 
-    // Admin o'ziga o'zi amal bajara olmaydi
     if (String(userId) === String(session.id)) {
       return NextResponse.json(
         { error: "O'zingizga amal bajara olmaysiz" },
@@ -57,7 +52,6 @@ export async function POST(req) {
 
     const currentCoins = Number(target.coins) || 0;
 
-    // MUHIM: balans hech qachon manfiy bo'lib qolmasligi kerak
     if (coinsToSpend > currentCoins) {
       return NextResponse.json(
         { error: `Balansda yetarli coin yo'q. Mavjud: ${currentCoins}` },
@@ -71,9 +65,20 @@ export async function POST(req) {
       coins: newCoins,
     });
 
+    const finalCoins = updated?.coins ?? newCoins;
+
+    // Telegram xabari (xato bersa ham asosiy ish to‘xtamasin)
+    try {
+      await notifyTelegram(
+        `➖ <b>Coin bilan to'landi</b>\nMijoz: ${target.name}\nIshlatildi: -${coinsToSpend} coin (${(coinsToSpend * COIN_VALUE_SOM).toLocaleString()} so'm)\nQolgan balans: ${finalCoins}\nAdmin: ${admin.name}`
+      );
+    } catch (tgErr) {
+      console.error("Telegram notify error:", tgErr);
+    }
+
     return NextResponse.json({
       success: true,
-      coins: updated.coins,
+      coins: finalCoins,
       spent: coinsToSpend,
       equivalentSum: coinsToSpend * COIN_VALUE_SOM,
     });

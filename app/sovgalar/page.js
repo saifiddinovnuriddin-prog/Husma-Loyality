@@ -29,7 +29,7 @@ const GIFTS = [
     name: "Fitnes zal (1 kunlik)",
     coins: 100000,
     icon: "🏋️‍♂️",
-    image: "/gym.jpg",  
+    image: "/gym.jpg",
     desc: "Kunlik fitnes zalga kirish (100 000 so'm)",
     category: "spa",
   },
@@ -47,7 +47,7 @@ const GIFTS = [
     name: "Fitnes + Basseyn (1 kunlik)",
     coins: 200000,
     icon: "💪",
-    image:"/gym.jpg",
+    image: "/gym.jpg",
     desc: "1 kunlik zal va basseyn ziyorati (200 000 so'm)",
     category: "spa",
   },
@@ -182,16 +182,9 @@ const GIFTS = [
     category: "spa",
   },
 
-
-
-
   // --- MAVI RESTORANT ---
   // Bu 3 tasida tavsifda so'm ko'rsatilmagan edi — taxminiy bozor narxi
   // qo'yildi. O'zingizning haqiqiy narxlaringizga moslab o'zgartiring.
-
-
-
-  
   {
     id: 201,
     name: "Xush kelibsiz meva savati",

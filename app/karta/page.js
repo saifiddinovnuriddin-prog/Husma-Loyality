@@ -25,6 +25,12 @@ import {
   Diamond as DiamondIcon,
   Star,
   ChevronDown,
+  Settings,
+  Eye,
+  EyeOff,
+  KeyRound,
+  UserRound,
+  ShieldCheck,
 } from "lucide-react";
 
 function formatCoins(n) {
@@ -61,6 +67,8 @@ const LEVELS = [
       "Ilovani o'rnatganda 50 000 so'mlik chegirma (Husma fit, Mavi restoranda ham)",
       "Har bir xariddan 1% coin qaytariladi (1 coin = 1 so'm)",
     ],
+    // Standard darajada avtomatik sovg'a berilmaydi (bu shunchaki boshlang'ich daraja)
+    autoGift: null,
   },
   {
     key: "Bronze",
@@ -76,6 +84,7 @@ const LEVELS = [
       "Kir yuvish xizmatida 5% chegirma",
       "Husma Spa va Fitness xizmatlarida 5% chegirma",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 1)", coins: 0 },
   },
   {
     key: "Silver",
@@ -92,6 +101,7 @@ const LEVELS = [
       "Mavi restoranda 5% chegirma",
       "Kelganda xonada VIP 2 mevalar savati",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 2)", coins: 0 },
   },
   {
     key: "Gold",
@@ -111,6 +121,7 @@ const LEVELS = [
       "Mavi restoranda 10% chegirma",
       "Kelganda xonada VIP 3 mevalar savati",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 3)", coins: 0 },
   },
   {
     key: "Platinum",
@@ -132,6 +143,7 @@ const LEVELS = [
       "Kelganda xonada VIP 4 mevalar savati",
       "Jo'nab ketishda sovg'a 🎁 1-daraja",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 4)", coins: 0 },
   },
   {
     key: "Diamond",
@@ -153,6 +165,7 @@ const LEVELS = [
       "Kelganda va har kuni yangilanadigan VIP 5 mevalar savati",
       "Jo'nab ketishda sovg'a 🎁 2-daraja",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 5)", coins: 0 },
   },
   {
     key: "VIP",
@@ -174,6 +187,7 @@ const LEVELS = [
       "Kelganda va har kuni yangilanadigan VIP 6 mevalar savati",
       "Jo'nab ketishda sovg'a 🎁 3-daraja",
     ],
+    autoGift: { name: "Xush kelibsiz meva savati (VIP 6)", coins: 0 },
   },
 ];
 
@@ -242,6 +256,26 @@ function getStatusClass(status) {
   }
 }
 
+/* Parol kuchini juda oddiy baholash: 0-4 */
+function getPasswordStrength(pw) {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.min(score, 4);
+}
+
+const STRENGTH_LABELS = ["Juda zaif", "Zaif", "O'rtacha", "Yaxshi", "Kuchli"];
+const STRENGTH_COLORS = [
+  "bg-neutral-700",
+  "bg-red-500",
+  "bg-amber-500",
+  "bg-yellow-400",
+  "bg-emerald-500",
+];
+
 export default function KartaPage() {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
@@ -265,6 +299,19 @@ export default function KartaPage() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState(null);
 
+  /* ===================== SOZLAMALAR (login/parol) ===================== */
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsLogin, setSettingsLogin] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [settingsSubmitting, setSettingsSubmitting] = useState(false);
+  const [settingsError, setSettingsError] = useState(null);
+  const [settingsSuccess, setSettingsSuccess] = useState(false);
+
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -285,6 +332,16 @@ export default function KartaPage() {
       else next.add(key);
       return next;
     });
+  }
+
+  function openSettings() {
+    setSettingsError(null);
+    setSettingsSuccess(false);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setSettingsLogin(user?.login || user?.phone || user?.username || "");
+    setShowSettings(true);
   }
 
   useEffect(() => {
@@ -373,6 +430,57 @@ export default function KartaPage() {
       .catch(() => setQrDataUrl(null));
   }, [user]);
 
+  /* =========================================================
+     YANGI DARAJAGA CHIQQANDA AVTOMATIK SOVG'A YOZUVI
+     — "Almashtirilgan sovg'alar" ro'yxatiga (rasmdagi joy)
+       avtomatik "Kutilmoqda" holatida yozuv qo'shiladi.
+     — Har bir daraja uchun BIR MARTA ishlaydi (localStorage bilan
+       himoyalangan), sahifa qayta ochilganda takrorlanmaydi.
+     — Backendda buni saqlab qo'yish uchun /api/level-reward
+       nomli POST endpoint kerak (pastdagi tushuntirishga qarang).
+  ========================================================= */
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const coinsForLevel = Math.max(Number(user.coins) || 0, highestCoins);
+    const level = getCurrentLevelByCoins(coinsForLevel);
+
+    if (!level || !level.autoGift) return;
+
+    const rewardedKey = `husma_level_reward_${user.id}_${level.key}`;
+    if (localStorage.getItem(rewardedKey)) return;
+
+    // Boshqa tab/qayta render orqali qo'sh yuborilib ketmasligi uchun
+    // darhol belgilab qo'yamiz, xatolik bo'lsa keyin qaytarib olamiz.
+    localStorage.setItem(rewardedKey, "1");
+
+    fetch("/api/level-reward", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        level: level.key,
+        giftName: level.autoGift.name,
+        coins: level.autoGift.coins,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("level-reward failed");
+        return res.json();
+      })
+      .then(() => fetch("/api/redemptions", { cache: "no-store" }))
+      .then((res) => (res && res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.redemptions)) {
+          setHistory(data.redemptions);
+        }
+      })
+      .catch((err) => {
+        console.error("Level reward error:", err);
+        // Xatolik bo'lsa, keyingi safar qayta urinib ko'rish uchun belgini olib tashlaymiz
+        localStorage.removeItem(rewardedKey);
+      });
+  }, [user?.id, user?.coins, highestCoins]);
+
   async function handleSpin() {
     if (!spinStatus?.canSpin || isSpinning) return;
 
@@ -455,6 +563,70 @@ export default function KartaPage() {
     setFeedbackSubmitting(false);
   }
 
+  async function handleSettingsSubmit(e) {
+    e.preventDefault();
+    if (settingsSubmitting) return;
+
+    setSettingsError(null);
+    setSettingsSuccess(false);
+
+    const wantsPasswordChange =
+      newPassword.length > 0 || confirmPassword.length > 0;
+
+    if (wantsPasswordChange) {
+      if (!currentPassword) {
+        setSettingsError("Joriy parolni kiriting");
+        return;
+      }
+      if (newPassword.length < 6) {
+        setSettingsError("Yangi parol kamida 6 ta belgidan iborat bo'lsin");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setSettingsError("Yangi parollar bir xil emas");
+        return;
+      }
+    }
+
+    if (!settingsLogin.trim()) {
+      setSettingsError("Login bo'sh bo'lishi mumkin emas");
+      return;
+    }
+
+    setSettingsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          login: settingsLogin.trim(),
+          currentPassword: wantsPasswordChange ? currentPassword : undefined,
+          newPassword: wantsPasswordChange ? newPassword : undefined,
+        }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setUser((prev) =>
+          prev ? { ...prev, login: settingsLogin.trim() } : prev
+        );
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setSettingsSuccess(true);
+        setTimeout(() => setSettingsSuccess(false), 3500);
+      } else {
+        setSettingsError(data.error || "Xatolik yuz berdi");
+      }
+    } catch (err) {
+      console.error(err);
+      setSettingsError("Server bilan bog'lanishda xatolik");
+    }
+
+    setSettingsSubmitting(false);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-neutral-950 flex items-center justify-center px-3">
@@ -525,6 +697,7 @@ export default function KartaPage() {
 
   const style = tierStyles[currentKey] || tierStyles.Standard;
   const cardNumber = user.cardNumber || "•••• •••• •••• ••••";
+  const passwordStrength = getPasswordStrength(newPassword);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 overflow-x-hidden">
@@ -546,6 +719,13 @@ export default function KartaPage() {
             >
               Bosh sahifa
             </Link>
+            <button
+              onClick={openSettings}
+              className="flex items-center gap-1 text-[11px] sm:text-sm text-neutral-300 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
+            >
+              <Settings size={13} />
+              Sozlamalar
+            </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 text-[11px] sm:text-sm text-red-400 hover:text-red-300 transition px-2.5 py-1.5 rounded-lg bg-red-950/30 border border-red-900/50 font-medium whitespace-nowrap"
@@ -1068,6 +1248,174 @@ export default function KartaPage() {
             >
               Yopish
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* SOZLAMALAR MODAL — login va parolni o'zgartirish */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl text-neutral-200 max-h-[92vh] overflow-y-auto">
+            <button
+              onClick={() => setShowSettings(false)}
+              className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-white transition rounded-lg bg-neutral-800/50 z-10"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 shrink-0">
+                  <Settings size={16} />
+                </span>
+                <h3 className="text-base font-bold text-white">Sozlamalar</h3>
+              </div>
+              <p className="text-[11px] sm:text-xs text-neutral-500 mb-5">
+                Login va parolingizni shu yerda yangilashingiz mumkin.
+              </p>
+
+              <form onSubmit={handleSettingsSubmit} className="space-y-5">
+                {/* LOGIN */}
+                <div>
+                  <label className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-neutral-400 mb-1.5">
+                    <UserRound size={12} />
+                    Login / Telefon raqam
+                  </label>
+                  <input
+                    type="text"
+                    value={settingsLogin}
+                    onChange={(e) => setSettingsLogin(e.target.value)}
+                    placeholder="Login yoki telefon raqam"
+                    className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                  />
+                </div>
+
+                <div className="h-px bg-neutral-800" />
+
+                {/* PAROL */}
+                <div>
+                  <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-neutral-400 mb-3">
+                    <KeyRound size={12} />
+                    Parolni o'zgartirish
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Joriy parol"
+                        autoComplete="current-password"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword((v) => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition"
+                        tabIndex={-1}
+                      >
+                        {showCurrentPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Yangi parol"
+                        autoComplete="new-password"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword((v) => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition"
+                        tabIndex={-1}
+                      >
+                        {showNewPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+
+                    {newPassword.length > 0 && (
+                      <div>
+                        <div className="flex gap-1">
+                          {[0, 1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className={`h-1 flex-1 rounded-full transition-colors ${
+                                i < passwordStrength
+                                  ? STRENGTH_COLORS[passwordStrength]
+                                  : "bg-neutral-800"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-neutral-500 mt-1">
+                          {STRENGTH_LABELS[passwordStrength]}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Yangi parolni tasdiqlang"
+                        autoComplete="new-password"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((v) => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition"
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="flex items-start gap-1.5 text-[10px] sm:text-[11px] text-neutral-600 mt-2.5">
+                    <ShieldCheck size={12} className="mt-0.5 shrink-0" />
+                    Parolni o'zgartirmoqchi bo'lmasangiz, ushbu maydonlarni bo'sh qoldiring.
+                  </p>
+                </div>
+
+                {settingsError && (
+                  <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-red-400">
+                    <AlertCircle size={12} />
+                    {settingsError}
+                  </p>
+                )}
+
+                {settingsSuccess && (
+                  <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-400">
+                    <CheckCircle2 size={12} />
+                    Sozlamalar muvaffaqiyatli saqlandi!
+                  </p>
+                )}
+
+                <div className="flex gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowSettings(false)}
+                    className="flex-1 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs sm:text-sm font-semibold text-white transition"
+                  >
+                    Bekor qilish
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={settingsSubmitting}
+                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-xs sm:text-sm font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {settingsSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -3,11 +3,7 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, parseSessionToken } from "@/lib/auth";
 import { getUserById, updateUser } from "@/lib/db";
 
-// Coin ISHLAB TOPISH: xaridning necha foizi coin sifatida qaytariladi.
-// 1 coin = 1 so'm (spend/route.js dagi COIN_VALUE_SOM bilan BIR XIL
-// bo'lishi shart). Shu bilan mijoz aynan EARN_RATE (1%) miqdorida
-// cashback oladi — ortiqcha emas.
-const EARN_RATE = 0.01; // xaridning 1%i coin sifatida beriladi
+const EARN_RATE = 0.01;
 
 export async function POST(req) {
   try {
@@ -34,7 +30,6 @@ export async function POST(req) {
     let coinsToAdd = 0;
     let spentToAdd = 0;
 
-    // ===== Summa (so'm) orqali qo'shish — kassa skaneridan keladi =====
     if (body.spent !== undefined && body.spent !== null && body.spent !== "") {
       const spent = Number(body.spent);
 
@@ -47,9 +42,7 @@ export async function POST(req) {
 
       spentToAdd = spent;
       coinsToAdd = Math.floor(spent * EARN_RATE);
-    }
-    // ===== Tayyor coin miqdorini qo'shish (+10, +50...) — foydalanuvchilar ro'yxatidan =====
-    else {
+    } else {
       const amount = Number(body.amount);
 
       if (!userId || isNaN(amount) || amount === 0) {
@@ -62,7 +55,6 @@ export async function POST(req) {
       coinsToAdd = amount;
     }
 
-    // Admin o'ziga o'zi coin qo'sha olmaydi
     if (String(userId) === String(session.id)) {
       return NextResponse.json(
         { error: "O'zingizga coin qo'sha olmaysiz" },
@@ -78,18 +70,22 @@ export async function POST(req) {
       );
     }
 
-    const newCoins = Math.max(0, (target.coins || 0) + coinsToAdd);
-    const newTotalSpent = Math.max(0, (target.totalSpent || 0) + spentToAdd);
+    const currentCoins = target.coins || 0;
+    const currentTotalSpent = target.total_spent || target.totalSpent || 0;
+
+    const newCoins = Math.max(0, currentCoins + coinsToAdd);
+    const newTotalSpent = Math.max(0, currentTotalSpent + spentToAdd);
 
     const updated = await updateUser(userId, {
       coins: newCoins,
-      totalSpent: newTotalSpent,
+      total_spent: newTotalSpent,   // snake_case (DB)
+      totalSpent: newTotalSpent,    // agar mapping bo‘lsa
     });
 
     return NextResponse.json({
       success: true,
-      coins: updated.coins,
-      totalSpent: updated.totalSpent,
+      coins: updated?.coins ?? newCoins,
+      totalSpent: updated?.total_spent ?? updated?.totalSpent ?? newTotalSpent,
       coinsAdded: coinsToAdd,
     });
   } catch (err) {
