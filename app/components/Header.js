@@ -18,6 +18,7 @@ function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const langRef = useRef(null);
   const router = useRouter();
@@ -48,10 +49,18 @@ function Header() {
   }, [pathname]);
 
   // =====================================================
-  // SCROLL HOLATI
+  // SCROLL HOLATI + SCROLL PROGRESS
   // =====================================================
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setScrollProgress(progress);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -171,201 +180,217 @@ function Header() {
   ];
 
   return (
-    <header
-      className={`w-full sticky top-0 z-50 border-b transition-colors duration-300 ${
-        scrolled
-          ? "bg-black/90 backdrop-blur-md border-neutral-800"
-          : "bg-black border-neutral-900"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 sm:h-18 flex items-center justify-between">
-        {/* Logotip */}
-        <Link href="/" className="flex items-center gap-2 group shrink-0">
-          <span className="text-lg sm:text-xl font-black tracking-tight text-white group-hover:text-red-500 transition">
-            HUSMA{" "}
-            <span className="text-red-600 font-semibold text-sm sm:text-base">
-              Loyalty
-            </span>
-          </span>
-        </Link>
-
-        {/* Desktop navigatsiya */}
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`relative transition ${
-                isActive(link.href)
-                  ? "text-red-500"
-                  : "text-neutral-300 hover:text-red-500"
-              }`}
-            >
-              {link.label}
-              {isActive(link.href) && (
-                <span className="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-red-600" />
-              )}
-            </Link>
-          ))}
-
-          {me && me.role === "admin" && (
-            <Link
-              href="/admin"
-              className={`font-medium transition ${
-                isActive("/admin")
-                  ? "text-red-500"
-                  : "text-neutral-300 hover:text-red-500"
-              }`}
-            >
-              {t("nav.admin")}
-            </Link>
-          )}
-        </nav>
-
-        {/* Desktop o'ng blok */}
-        <div className="hidden lg:flex items-center gap-3">
-          <CoinBadge />
-          <LangSwitcher />
-
-          {me ? (
-            <div className="flex items-center gap-3 pl-3 border-l border-neutral-800">
-              <span className="text-white font-medium text-sm">{me.name}</span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 text-xs font-medium hover:bg-neutral-800 hover:text-white transition"
-              >
-                {t("nav.logout")}
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="px-4 py-2 text-neutral-200 hover:text-red-500 transition font-medium text-sm"
-              >
-                {t("nav.login")}
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Mobil */}
-        <div className="flex lg:hidden items-center gap-3">
-          <CoinBadge />
-          <button
-            onClick={() => setMobileOpen(true)}
-            aria-label="Menyuni ochish"
-            className="p-2 -mr-2 text-white hover:text-red-500 transition"
-          >
-            <Menu size={24} />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobil menyu */}
-      <div
-        className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${
-          mobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+    <>
+      {/* Header endi fixed - sahifa scroll bo'lganda ham doim tepada turadi */}
+      <header
+        className={`w-full fixed top-0 left-0 z-50 border-b transition-colors duration-300 ${
+          scrolled
+            ? "bg-black/90 backdrop-blur-md border-neutral-800 shadow-lg shadow-black/20"
+            : "bg-black border-neutral-900"
         }`}
       >
-        <div
-          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-
-        <div
-          className={`absolute top-0 right-0 h-full w-[82%] max-w-sm bg-neutral-950 border-l border-neutral-800 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-            mobileOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex items-center justify-between h-16 px-5 border-b border-neutral-800">
-            <span className="text-lg font-black text-white">
-              HUSMA <span className="text-red-600">Loyalty</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 h-16 sm:h-18 flex items-center justify-between">
+          {/* Logotip */}
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
+            <span className="text-lg sm:text-xl font-black tracking-tight text-white group-hover:text-red-500 transition">
+              HUSMA{" "}
+              <span className="text-red-600 font-semibold text-sm sm:text-base">
+                Loyalty
+              </span>
             </span>
-            <button
-              onClick={() => setMobileOpen(false)}
-              aria-label="Menyuni yopish"
-              className="p-2 text-neutral-400 hover:text-white transition"
-            >
-              <X size={22} />
-            </button>
-          </div>
+          </Link>
 
-          <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+          {/* Desktop navigatsiya */}
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative transition ${
+                  isActive(link.href)
+                    ? "text-red-500"
+                    : "text-neutral-300 hover:text-red-500"
+                }`}
+              >
+                {link.label}
+                {isActive(link.href) && (
+                  <span className="absolute -bottom-2 left-0 right-0 h-0.5 rounded-full bg-red-600" />
+                )}
+              </Link>
+            ))}
+
+            {me && me.role === "admin" && (
+              <Link
+                href="/admin"
+                className={`font-medium transition ${
+                  isActive("/admin")
+                    ? "text-red-500"
+                    : "text-neutral-300 hover:text-red-500"
+                }`}
+              >
+                {t("nav.admin")}
+              </Link>
+            )}
+          </nav>
+
+          {/* Desktop o'ng blok */}
+          <div className="hidden lg:flex items-center gap-3">
+            <CoinBadge />
+            <LangSwitcher />
+
             {me ? (
-              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3">
-                <div>
-                  <div className="text-white font-medium text-sm">{me.name}</div>
-                  <div className="text-neutral-500 text-xs mt-0.5">
-                    {t("nav.welcome")}
-                  </div>
-                </div>
-                <CoinBadge mobile />
+              <div className="flex items-center gap-3 pl-3 border-l border-neutral-800">
+                <span className="text-white font-medium text-sm">{me.name}</span>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 text-xs font-medium hover:bg-neutral-800 hover:text-white transition"
+                >
+                  {t("nav.logout")}
+                </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="w-full text-center px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-200 font-medium text-sm hover:bg-neutral-800 transition"
+                  className="px-4 py-2 text-neutral-200 hover:text-red-500 transition font-medium text-sm"
                 >
                   {t("nav.login")}
                 </Link>
-                <Link
-                  href="/register"
-                  className="w-full text-center px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition"
-                >
-                  {t("nav.register")}
-                </Link>
               </div>
             )}
+          </div>
 
-            <nav className="flex flex-col gap-1">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
-                    isActive(link.href)
-                      ? "bg-red-600/10 text-red-500"
-                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              {me && me.role === "admin" && (
-                <Link
-                  href="/admin"
-                  className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
-                    isActive("/admin")
-                      ? "bg-red-600/10 text-red-500"
-                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
-                  }`}
-                >
-                  {t("nav.admin")}
-                </Link>
-              )}
-            </nav>
-
-            <div className="mt-auto pt-4 border-t border-neutral-800">
-              <LangSwitcher mobile />
-            </div>
-
-            {me && (
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 text-sm font-medium hover:bg-neutral-800 hover:text-white transition"
-              >
-                {t("nav.logout")}
-              </button>
-            )}
+          {/* Mobil */}
+          <div className="flex lg:hidden items-center gap-3">
+            <CoinBadge />
+            <button
+              onClick={() => setMobileOpen(true)}
+              aria-label="Menyuni ochish"
+              className="p-2 -mr-2 text-white hover:text-red-500 transition"
+            >
+              <Menu size={24} />
+            </button>
           </div>
         </div>
-      </div>
-    </header>
+
+        {/* Scroll progress bar - sahifa qanchalik o'qilganini ko'rsatadi */}
+        <div className="h-0.5 w-full bg-neutral-900">
+          <div
+            className="h-full bg-red-600 transition-[width] duration-150 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+
+        {/* Mobil menyu */}
+        <div
+          className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${
+            mobileOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+
+          <div
+            className={`absolute top-0 right-0 h-full w-[82%] max-w-sm bg-neutral-950 border-l border-neutral-800 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
+              mobileOpen ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="flex items-center justify-between h-16 px-5 border-b border-neutral-800">
+              <span className="text-lg font-black text-white">
+                HUSMA <span className="text-red-600">Loyalty</span>
+              </span>
+              <button
+                onClick={() => setMobileOpen(false)}
+                aria-label="Menyuni yopish"
+                className="p-2 text-neutral-400 hover:text-white transition"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+              {me ? (
+                <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3">
+                  <div>
+                    <div className="text-white font-medium text-sm">{me.name}</div>
+                    <div className="text-neutral-500 text-xs mt-0.5">
+                      {t("nav.welcome")}
+                    </div>
+                  </div>
+                  <CoinBadge mobile />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/login"
+                    className="w-full text-center px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-200 font-medium text-sm hover:bg-neutral-800 transition"
+                  >
+                    {t("nav.login")}
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="w-full text-center px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition"
+                  >
+                    {t("nav.register")}
+                  </Link>
+                </div>
+              )}
+
+              <nav className="flex flex-col gap-1">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
+                      isActive(link.href)
+                        ? "bg-red-600/10 text-red-500"
+                        : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                {me && me.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
+                      isActive("/admin")
+                        ? "bg-red-600/10 text-red-500"
+                        : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                    }`}
+                  >
+                    {t("nav.admin")}
+                  </Link>
+                )}
+              </nav>
+
+              <div className="mt-auto pt-4 border-t border-neutral-800">
+                <LangSwitcher mobile />
+              </div>
+
+              {me && (
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 text-sm font-medium hover:bg-neutral-800 hover:text-white transition"
+                >
+                  {t("nav.logout")}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Header fixed bo'lgani uchun kontent uning ostida yashirinib qolmasligi
+          uchun shu bo'sh joy (spacer) qo'yildi. Balandligi header balandligi bilan
+          bir xil (h-16 sm:h-18 + progress bar 0.5px) */}
+      <div className="h-16 sm:h-18" aria-hidden="true" />
+    </>
   );
 }
 
