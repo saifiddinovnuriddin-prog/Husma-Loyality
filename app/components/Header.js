@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu, X, Coins, Globe, ChevronDown } from "lucide-react";
+import { X, Coins, Globe, ChevronDown } from "lucide-react";
 import { useI18n } from "../../lib/i18n"; // yo'lni o'zingizga moslashtiring
 
 const LANGS = [
@@ -90,6 +90,18 @@ function Header() {
   }, [mobileOpen]);
 
   // =====================================================
+  // ESCAPE TUGMASI — MOBIL MENYUNI YOPISH (yangi qo'shildi)
+  // =====================================================
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
+  // =====================================================
   // SAHIFA O'ZGARSA — MOBIL MENYUNI YOPISH
   // =====================================================
   useEffect(() => {
@@ -112,6 +124,7 @@ function Header() {
   const LangSwitcher = ({ mobile = false }) => (
     <div ref={!mobile ? langRef : undefined} className="relative">
       <button
+        type="button"
         onClick={() => setLangOpen((v) => !v)}
         className={`flex items-center gap-1.5 rounded-lg border border-neutral-700 px-3 py-2 text-xs font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white transition ${
           mobile ? "w-full justify-between" : ""
@@ -136,6 +149,7 @@ function Header() {
           {LANGS.map((l) => (
             <button
               key={l.code}
+              type="button"
               onClick={() => {
                 setLocale(l.code); // "uz" | "ru" | "en"
                 setLangOpen(false);
@@ -169,6 +183,32 @@ function Header() {
         {typeof me.coins === "number" ? me.coins.toLocaleString() : 0}
       </div>
     ) : null;
+
+  // =====================================================
+  // ANIMATSIYALI HAMBURGER IKONKA (yangi qo'shildi)
+  // lucide-react'ning Menu ikonkasi o'rniga qo'lda SVG chizildi —
+  // shunda ochiq/yopiq holatda 3 ta chiziq silliq X ga aylanadi
+  // va ikonka render bo'lmay qolish ehtimoli yo'qoladi.
+  // =====================================================
+  const HamburgerIcon = ({ open }) => (
+    <span className="relative flex items-center justify-center w-6 h-6">
+      <span
+        className={`absolute block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ${
+          open ? "rotate-45" : "-translate-y-2"
+        }`}
+      />
+      <span
+        className={`absolute block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ${
+          open ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      <span
+        className={`absolute block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ${
+          open ? "-rotate-45" : "translate-y-2"
+        }`}
+      />
+    </span>
+  );
 
   const NAV_LINKS = [
     { href: "/xonalar", label: t("nav.coinshop") },
@@ -242,6 +282,7 @@ function Header() {
               <div className="flex items-center gap-3 pl-3 border-l border-neutral-800">
                 <span className="text-white font-medium text-sm">{me.name}</span>
                 <button
+                  type="button"
                   onClick={handleLogout}
                   className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 text-xs font-medium hover:bg-neutral-800 hover:text-white transition"
                 >
@@ -260,15 +301,17 @@ function Header() {
             )}
           </div>
 
-          {/* Mobil */}
+          {/* Mobil o'ng blok — hamburger tugmasi shu yerda */}
           <div className="flex lg:hidden items-center gap-3">
             <CoinBadge />
             <button
-              onClick={() => setMobileOpen(true)}
-              aria-label="Menyuni ochish"
-              className="p-2 -mr-2 text-white hover:text-red-500 transition"
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? "Menyuni yopish" : "Menyuni ochish"}
+              aria-expanded={mobileOpen}
+              className="relative z-[70] flex items-center justify-center w-10 h-10 -mr-2 shrink-0 text-white active:scale-95 transition-transform"
             >
-              <Menu size={24} />
+              <HamburgerIcon open={mobileOpen} />
             </button>
           </div>
         </div>
@@ -280,111 +323,114 @@ function Header() {
             style={{ width: `${scrollProgress}%` }}
           />
         </div>
+      </header>
 
-        {/* Mobil menyu */}
+      {/* Mobil menyu — header'dan tashqariga chiqarildi, shunda z-index
+          va fixed positioning konflikti bo'lmaydi */}
+      <div
+        className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
         <div
-          className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-300 ${
-            mobileOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={() => setMobileOpen(false)}
+        />
+
+        <div
+          className={`absolute top-0 right-0 h-full w-[82%] max-w-sm bg-neutral-950 border-l border-neutral-800 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
+            mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setMobileOpen(false)}
-          />
+          <div className="flex items-center justify-between h-16 px-5 border-b border-neutral-800">
+            <span className="text-lg font-black text-white">
+              HUSMA <span className="text-red-600">Loyalty</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Menyuni yopish"
+              className="p-2 text-neutral-400 hover:text-white transition"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-          <div
-            className={`absolute top-0 right-0 h-full w-[82%] max-w-sm bg-neutral-950 border-l border-neutral-800 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-              mobileOpen ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            <div className="flex items-center justify-between h-16 px-5 border-b border-neutral-800">
-              <span className="text-lg font-black text-white">
-                HUSMA <span className="text-red-600">Loyalty</span>
-              </span>
-              <button
-                onClick={() => setMobileOpen(false)}
-                aria-label="Menyuni yopish"
-                className="p-2 text-neutral-400 hover:text-white transition"
-              >
-                <X size={22} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
-              {me ? (
-                <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3">
-                  <div>
-                    <div className="text-white font-medium text-sm">{me.name}</div>
-                    <div className="text-neutral-500 text-xs mt-0.5">
-                      {t("nav.welcome")}
-                    </div>
+          <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+            {me ? (
+              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3">
+                <div>
+                  <div className="text-white font-medium text-sm">{me.name}</div>
+                  <div className="text-neutral-500 text-xs mt-0.5">
+                    {t("nav.welcome")}
                   </div>
-                  <CoinBadge mobile />
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/login"
-                    className="w-full text-center px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-200 font-medium text-sm hover:bg-neutral-800 transition"
-                  >
-                    {t("nav.login")}
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="w-full text-center px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition"
-                  >
-                    {t("nav.register")}
-                  </Link>
-                </div>
-              )}
-
-              <nav className="flex flex-col gap-1">
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
-                      isActive(link.href)
-                        ? "bg-red-600/10 text-red-500"
-                        : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-
-                {me && me.role === "admin" && (
-                  <Link
-                    href="/admin"
-                    className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
-                      isActive("/admin")
-                        ? "bg-red-600/10 text-red-500"
-                        : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
-                    }`}
-                  >
-                    {t("nav.admin")}
-                  </Link>
-                )}
-              </nav>
-
-              <div className="mt-auto pt-4 border-t border-neutral-800">
-                <LangSwitcher mobile />
+                <CoinBadge mobile />
               </div>
-
-              {me && (
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 text-sm font-medium hover:bg-neutral-800 hover:text-white transition"
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/login"
+                  className="w-full text-center px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-200 font-medium text-sm hover:bg-neutral-800 transition"
                 >
-                  {t("nav.logout")}
-                </button>
+                  {t("nav.login")}
+                </Link>
+                <Link
+                  href="/register"
+                  className="w-full text-center px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition"
+                >
+                  {t("nav.register")}
+                </Link>
+              </div>
+            )}
+
+            <nav className="flex flex-col gap-1">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
+                    isActive(link.href)
+                      ? "bg-red-600/10 text-red-500"
+                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              {me && me.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className={`px-3 py-3 rounded-lg text-sm font-medium transition ${
+                    isActive("/admin")
+                      ? "bg-red-600/10 text-red-500"
+                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
+                  }`}
+                >
+                  {t("nav.admin")}
+                </Link>
               )}
+            </nav>
+
+            <div className="mt-auto pt-4 border-t border-neutral-800">
+              <LangSwitcher mobile />
             </div>
+
+            {me && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 text-sm font-medium hover:bg-neutral-800 hover:text-white transition"
+              >
+                {t("nav.logout")}
+              </button>
+            )}
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Header fixed bo'lgani uchun kontent uning ostida yashirinib qolmasligi
           uchun shu bo'sh joy (spacer) qo'yildi. Balandligi header balandligi bilan
