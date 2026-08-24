@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HeroSection from "./karusel/page";
+import { useI18n } from "../lib/i18n";
 import {
   QrCode,
   Gift,
@@ -62,8 +63,15 @@ function Reveal({ children, className = "", delay = 0 }) {
   );
 }
 
-function FaqList() {
+function FaqList({ t }) {
   const [openIndex, setOpenIndex] = useState(0);
+
+  const FAQ = [
+    { q: t("faq.1q"), a: t("faq.1a") },
+    { q: t("faq.2q"), a: t("faq.2a") },
+    { q: t("faq.3q"), a: t("faq.3a") },
+    { q: t("faq.4q"), a: t("faq.4a") },
+  ];
 
   return (
     <div className="rounded-2xl border border-neutral-800/80 bg-neutral-900/40 divide-y divide-neutral-800/80 overflow-hidden">
@@ -104,222 +112,205 @@ function FaqList() {
   );
 }
 
-const STEPS = [
-  {
-    num: "01",
-    title: "Ilovani o'rnating va kartani oching",
-    desc: "1 daqiqada ro'yxatdan o'ting — 50 000 so'm chegirma va start bonusiga ega bo'ling.",
-    icon: Sparkles,
-  },
-  {
-    num: "02",
-    title: "Xaridlardan coin yig'ing",
-    desc: "Har bir 1000 so'm sarf-xarajat uchun 1 coin avtomatik ravishda hisobingizga tushadi.",
-    icon: QrCode,
-  },
-  {
-    num: "03",
-    title: "Darajani oshiring va sovg'alar oling",
-    desc: "To'plangan coinlar evaziga darajangizni oshiring, VIP xizmatlar hamda eksklyuziv sovg'alarga ega bo'ling.",
-    icon: Gift,
-  },
-];
-
-const FEATURES = [
-  {
-    title: "Coin to'plash",
-    desc: "Har bir 1000 so'm sarflangan xarid uchun 1 coin hisoblanadi (Husma Fit va Mavi restorani bilan birga).",
-    icon: Coins,
-  },
-  {
-    title: "Sovg'alar va Chegirmalar",
-    desc: "Mavi restorani, Spa, fitnes hamda xonalar uchun eksklyuziv chegirmalardan foydalaning.",
-    icon: Gift,
-  },
-  {
-    title: "Welcome bonus",
-    desc: "Ilovani o'rnatishingiz bilan 50 000 so'm chegirma balansingizga taqdim etiladi.",
-    icon: Sparkles,
-  },
-  {
-    title: "Do'stlarni taklif qiling",
-    desc: "Do'stingiz kartani ochsa — ikkalangizga ham qo'shimcha bonus coinlar tushadi.",
-    icon: Users,
-  },
-  {
-    title: "Tug'ilgan kun sovg'asi",
-    desc: "Har yili tug'ilgan kuningizda maxsus coin paketi va kutilmagan sovg'alar.",
-    icon: Cake,
-  },
-  {
-    title: "Har doim telefoningizda",
-    desc: "Plastik karta kerak emas. Barcha darajalar, coinlar va chegirmalar smartfoningizda.",
-    icon: Smartphone,
-  },
-];
-
-// MUHIM: bu yerdagi nomlar va coin narxlari `/sovgalar` sahifasidagi
-// haqiqiy katalog (GIFTS massivi, sovgalar/page.js) bilan bir xil
-// bo'lishi kerak — endi 1 coin = 1 so'm tizimi ishlayapti.
-const GIFTS = [
-  { name: "Bepul nonushta (1 kishi)", coins: 80000, icon: "🥐" },
-  { name: "Kech chiqish (Late checkout)", coins: 100000, icon: "🕒" },
-  { name: "Orqa massaji (30 min)", coins: 250000, icon: "💆" },
-  { name: "Xona darajasini oshirish", coins: 500000, icon: "⬆️" },
-  { name: "1 kecha bepul turar joy", coins: 900000, icon: "🏨" },
-  { name: "Presidential Suite — 1 kecha", coins: 5000000, icon: "👑" },
-];
-
 function formatCoins(n) {
   return (Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-const LAUNCH_PERKS = [
-  {
-    title: "50 000 so'm Welcome Chegirma",
-    desc: "Ilovani o'rnatganingizda Husma, Husma Fit va Mavi restoranida amal qiladigan chegirma.",
-    icon: Flame,
-  },
-  {
-    title: "Chorsiz to'plash",
-    desc: "Har 1000 so'm uchun 1 coin tushadi va darajalarga tezroq erishishga yordam beradi.",
-    icon: Star,
-  },
-  {
-    title: "Ertaroq kirish",
-    desc: "Yangi sovg'alar, xonalar va maxsus aksiyalarga birinchilardan bo'lib kirish huquqi.",
-    icon: Rocket,
-  },
-];
-
-const LEVELS = [
-  {
-    name: "Standard",
-    coinsReq: "0 coin",
-    color: "from-neutral-700/30 to-neutral-900/10",
-    border: "border-neutral-600/40",
-    text: "text-neutral-300",
-    badge: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
-    perks: [
-      "50 000 so'm chegirma (Ilovani o'rnatganda)",
-      "Husma Fit va Mavi restoranida amal qiladi",
-      "Har 1000 so'm uchun 1 coin",
-    ],
-  },
-  {
-    name: "Bronze",
-    coinsReq: "99 000 coin",
-    color: "from-amber-800/30 to-amber-950/10",
-    border: "border-amber-700/40",
-    text: "text-amber-400",
-    badge: "bg-amber-600/15 text-amber-400 border-amber-600/30",
-    perks: [
-      "VIP 1 meva savati (kelganda xonada)",
-      "Kir yuvish xizmatiga 5% chegirma",
-      "Husma Spa va Fitness'da 5% chegirma",
-    ],
-  },
-  {
-    name: "Silver",
-    coinsReq: "199 000 coin",
-    color: "from-slate-400/20 to-slate-800/10",
-    border: "border-slate-400/40",
-    text: "text-slate-300",
-    badge: "bg-slate-400/15 text-slate-300 border-slate-400/30",
-    perks: [
-      "Xonalarni bepul upgrade qilish (joy bo'lsa)",
-      "Xonalarga 5% chegirma",
-      "Mavi restoranida 5% chegirma",
-      "VIP 2 meva savati xonada",
-    ],
-  },
-  {
-    name: "Gold",
-    coinsReq: "399 000 coin",
-    color: "from-yellow-600/25 to-yellow-900/10",
-    border: "border-yellow-500/40",
-    text: "text-yellow-300",
-    badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-    perks: [
-      "Erta kirish / kech chiqish (joy bo'lsa)",
-      "Aeroport/Vokzalga bepul kuzatib qo'yish",
-      "Xonalarga 10% chegirma",
-      "Mavi va Kir yuvishga 10% chegirma",
-      "VIP 3 meva savati xonada",
-    ],
-  },
-  {
-    name: "Platinum",
-    coinsReq: "599 000 coin",
-    color: "from-cyan-600/20 to-cyan-900/10",
-    border: "border-cyan-500/40",
-    text: "text-cyan-300",
-    badge: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
-    perks: [
-      "Kafolatlangan erta kirish / kech chiqish",
-      "Kafolatlangan xona upgrade",
-      "Business Class aeroport/vokzal transfer",
-      "Xonaga 10%, Kir yuvishga 20% chegirma",
-      "Mavi restoranida 10% chegirma",
-      "VIP 4 meva savati + Ketishda Level 1 sovg'a 🎁",
-    ],
-  },
-  {
-    name: "Diamond",
-    coinsReq: "799 000 coin",
-    color: "from-sky-600/20 to-sky-950/10",
-    border: "border-sky-400/50",
-    text: "text-sky-300",
-    badge: "bg-sky-500/15 text-sky-300 border-sky-400/40",
-    perks: [
-      "Erta kirish / kech chiqish",
-      "Suit xonasiga bepul upgrade (joy bo'lsa)",
-      "Business Class aeroport/vokzal transfer",
-      "Xonalarga 15%, Mavi'da 10% chegirma",
-      "Kuniga 2 dona bepul kir yuvish xizmati",
-      "VIP 5 meva savati (har kuni yangilanadi)",
-      "Ketishda Level 2 sovg'a 🎁",
-    ],
-  },
-  {
-    name: "VIP",
-    coinsReq: "999 000 coin",
-    color: "from-rose-600/25 to-purple-950/20",
-    border: "border-rose-500/50",
-    text: "text-rose-300",
-    badge: "bg-rose-500/15 text-rose-300 border-rose-400/40",
-    perks: [
-      "Erta kirish / kech chiqish",
-      "Suit xonasiga bepul upgrade (joy bo'lsa)",
-      "Business Class aeroport/vokzal transfer",
-      "Xonalarga 15%, Mavi'da 15% chegirma",
-      "Mutlaqo bepul kir yuvish xizmatlari",
-      "VIP 6 meva savati (har kuni yangilanadi)",
-      "Ketishda Level 3 sovg'a 🎁",
-    ],
-  },
-];
-
-const FAQ = [
-  {
-    q: "Karta uchun to'lov kerakmi?",
-    a: "Yo'q. Ro'yxatdan o'tish va kartani ochish butunlay bepul.",
-  },
-  {
-    q: "Coinlar qanday hisoblanadi?",
-    a: "Har bir sarflangan 1000 so'm uchun hisobingizga 1 coin qo'shiladi.",
-  },
-  {
-    q: "50 000 so'm chegirma bonusidan qayerda foydalansa bo'ladi?",
-    a: "Ushbu chegirma ilovani o'rnatishingiz bilan beriladi va Husma hotel, Husma Fit hamda Mavi restoranida amal qiladi.",
-  },
-  {
-    q: "Darajalar (Bronze, Silver...) qanday oshadi?",
-    a: "Yetarlicha coin yig'ganingizdan so'ng mos darajaga ko'tarilasiz (masalan, 99 000 coin bilan Bronze, 999 000 coin bilan VIP darajasiga ega bo'lasiz).",
-  },
-];
-
 export default function Home() {
+  const { t } = useI18n();
+
+  const STEPS = [
+    {
+      num: "01",
+      title: t("steps.1Title"),
+      desc: t("steps.1Desc"),
+      icon: Sparkles,
+    },
+    {
+      num: "02",
+      title: t("steps.2Title"),
+      desc: t("steps.2Desc"),
+      icon: QrCode,
+    },
+    {
+      num: "03",
+      title: t("steps.3Title"),
+      desc: t("steps.3Desc"),
+      icon: Gift,
+    },
+  ];
+
+  const FEATURES = [
+    {
+      title: t("features.1Title"),
+      desc: t("features.1Desc"),
+      icon: Coins,
+    },
+    {
+      title: t("features.2Title"),
+      desc: t("features.2Desc"),
+      icon: Gift,
+    },
+    {
+      title: t("features.3Title"),
+      desc: t("features.3Desc"),
+      icon: Sparkles,
+    },
+    {
+      title: t("features.4Title"),
+      desc: t("features.4Desc"),
+      icon: Users,
+    },
+    {
+      title: t("features.5Title"),
+      desc: t("features.5Desc"),
+      icon: Cake,
+    },
+    {
+      title: t("features.6Title"),
+      desc: t("features.6Desc"),
+      icon: Smartphone,
+    },
+  ];
+
+  // MUHIM: bu yerdagi nomlar va coin narxlari `/sovgalar` sahifasidagi
+  // haqiqiy katalog (GIFTS massivi, sovgalar/page.js) bilan bir xil
+  // bo'lishi kerak — endi 1 coin = 1 so'm tizimi ishlayapti.
+  const GIFTS = [
+    { name: t("gifts.1"), coins: 80000, icon: "🥐" },
+    { name: t("gifts.2"), coins: 100000, icon: "🕒" },
+    { name: t("gifts.3"), coins: 250000, icon: "💆" },
+    { name: t("gifts.4"), coins: 500000, icon: "⬆️" },
+    { name: t("gifts.5"), coins: 900000, icon: "🏨" },
+    { name: t("gifts.6"), coins: 5000000, icon: "👑" },
+  ];
+
+  const LAUNCH_PERKS = [
+    {
+      title: t("launch.perk1Title"),
+      desc: t("launch.perk1Desc"),
+      icon: Flame,
+    },
+    {
+      title: t("launch.perk2Title"),
+      desc: t("launch.perk2Desc"),
+      icon: Star,
+    },
+    {
+      title: t("launch.perk3Title"),
+      desc: t("launch.perk3Desc"),
+      icon: Rocket,
+    },
+  ];
+
+  const LEVELS = [
+    {
+      name: "Standard",
+      coinsReq: "0 coin",
+      color: "from-neutral-700/30 to-neutral-900/10",
+      border: "border-neutral-600/40",
+      text: "text-neutral-300",
+      badge: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
+      perks: [
+        t("levels.standard.1"),
+        t("levels.standard.2"),
+        t("levels.standard.3"),
+      ],
+    },
+    {
+      name: "Bronze",
+      coinsReq: "99 000 coin",
+      color: "from-amber-800/30 to-amber-950/10",
+      border: "border-amber-700/40",
+      text: "text-amber-400",
+      badge: "bg-amber-600/15 text-amber-400 border-amber-600/30",
+      perks: [
+        t("levels.bronze.1"),
+        t("levels.bronze.2"),
+        t("levels.bronze.3"),
+      ],
+    },
+    {
+      name: "Silver",
+      coinsReq: "199 000 coin",
+      color: "from-slate-400/20 to-slate-800/10",
+      border: "border-slate-400/40",
+      text: "text-slate-300",
+      badge: "bg-slate-400/15 text-slate-300 border-slate-400/30",
+      perks: [
+        t("levels.silver.1"),
+        t("levels.silver.2"),
+        t("levels.silver.3"),
+        t("levels.silver.4"),
+      ],
+    },
+    {
+      name: "Gold",
+      coinsReq: "399 000 coin",
+      color: "from-yellow-600/25 to-yellow-900/10",
+      border: "border-yellow-500/40",
+      text: "text-yellow-300",
+      badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+      perks: [
+        t("levels.gold.1"),
+        t("levels.gold.2"),
+        t("levels.gold.3"),
+        t("levels.gold.4"),
+        t("levels.gold.5"),
+      ],
+    },
+    {
+      name: "Platinum",
+      coinsReq: "599 000 coin",
+      color: "from-cyan-600/20 to-cyan-900/10",
+      border: "border-cyan-500/40",
+      text: "text-cyan-300",
+      badge: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
+      perks: [
+        t("levels.platinum.1"),
+        t("levels.platinum.2"),
+        t("levels.platinum.3"),
+        t("levels.platinum.4"),
+        t("levels.platinum.5"),
+        t("levels.platinum.6"),
+      ],
+    },
+    {
+      name: "Diamond",
+      coinsReq: "799 000 coin",
+      color: "from-sky-600/20 to-sky-950/10",
+      border: "border-sky-400/50",
+      text: "text-sky-300",
+      badge: "bg-sky-500/15 text-sky-300 border-sky-400/40",
+      perks: [
+        t("levels.diamond.1"),
+        t("levels.diamond.2"),
+        t("levels.diamond.3"),
+        t("levels.diamond.4"),
+        t("levels.diamond.5"),
+        t("levels.diamond.6"),
+        t("levels.diamond.7"),
+      ],
+    },
+    {
+      name: "VIP",
+      coinsReq: "999 000 coin",
+      color: "from-rose-600/25 to-purple-950/20",
+      border: "border-rose-500/50",
+      text: "text-rose-300",
+      badge: "bg-rose-500/15 text-rose-300 border-rose-400/40",
+      perks: [
+        t("levels.vip.1"),
+        t("levels.vip.2"),
+        t("levels.vip.3"),
+        t("levels.vip.4"),
+        t("levels.vip.5"),
+        t("levels.vip.6"),
+        t("levels.vip.7"),
+      ],
+    },
+  ];
+
   return (
     <main className="relative flex flex-1 w-full flex-col bg-neutral-950 min-h-screen text-neutral-100 overflow-x-hidden">
       <Header />
@@ -334,13 +325,13 @@ export default function Home() {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-400 mb-3 sm:mb-4">
                 <Rocket size={12} />
-                Endigina ishga tushdi
+                {t("launch.badge")}
               </div>
               <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-2 leading-snug">
-                Birinchilardan bo&apos;ling — Eksklyuziv imtiyozlarni qo&apos;lga kiriting
+                {t("launch.title")}
               </h2>
               <p className="text-neutral-400 text-sm sm:text-base max-w-lg mb-5 sm:mb-6 leading-relaxed">
-                Husma sodiqlik kartasini oching, har 1000 so'mga 1 coin to'plang va maxsus VIP darajalariga erishing.
+                {t("launch.desc")}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                 {LAUNCH_PERKS.map((p) => {
@@ -373,13 +364,13 @@ export default function Home() {
           <div className="mb-8 sm:mb-10 lg:mb-12">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest text-amber-400 mb-3 sm:mb-4">
               <Crown size={12} />
-              Darajalar
+              {t("levels.badge")}
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 leading-snug">
-              Husma Card darajalari — qancha yuqori, shuncha ko&apos;p VIP imtiyozlar
+              {t("levels.title")}
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-              Coinlar yig'ib borish orqali darajangizni oshiring. Har bir daraja o&apos;zining maxsus chegirma va bonuslariga ega.
+              {t("levels.desc")}
             </p>
           </div>
         </Reveal>
@@ -425,7 +416,7 @@ export default function Home() {
               href="/login"
               className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-400 text-sm font-medium hover:bg-amber-500/20 hover:border-amber-400/60 active:scale-[0.98] transition-all"
             >
-              Kartani ochish va darajani oshirish
+              {t("levels.cta")}
               <ArrowRight
                 size={16}
                 className="transition-transform group-hover:translate-x-1"
@@ -441,13 +432,13 @@ export default function Home() {
           <div className="mb-8 sm:mb-10 lg:mb-12">
             <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/5 px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest text-red-400 mb-3 sm:mb-4">
               <Zap size={12} />
-              Oddiy jarayon
+              {t("steps.badge")}
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 leading-snug">
-              Qanday ishlaydi?
+              {t("steps.title")}
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-              Oddiy 3 qadam — coin to&apos;plang va VIP darajalar hamda sovg&apos;alarga almashtiring.
+              {t("steps.desc")}
             </p>
           </div>
         </Reveal>
@@ -488,20 +479,20 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/5 px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest text-red-400 mb-3 sm:mb-4">
                 <Gift size={12} />
-                Catalog
+                {t("gifts.badge")}
               </div>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 leading-snug">
-                Sovg&apos;alar catalogi
+                {t("gifts.title")}
               </h2>
               <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-                Coinlaringizni quyidagi sovg&apos;alarga almashtiring.
+                {t("gifts.desc")}
               </p>
             </div>
             <Link
               href="/sovgalar"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-red-400 hover:text-red-300 active:text-red-200 transition-colors group self-start sm:self-auto py-1"
             >
-              Barchasini ko&apos;rish
+              {t("gifts.seeAll")}
               <ArrowRight
                 size={15}
                 className="transition-transform group-hover:translate-x-0.5"
@@ -537,13 +528,13 @@ export default function Home() {
           <div className="mb-8 sm:mb-10 lg:mb-12">
             <div className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-800/40 px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest text-neutral-400 mb-3 sm:mb-4">
               <Star size={12} />
-              Afzalliklar
+              {t("features.badge")}
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 leading-snug">
-              Nima uchun Husma kartasi?
+              {t("features.title")}
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-              Husma tizimi — shaffof, tushunarli va real foyda beruvchi imtiyozlar majmuasi.
+              {t("features.desc")}
             </p>
           </div>
         </Reveal>
@@ -574,19 +565,19 @@ export default function Home() {
           <div className="mb-8 sm:mb-10 lg:mb-12">
             <div className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-800/40 px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest text-neutral-400 mb-3 sm:mb-4">
               <Star size={12} />
-              Savol-javob
+              {t("faq.badge")}
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white mb-2 leading-snug">
-              Ko&apos;p beriladigan savollar
+              {t("faq.title")}
             </h2>
             <p className="text-neutral-400 text-sm sm:text-base max-w-lg leading-relaxed">
-              Savollaringiz bo'lsa, javoblarni shu yerdan topishingiz mumkin.
+              {t("faq.desc")}
             </p>
           </div>
         </Reveal>
 
         <Reveal>
-          <FaqList />
+          <FaqList t={t} />
         </Reveal>
       </section>
 
@@ -601,21 +592,17 @@ export default function Home() {
               <div className="max-w-md">
                 <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-[11px] font-medium text-red-400 mb-3 sm:mb-4">
                   <Sparkles size={12} />
-                  Welcome bonus
+                  {t("cta.badge")}
                 </div>
                 <h2 className="text-lg sm:text-xl lg:text-3xl font-semibold text-white mb-3 leading-snug">
-                  Bugun kartani oching —{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-400">
-                    50 000 so'm chegirma
-                  </span>{" "}
-                  darhol sizniki
+                  {t("cta.title")}
                 </h2>
                 <p className="text-neutral-400 text-sm leading-relaxed mb-3 sm:mb-4">
-                  Ro&apos;yxatdan o&apos;tish bepul. Bonus balansingizga taqdim etiladi.
+                  {t("cta.desc")}
                 </p>
                 <div className="flex items-center gap-1.5 text-xs text-neutral-500">
                   <ShieldCheck size={13} className="text-emerald-400 shrink-0" />
-                  Ma&apos;lumotlaringiz xavfsiz saqlanadi
+                  {t("cta.secure")}
                 </div>
               </div>
 
@@ -623,7 +610,7 @@ export default function Home() {
                 href="/register"
                 className="w-full sm:w-auto shrink-0 group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-neutral-900 font-medium text-sm hover:bg-neutral-100 active:scale-[0.98] transition-all shadow-xl shadow-black/40"
               >
-                Bepul karta + 50 000 so'm
+                {t("cta.button")}
                 <ArrowRight
                   size={16}
                   className="transition-transform group-hover:translate-x-0.5"

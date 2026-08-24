@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import QRCode from "qrcode";
+import { useI18n } from "../../lib/i18n";
 
 import {
   Crown,
@@ -34,172 +35,10 @@ import {
 } from "lucide-react";
 
 function formatCoins(n) {
-  return (Number(n) || 0)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return (Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString("uz-UZ", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-/* ===================== DARAJALAR (7 ta) ===================== */
-const LEVELS = [
-  {
-    key: "Standard",
-    name: "Standard",
-    icon: Sparkles,
-    minCoins: 0,
-    color: "from-neutral-700/40 to-neutral-900/20",
-    border: "border-neutral-500/40",
-    text: "text-neutral-300",
-    badge: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
-    perks: [
-      "Ilovani o'rnatganda 50 000 so'mlik chegirma (Husma fit, Mavi restoranda ham)",
-      "Har bir xariddan 1% coin qaytariladi (1 coin = 1 so'm)",
-    ],
-    // Standard darajada avtomatik sovg'a berilmaydi (bu shunchaki boshlang'ich daraja)
-    autoGift: null,
-  },
-  {
-    key: "Bronze",
-    name: "Bronze",
-    icon: Medal,
-    minCoins: 99000,
-    color: "from-amber-800/40 to-amber-950/20",
-    border: "border-amber-600/40",
-    text: "text-amber-300",
-    badge: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    perks: [
-      "Kelganda xonada VIP 1 mevalar savati",
-      "Kir yuvish xizmatida 5% chegirma",
-      "Husma Spa va Fitness xizmatlarida 5% chegirma",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 1)", coins: 0 },
-  },
-  {
-    key: "Silver",
-    name: "Silver",
-    icon: Award,
-    minCoins: 199000,
-    color: "from-slate-500/20 to-slate-800/20",
-    border: "border-slate-400/40",
-    text: "text-slate-200",
-    badge: "bg-slate-400/15 text-slate-300 border-slate-400/30",
-    perks: [
-      "Mavjud bo'lsa bepul upgrade",
-      "Xonalarda 5% chegirma",
-      "Mavi restoranda 5% chegirma",
-      "Kelganda xonada VIP 2 mevalar savati",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 2)", coins: 0 },
-  },
-  {
-    key: "Gold",
-    name: "Gold",
-    icon: Trophy,
-    minCoins: 399000,
-    color: "from-yellow-700/30 to-yellow-950/20",
-    border: "border-yellow-500/40",
-    text: "text-yellow-300",
-    badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-    perks: [
-      "Mavjud bo'lsa bepul erta check-in",
-      "Mavjud bo'lsa bepul kech check-out",
-      "Bepul aeroport/vokzalga transfer",
-      "Xonalarda 10% chegirma",
-      "Kir yuvishda 10% chegirma",
-      "Mavi restoranda 10% chegirma",
-      "Kelganda xonada VIP 3 mevalar savati",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 3)", coins: 0 },
-  },
-  {
-    key: "Platinum",
-    name: "Platinum",
-    icon: Gem,
-    minCoins: 599000,
-    color: "from-neutral-400/20 to-neutral-800/20",
-    border: "border-neutral-300/40",
-    text: "text-neutral-100",
-    badge: "bg-neutral-300/15 text-neutral-200 border-neutral-300/30",
-    perks: [
-      "Bepul erta check-in",
-      "Bepul kech check-out",
-      "Bepul xona upgrade",
-      "Biznes-klass aeroport/vokzalga bepul transfer",
-      "Xonalarda 10% chegirma",
-      "Kir yuvishda 20% chegirma",
-      "Mavi restoranda 10% chegirma",
-      "Kelganda xonada VIP 4 mevalar savati",
-      "Jo'nab ketishda sovg'a 🎁 1-daraja",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 4)", coins: 0 },
-  },
-  {
-    key: "Diamond",
-    name: "Diamond",
-    icon: DiamondIcon,
-    minCoins: 799000,
-    color: "from-cyan-700/30 to-sky-950/20",
-    border: "border-cyan-400/50",
-    text: "text-cyan-300",
-    badge: "bg-cyan-500/15 text-cyan-300 border-cyan-400/40",
-    perks: [
-      "Bepul erta check-in",
-      "Bepul kech check-out",
-      "Mavjud bo'lsa Suite xonaga bepul upgrade",
-      "Biznes-klass aeroport/vokzalga bepul transfer",
-      "Xonalarda 15% chegirma",
-      "Har kuni 2 dona kir yuvish bepul",
-      "Mavi restoranda 10% chegirma",
-      "Kelganda va har kuni yangilanadigan VIP 5 mevalar savati",
-      "Jo'nab ketishda sovg'a 🎁 2-daraja",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 5)", coins: 0 },
-  },
-  {
-    key: "VIP",
-    name: "VIP",
-    icon: Star,
-    minCoins: 999000,
-    color: "from-purple-700/30 to-fuchsia-950/20",
-    border: "border-purple-400/50",
-    text: "text-purple-300",
-    badge: "bg-purple-500/15 text-purple-300 border-purple-400/40",
-    perks: [
-      "Bepul erta check-in",
-      "Bepul kech check-out",
-      "Mavjud bo'lsa Suite xonaga bepul upgrade",
-      "Biznes-klass aeroport/vokzalga bepul transfer",
-      "Xonalarda 15% chegirma",
-      "Bepul kir yuvish xizmati",
-      "Mavi restoranda 15% chegirma",
-      "Kelganda va har kuni yangilanadigan VIP 6 mevalar savati",
-      "Jo'nab ketishda sovg'a 🎁 3-daraja",
-    ],
-    autoGift: { name: "Xush kelibsiz meva savati (VIP 6)", coins: 0 },
-  },
-];
 
 const LEVEL_PERKS_PREVIEW = 3;
-
-/* ===================== BARABAN ===================== */
-const WHEEL_SEGMENTS = [
-  { prize: 0, label: "Yutuqsiz", short: "0", color: "#3f3f46" },
-  { prize: 5, label: "5 coin", short: "5", color: "#f59e0b" },
-  { prize: 10, label: "10 coin", short: "10", color: "#eab308" },
-  { prize: 15, label: "15 coin", short: "15", color: "#dc2626" },
-];
 
 const WHEEL_LABEL_POS = [
   { top: "26%", left: "72%" },
@@ -208,14 +47,7 @@ const WHEEL_LABEL_POS = [
   { top: "26%", left: "26%" },
 ];
 
-const WHEEL_GRADIENT = `conic-gradient(
-  ${WHEEL_SEGMENTS[0].color} 0deg 90deg,
-  ${WHEEL_SEGMENTS[1].color} 90deg 180deg,
-  ${WHEEL_SEGMENTS[2].color} 180deg 270deg,
-  ${WHEEL_SEGMENTS[3].color} 270deg 360deg
-)`;
-
-function getCurrentLevelByCoins(coins) {
+function getCurrentLevelByCoins(coins, LEVELS) {
   const amount = Number(coins) || 0;
   return (
     LEVELS.slice()
@@ -224,39 +56,6 @@ function getCurrentLevelByCoins(coins) {
   );
 }
 
-function getStatusText(status) {
-  switch (status) {
-    case "pending":
-    case "kutilmoqda":
-      return "Kutilmoqda";
-    case "completed":
-    case "bajarildi":
-      return "Bajarildi";
-    case "cancelled":
-    case "bekor qilindi":
-      return "Bekor qilindi";
-    default:
-      return status || "—";
-  }
-}
-
-function getStatusClass(status) {
-  switch (status) {
-    case "completed":
-    case "bajarildi":
-      return "text-green-400";
-    case "pending":
-    case "kutilmoqda":
-      return "text-yellow-400";
-    case "cancelled":
-    case "bekor qilindi":
-      return "text-red-400";
-    default:
-      return "text-neutral-500";
-  }
-}
-
-/* Parol kuchini juda oddiy baholash: 0-4 */
 function getPasswordStrength(pw) {
   if (!pw) return 0;
   let score = 0;
@@ -267,7 +66,6 @@ function getPasswordStrength(pw) {
   return Math.min(score, 4);
 }
 
-const STRENGTH_LABELS = ["Juda zaif", "Zaif", "O'rtacha", "Yaxshi", "Kuchli"];
 const STRENGTH_COLORS = [
   "bg-neutral-700",
   "bg-red-500",
@@ -277,12 +75,14 @@ const STRENGTH_COLORS = [
 ];
 
 export default function KartaPage() {
+  const { t } = useI18n();
+  const router = useRouter();
+
   const [user, setUser] = useState(null);
-  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [historyLoading, setHistoryLoading] = useState(true);
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [highestCoins, setHighestCoins] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
 
   const [showReceipt, setShowReceipt] = useState(false);
   const [expandedLevels, setExpandedLevels] = useState(() => new Set());
@@ -299,7 +99,6 @@ export default function KartaPage() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackError, setFeedbackError] = useState(null);
 
-  /* ===================== SOZLAMALAR (login/parol) ===================== */
   const [showSettings, setShowSettings] = useState(false);
   const [settingsLogin, setSettingsLogin] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -312,7 +111,161 @@ export default function KartaPage() {
   const [settingsError, setSettingsError] = useState(null);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
-  const router = useRouter();
+  const LEVELS = [
+    {
+      key: "Standard",
+      name: "Standard",
+      icon: Sparkles,
+      minCoins: 0,
+      color: "from-neutral-700/40 to-neutral-900/20",
+      border: "border-neutral-500/40",
+      text: "text-neutral-300",
+      badge: "bg-neutral-500/15 text-neutral-300 border-neutral-500/30",
+      perks: [t("karta.levels.standard.1"), t("karta.levels.standard.2")],
+      autoGift: null,
+    },
+    {
+      key: "Bronze",
+      name: "Bronze",
+      icon: Medal,
+      minCoins: 99000,
+      color: "from-amber-800/40 to-amber-950/20",
+      border: "border-amber-600/40",
+      text: "text-amber-300",
+      badge: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+      perks: [
+        t("karta.levels.bronze.1"),
+        t("karta.levels.bronze.2"),
+        t("karta.levels.bronze.3"),
+      ],
+      autoGift: { name: t("karta.levels.bronze.gift"), coins: 0 },
+    },
+    {
+      key: "Silver",
+      name: "Silver",
+      icon: Award,
+      minCoins: 199000,
+      color: "from-slate-500/20 to-slate-800/20",
+      border: "border-slate-400/40",
+      text: "text-slate-200",
+      badge: "bg-slate-400/15 text-slate-300 border-slate-400/30",
+      perks: [
+        t("karta.levels.silver.1"),
+        t("karta.levels.silver.2"),
+        t("karta.levels.silver.3"),
+        t("karta.levels.silver.4"),
+      ],
+      autoGift: { name: t("karta.levels.silver.gift"), coins: 0 },
+    },
+    {
+      key: "Gold",
+      name: "Gold",
+      icon: Trophy,
+      minCoins: 399000,
+      color: "from-yellow-700/30 to-yellow-950/20",
+      border: "border-yellow-500/40",
+      text: "text-yellow-300",
+      badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+      perks: [
+        t("karta.levels.gold.1"),
+        t("karta.levels.gold.2"),
+        t("karta.levels.gold.3"),
+        t("karta.levels.gold.4"),
+        t("karta.levels.gold.5"),
+        t("karta.levels.gold.6"),
+        t("karta.levels.gold.7"),
+      ],
+      autoGift: { name: t("karta.levels.gold.gift"), coins: 0 },
+    },
+    {
+      key: "Platinum",
+      name: "Platinum",
+      icon: Gem,
+      minCoins: 599000,
+      color: "from-neutral-400/20 to-neutral-800/20",
+      border: "border-neutral-300/40",
+      text: "text-neutral-100",
+      badge: "bg-neutral-300/15 text-neutral-200 border-neutral-300/30",
+      perks: [
+        t("karta.levels.platinum.1"),
+        t("karta.levels.platinum.2"),
+        t("karta.levels.platinum.3"),
+        t("karta.levels.platinum.4"),
+        t("karta.levels.platinum.5"),
+        t("karta.levels.platinum.6"),
+        t("karta.levels.platinum.7"),
+        t("karta.levels.platinum.8"),
+        t("karta.levels.platinum.9"),
+      ],
+      autoGift: { name: t("karta.levels.platinum.gift"), coins: 0 },
+    },
+    {
+      key: "Diamond",
+      name: "Diamond",
+      icon: DiamondIcon,
+      minCoins: 799000,
+      color: "from-cyan-700/30 to-sky-950/20",
+      border: "border-cyan-400/50",
+      text: "text-cyan-300",
+      badge: "bg-cyan-500/15 text-cyan-300 border-cyan-400/40",
+      perks: [
+        t("karta.levels.diamond.1"),
+        t("karta.levels.diamond.2"),
+        t("karta.levels.diamond.3"),
+        t("karta.levels.diamond.4"),
+        t("karta.levels.diamond.5"),
+        t("karta.levels.diamond.6"),
+        t("karta.levels.diamond.7"),
+        t("karta.levels.diamond.8"),
+        t("karta.levels.diamond.9"),
+      ],
+      autoGift: { name: t("karta.levels.diamond.gift"), coins: 0 },
+    },
+    {
+      key: "VIP",
+      name: "VIP",
+      icon: Star,
+      minCoins: 999000,
+      color: "from-purple-700/30 to-fuchsia-950/20",
+      border: "border-purple-400/50",
+      text: "text-purple-300",
+      badge: "bg-purple-500/15 text-purple-300 border-purple-400/40",
+      perks: [
+        t("karta.levels.vip.1"),
+        t("karta.levels.vip.2"),
+        t("karta.levels.vip.3"),
+        t("karta.levels.vip.4"),
+        t("karta.levels.vip.5"),
+        t("karta.levels.vip.6"),
+        t("karta.levels.vip.7"),
+        t("karta.levels.vip.8"),
+        t("karta.levels.vip.9"),
+      ],
+      autoGift: { name: t("karta.levels.vip.gift"), coins: 0 },
+    },
+  ];
+
+  const WHEEL_SEGMENTS = [
+    { prize: 0, label: t("karta.wheel.seg0"), short: "0", color: "#3f3f46" },
+    { prize: 5, label: t("karta.wheel.seg5"), short: "5", color: "#f59e0b" },
+    { prize: 10, label: t("karta.wheel.seg10"), short: "10", color: "#eab308" },
+    { prize: 15, label: t("karta.wheel.seg15"), short: "15", color: "#dc2626" },
+  ];
+
+  const WHEEL_GRADIENT = `conic-gradient(
+    ${WHEEL_SEGMENTS[0].color} 0deg 90deg,
+    ${WHEEL_SEGMENTS[1].color} 90deg 180deg,
+    ${WHEEL_SEGMENTS[2].color} 180deg 270deg,
+    ${WHEEL_SEGMENTS[3].color} 270deg 360deg
+  )`;
+
+  const STRENGTH_LABELS = [
+    t("karta.settings.strength0"),
+    t("karta.settings.strength1"),
+    t("karta.settings.strength2"),
+    t("karta.settings.strength3"),
+    t("karta.settings.strength4"),
+  ];
 
   const handleLogout = async () => {
     try {
@@ -367,24 +320,21 @@ export default function KartaPage() {
         localStorage.setItem(storageKey, String(newHighest));
         setHighestCoins(newHighest);
 
-        setHistoryLoading(true);
-        const historyRes = await fetch("/api/redemptions", {
-          method: "GET",
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" },
-        });
-
-        if (historyRes.ok) {
-          const historyData = await historyRes.json();
-          if (!cancelled) {
-            setHistory(
-              Array.isArray(historyData.redemptions)
-                ? historyData.redemptions
-                : []
-            );
+        // Pending buyurtmalar soni
+        try {
+          const histRes = await fetch("/api/redemptions", { cache: "no-store" });
+          if (histRes.ok) {
+            const histData = await histRes.json();
+            if (!cancelled && Array.isArray(histData.redemptions)) {
+              const pending = histData.redemptions.filter(
+                (item) =>
+                  item.status === "pending" || item.status === "kutilmoqda"
+              ).length;
+              setPendingCount(pending);
+            }
           }
-        } else if (!cancelled) {
-          setHistory([]);
+        } catch {
+          /* ignore */
         }
 
         setSpinStatusLoading(true);
@@ -405,10 +355,7 @@ export default function KartaPage() {
         console.error("Karta load error:", error);
         if (!cancelled) router.replace("/login");
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-          setHistoryLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -430,28 +377,17 @@ export default function KartaPage() {
       .catch(() => setQrDataUrl(null));
   }, [user]);
 
-  /* =========================================================
-     YANGI DARAJAGA CHIQQANDA AVTOMATIK SOVG'A YOZUVI
-     — "Almashtirilgan sovg'alar" ro'yxatiga (rasmdagi joy)
-       avtomatik "Kutilmoqda" holatida yozuv qo'shiladi.
-     — Har bir daraja uchun BIR MARTA ishlaydi (localStorage bilan
-       himoyalangan), sahifa qayta ochilganda takrorlanmaydi.
-     — Backendda buni saqlab qo'yish uchun /api/level-reward
-       nomli POST endpoint kerak (pastdagi tushuntirishga qarang).
-  ========================================================= */
   useEffect(() => {
     if (!user?.id) return;
 
     const coinsForLevel = Math.max(Number(user.coins) || 0, highestCoins);
-    const level = getCurrentLevelByCoins(coinsForLevel);
+    const level = getCurrentLevelByCoins(coinsForLevel, LEVELS);
 
     if (!level || !level.autoGift) return;
 
     const rewardedKey = `husma_level_reward_${user.id}_${level.key}`;
     if (localStorage.getItem(rewardedKey)) return;
 
-    // Boshqa tab/qayta render orqali qo'sh yuborilib ketmasligi uchun
-    // darhol belgilab qo'yamiz, xatolik bo'lsa keyin qaytarib olamiz.
     localStorage.setItem(rewardedKey, "1");
 
     fetch("/api/level-reward", {
@@ -467,16 +403,12 @@ export default function KartaPage() {
         if (!res.ok) throw new Error("level-reward failed");
         return res.json();
       })
-      .then(() => fetch("/api/redemptions", { cache: "no-store" }))
-      .then((res) => (res && res.ok ? res.json() : null))
-      .then((data) => {
-        if (data && Array.isArray(data.redemptions)) {
-          setHistory(data.redemptions);
-        }
+      .then(() => {
+        // Yangi pending paydo bo'lishi mumkin
+        setPendingCount((c) => c + 1);
       })
       .catch((err) => {
         console.error("Level reward error:", err);
-        // Xatolik bo'lsa, keyingi safar qayta urinib ko'rish uchun belgini olib tashlaymiz
         localStorage.removeItem(rewardedKey);
       });
   }, [user?.id, user?.coins, highestCoins]);
@@ -493,7 +425,7 @@ export default function KartaPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setSpinError(data.error || "Xatolik yuz berdi");
+        setSpinError(data.error || t("karta.msg.error"));
         setIsSpinning(false);
         return;
       }
@@ -527,7 +459,7 @@ export default function KartaPage() {
       }, 1600);
     } catch (err) {
       console.error(err);
-      setSpinError("Server bilan bog'lanishda xatolik");
+      setSpinError(t("karta.msg.network"));
       setIsSpinning(false);
     }
   }
@@ -553,11 +485,11 @@ export default function KartaPage() {
         setFeedbackSent(true);
         setTimeout(() => setFeedbackSent(false), 3500);
       } else {
-        setFeedbackError(data.error || "Xatolik yuz berdi");
+        setFeedbackError(data.error || t("karta.msg.error"));
       }
     } catch (err) {
       console.error(err);
-      setFeedbackError("Server bilan bog'lanishda xatolik");
+      setFeedbackError(t("karta.msg.network"));
     }
 
     setFeedbackSubmitting(false);
@@ -575,21 +507,21 @@ export default function KartaPage() {
 
     if (wantsPasswordChange) {
       if (!currentPassword) {
-        setSettingsError("Joriy parolni kiriting");
+        setSettingsError(t("karta.settings.errCurrent"));
         return;
       }
       if (newPassword.length < 6) {
-        setSettingsError("Yangi parol kamida 6 ta belgidan iborat bo'lsin");
+        setSettingsError(t("karta.settings.errMin"));
         return;
       }
       if (newPassword !== confirmPassword) {
-        setSettingsError("Yangi parollar bir xil emas");
+        setSettingsError(t("karta.settings.errMatch"));
         return;
       }
     }
 
     if (!settingsLogin.trim()) {
-      setSettingsError("Login bo'sh bo'lishi mumkin emas");
+      setSettingsError(t("karta.settings.errLogin"));
       return;
     }
 
@@ -617,11 +549,11 @@ export default function KartaPage() {
         setSettingsSuccess(true);
         setTimeout(() => setSettingsSuccess(false), 3500);
       } else {
-        setSettingsError(data.error || "Xatolik yuz berdi");
+        setSettingsError(data.error || t("karta.msg.error"));
       }
     } catch (err) {
       console.error(err);
-      setSettingsError("Server bilan bog'lanishda xatolik");
+      setSettingsError(t("karta.msg.network"));
     }
 
     setSettingsSubmitting(false);
@@ -630,7 +562,7 @@ export default function KartaPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-neutral-950 flex items-center justify-center px-3">
-        <div className="text-neutral-500 text-sm">Yuklanmoqda...</div>
+        <div className="text-neutral-500 text-sm">{t("karta.loading")}</div>
       </main>
     );
   }
@@ -639,7 +571,7 @@ export default function KartaPage() {
 
   const currentCoins = Number(user.coins) || 0;
   const levelCoins = Math.max(currentCoins, highestCoins);
-  const currentLevel = getCurrentLevelByCoins(levelCoins);
+  const currentLevel = getCurrentLevelByCoins(levelCoins, LEVELS);
   const currentKey = currentLevel.key;
   const currentIndex = LEVELS.findIndex((l) => l.key === currentKey);
   const nextLevel = LEVELS[currentIndex + 1];
@@ -706,7 +638,9 @@ export default function KartaPage() {
         {/* NAVBAR */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-neutral-900">
           <div className="min-w-0">
-            <p className="text-[11px] sm:text-sm text-neutral-500 mb-0.5">Salom,</p>
+            <p className="text-[11px] sm:text-sm text-neutral-500 mb-0.5">
+              {t("karta.hello")}
+            </p>
             <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
               {user.name}
             </h1>
@@ -717,21 +651,21 @@ export default function KartaPage() {
               href="/"
               className="text-[11px] sm:text-sm text-neutral-400 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
             >
-              Bosh sahifa
+              {t("karta.nav.home")}
             </Link>
             <button
               onClick={openSettings}
               className="flex items-center gap-1 text-[11px] sm:text-sm text-neutral-300 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
             >
               <Settings size={13} />
-              Sozlamalar
+              {t("karta.nav.settings")}
             </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 text-[11px] sm:text-sm text-red-400 hover:text-red-300 transition px-2.5 py-1.5 rounded-lg bg-red-950/30 border border-red-900/50 font-medium whitespace-nowrap"
             >
               <LogOut size={13} />
-              Chiqish
+              {t("karta.nav.logout")}
             </button>
           </div>
         </div>
@@ -764,7 +698,7 @@ export default function KartaPage() {
               <div className="flex items-end justify-between gap-2 sm:gap-4">
                 <div className="min-w-0 flex-1">
                   <p className="text-[9px] sm:text-xs text-neutral-500 mb-1 tracking-wide">
-                    KARTA RAQAMI
+                    {t("karta.card.number")}
                   </p>
                   <p className="text-sm sm:text-lg md:text-2xl font-mono font-semibold tracking-wide text-white break-all leading-tight">
                     {cardNumber}
@@ -777,7 +711,7 @@ export default function KartaPage() {
                 {qrDataUrl && (
                   <img
                     src={qrDataUrl}
-                    alt="Karta QR kodi"
+                    alt="QR"
                     className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0 rounded-md"
                   />
                 )}
@@ -785,7 +719,7 @@ export default function KartaPage() {
             </div>
           </div>
           <p className="text-center text-[10px] sm:text-xs text-neutral-500 mt-1.5 px-1">
-            💡 Raqamli chekni ko‘rish uchun karta ustiga bosing
+            {t("karta.card.hint")}
           </p>
         </div>
 
@@ -793,14 +727,20 @@ export default function KartaPage() {
         <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-5 sm:mb-8">
           <div className="flex items-end justify-between gap-2 mb-3">
             <div className="min-w-0">
-              <p className="text-[11px] sm:text-sm text-neutral-400 mb-0.5">Sizning coinlaringiz</p>
+              <p className="text-[11px] sm:text-sm text-neutral-400 mb-0.5">
+                {t("karta.coins.your")}
+              </p>
               <p className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
                 {formatCoins(currentCoins)}
-                <span className="text-xs sm:text-base text-red-400 ml-1 font-semibold">coin</span>
+                <span className="text-xs sm:text-base text-red-400 ml-1 font-semibold">
+                  coin
+                </span>
               </p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-[9px] sm:text-xs text-neutral-500">Joriy daraja</p>
+              <p className="text-[9px] sm:text-xs text-neutral-500">
+                {t("karta.coins.currentLevel")}
+              </p>
               <p className={`text-base sm:text-xl font-bold ${currentLevel.text}`}>
                 {currentLevel.name}
               </p>
@@ -814,7 +754,7 @@ export default function KartaPage() {
                 <span className="text-right shrink-0">
                   {needCoins > 0
                     ? `${formatCoins(needCoins)} coin`
-                    : "Ochildi!"}
+                    : t("karta.coins.unlocked")}
                 </span>
               </div>
               <div className="h-1.5 rounded-full bg-neutral-800 overflow-hidden">
@@ -825,19 +765,19 @@ export default function KartaPage() {
               </div>
               {highestCoins > currentCoins && (
                 <p className="text-[9px] sm:text-[11px] text-neutral-600 mt-1.5">
-                  Eng yuqori: {formatCoins(highestCoins)} coin
+                  {t("karta.coins.highest")}: {formatCoins(highestCoins)} coin
                 </p>
               )}
             </div>
           ) : (
             <p className="text-[11px] sm:text-sm text-purple-300 flex items-center gap-1.5">
               <Sparkles size={12} />
-              Eng yuqori daraja — VIP
+              {t("karta.coins.maxLevel")}
             </p>
           )}
 
           <p className="text-[11px] sm:text-sm text-neutral-500 mt-2.5">
-            Jami xarajat: {formatCoins(user.totalSpent || 0)} so&apos;m
+            {t("karta.coins.totalSpent")}: {formatCoins(user.totalSpent || 0)} {t("karta.coins.som")}
           </p>
         </div>
 
@@ -845,10 +785,12 @@ export default function KartaPage() {
         <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-5 sm:mb-8">
           <div className="flex items-center gap-1.5 mb-1">
             <Dices size={15} className="text-red-400 shrink-0" />
-            <h2 className="text-sm sm:text-lg font-bold text-white">Kunlik baraban</h2>
+            <h2 className="text-sm sm:text-lg font-bold text-white">
+              {t("karta.wheel.title")}
+            </h2>
           </div>
           <p className="text-[11px] sm:text-sm text-neutral-500 mb-4">
-            Kuniga 1 marta bepul aylantiring — 0, 5, 10 yoki 15 coin!
+            {t("karta.wheel.desc")}
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
@@ -903,20 +845,22 @@ export default function KartaPage() {
 
             <div className="flex-1 w-full text-center sm:text-left">
               {spinStatusLoading ? (
-                <p className="text-[11px] sm:text-sm text-neutral-500">Tekshirilmoqda...</p>
+                <p className="text-[11px] sm:text-sm text-neutral-500">
+                  {t("karta.wheel.checking")}
+                </p>
               ) : spinResult !== null ? (
                 <div>
                   {spinResult > 0 ? (
                     <p className="text-sm sm:text-lg font-bold text-emerald-400 mb-1">
-                      Tabriklaymiz! +{spinResult} coin 🎉
+                      {t("karta.wheel.win", { prize: spinResult })}
                     </p>
                   ) : (
                     <p className="text-sm sm:text-lg font-bold text-neutral-300 mb-1">
-                      Bu safar yutuqsiz. Ertaga urinib ko‘ring!
+                      {t("karta.wheel.lose")}
                     </p>
                   )}
                   <p className="text-[10px] sm:text-xs text-neutral-500">
-                    Ertaga yana bepul aylantirishingiz mumkin.
+                    {t("karta.wheel.tomorrow")}
                   </p>
                 </div>
               ) : spinStatus?.canSpin ? (
@@ -926,7 +870,7 @@ export default function KartaPage() {
                     disabled={isSpinning}
                     className="w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSpinning ? "Aylanmoqda..." : "Aylantirish"}
+                    {isSpinning ? t("karta.wheel.spinning") : t("karta.wheel.spin")}
                   </button>
                   {spinError && (
                     <p className="mt-2.5 flex items-center justify-center sm:justify-start gap-1.5 text-[10px] sm:text-xs text-red-400">
@@ -938,18 +882,18 @@ export default function KartaPage() {
               ) : (
                 <div>
                   <p className="text-[11px] sm:text-sm text-neutral-400 mb-1">
-                    Bugungi barabanni allaqachon aylantirgansiz.
+                    {t("karta.wheel.already")}
                   </p>
                   {spinStatus?.todaySpin && (
                     <p className="text-[10px] sm:text-xs text-neutral-600">
-                      Bugungi yutuq:{" "}
+                      {t("karta.wheel.todayPrize")}:{" "}
                       {spinStatus.todaySpin.prize > 0
                         ? `+${spinStatus.todaySpin.prize} coin`
-                        : "yutuqsiz"}
+                        : t("karta.wheel.noPrize")}
                     </p>
                   )}
                   <p className="text-[10px] sm:text-xs text-neutral-600 mt-0.5">
-                    Ertaga qayta urinib ko‘ring.
+                    {t("karta.wheel.tryTomorrow")}
                   </p>
                 </div>
               )}
@@ -957,11 +901,13 @@ export default function KartaPage() {
           </div>
         </div>
 
-        {/* DARAJALAR — ixcham, ikonkali, yig'iladigan */}
+        {/* DARAJALAR */}
         <div className="mb-6 sm:mb-10">
           <div className="flex items-center gap-1.5 mb-3.5 sm:mb-5">
             <Crown size={15} className="text-amber-400 shrink-0" />
-            <h2 className="text-base sm:text-xl font-bold text-white">Darajalar</h2>
+            <h2 className="text-base sm:text-xl font-bold text-white">
+              {t("karta.levelsTitle")}
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5 items-start">
@@ -989,7 +935,6 @@ export default function KartaPage() {
                     }
                   `}
                 >
-                  {/* Sarlavha qatori: ikonka + nom + (Hozirgi) chap tomonda, coin talabi o'ngda */}
                   <div className="flex items-center justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
@@ -1010,7 +955,7 @@ export default function KartaPage() {
                           </h3>
                           {isCurrent && (
                             <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-neutral-950 shrink-0">
-                              HOZIRGI
+                              {t("karta.current")}
                             </span>
                           )}
                         </div>
@@ -1026,7 +971,6 @@ export default function KartaPage() {
                     </span>
                   </div>
 
-                  {/* Imtiyozlar ro'yxati (qisqartirilgan) */}
                   <ul className="space-y-1.5">
                     {displayedPerks.map((perk) => (
                       <li key={perk} className="flex items-start gap-1.5 text-[11px] sm:text-[12.5px] leading-snug">
@@ -1042,15 +986,14 @@ export default function KartaPage() {
                     ))}
                   </ul>
 
-                  {/* Yig'ish / kengaytirish tugmasi */}
                   {hasMore && (
                     <button
                       onClick={() => toggleLevelExpanded(level.key)}
                       className="mt-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-neutral-400 hover:text-white transition"
                     >
                       {isExpanded
-                        ? "Kamroq ko'rsatish"
-                        : `Yana ${level.perks.length - LEVEL_PERKS_PREVIEW} ta imtiyoz`}
+                        ? t("karta.showLess")
+                        : t("karta.showMore", { n: level.perks.length - LEVEL_PERKS_PREVIEW })}
                       <ChevronDown
                         size={12}
                         className={`transition-transform duration-200 ${
@@ -1062,7 +1005,7 @@ export default function KartaPage() {
 
                   {!isUnlocked && (
                     <p className="mt-2 text-[9px] sm:text-[11px] text-neutral-600">
-                      {formatCoins(level.minCoins)} coin kerak
+                      {t("karta.needCoins", { coins: formatCoins(level.minCoins) })}
                     </p>
                   )}
                 </div>
@@ -1072,17 +1015,35 @@ export default function KartaPage() {
         </div>
 
         {/* TEZKOR AMALLAR */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 mb-6 sm:mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 mb-6 sm:mb-10">
           <Link
             href="/sovgalar"
             className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-red-500/40 active:border-red-500/60 transition group"
           >
             <div className="text-xl mb-1.5 sm:mb-3">🎁</div>
             <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
-              Sovg&apos;alarga almashtirish
+              {t("karta.quick.gifts")}
             </h3>
             <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
-              Coinlaringizni sovg&apos;alarga almashtiring
+              {t("karta.quick.giftsDesc")}
+            </p>
+          </Link>
+
+          <Link
+            href="/korzinka"
+            className="relative rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-red-500/40 active:border-red-500/60 transition group"
+          >
+            {pendingCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white shadow-lg z-10">
+                {pendingCount > 99 ? "99+" : pendingCount}
+              </span>
+            )}
+            <div className="text-xl mb-1.5 sm:mb-3">🛒</div>
+            <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
+              {t("karta.quick.orders")}
+            </h3>
+            <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
+              {t("karta.quick.ordersDesc")}
             </p>
           </Link>
 
@@ -1092,72 +1053,24 @@ export default function KartaPage() {
           >
             <div className="text-xl mb-1.5 sm:mb-3">🛏️</div>
             <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
-              Xonalarni ko&apos;rish
+              {t("karta.quick.rooms")}
             </h3>
             <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
-              Yangi bron qiling va coin to&apos;plang
+              {t("karta.quick.roomsDesc")}
             </p>
           </Link>
-        </div>
-
-        {/* ALMASHTIRILGAN SOVG‘ALAR */}
-        <div className="mb-6 sm:mb-10">
-          <h2 className="text-base sm:text-xl font-bold text-white mb-3">
-            Almashtirilgan sovg‘alar
-          </h2>
-
-          {historyLoading ? (
-            <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 px-4 py-8 text-center">
-              <p className="text-neutral-500 text-xs">Tarix yuklanmoqda...</p>
-            </div>
-          ) : history.length === 0 ? (
-            <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 px-4 py-8 text-center">
-              <div className="text-2xl mb-2">🎁</div>
-              <p className="text-neutral-500 text-xs">Hali hech narsa almashtirilmagan</p>
-              <Link
-                href="/sovgalar"
-                className="inline-block mt-3 text-xs text-red-400 hover:text-red-300 transition"
-              >
-                Sovg‘alarni ko‘rish →
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between gap-2 rounded-xl border border-neutral-800 bg-neutral-900/50 px-3 py-2.5 sm:px-5 sm:py-4"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
-                      {item.giftName || item.name || "Sovg'a"}
-                    </p>
-                    <p className="text-[9px] sm:text-xs text-neutral-500 mt-0.5">
-                      {formatDate(item.createdAt)}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xs font-semibold text-red-400">
-                      −{formatCoins(item.coinsSpent ?? item.coins ?? 0)} coin
-                    </p>
-                    <p className={`text-[10px] font-medium mt-0.5 ${getStatusClass(item.status)}`}>
-                      {getStatusText(item.status)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* FIKR VA TAKLIFLAR */}
         <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-6 sm:mb-10">
           <div className="flex items-center gap-1.5 mb-1">
             <MessageSquare size={15} className="text-red-400 shrink-0" />
-            <h2 className="text-sm sm:text-lg font-bold text-white">Fikr va takliflar</h2>
+            <h2 className="text-sm sm:text-lg font-bold text-white">
+              {t("karta.feedback.title")}
+            </h2>
           </div>
           <p className="text-[11px] sm:text-sm text-neutral-500 mb-3.5">
-            Xizmat sifati bo'yicha taklif va mulohazalaringizni yuboring.
+            {t("karta.feedback.desc")}
           </p>
 
           <form onSubmit={handleFeedbackSubmit} className="space-y-2.5">
@@ -1165,7 +1078,7 @@ export default function KartaPage() {
               rows={3}
               value={feedbackMessage}
               onChange={(e) => setFeedbackMessage(e.target.value)}
-              placeholder="Fikringizni yozing..."
+              placeholder={t("karta.feedback.placeholder")}
               className="w-full rounded-xl border border-neutral-800 bg-neutral-950 p-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition resize-none"
             />
 
@@ -1179,7 +1092,7 @@ export default function KartaPage() {
             {feedbackSent && (
               <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-400">
                 <CheckCircle2 size={12} />
-                Fikringiz muvaffaqiyatli yuborildi!
+                {t("karta.feedback.sent")}
               </p>
             )}
 
@@ -1189,16 +1102,15 @@ export default function KartaPage() {
               className="flex items-center justify-center gap-1.5 w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
             >
               <Send size={13} />
-              {feedbackSubmitting ? "Yuborilmoqda..." : "Yuborish"}
+              {feedbackSubmitting ? t("karta.feedback.sending") : t("karta.feedback.send")}
             </button>
           </form>
         </div>
-
       </div>
 
       {/* RAQAMLI CHEK MODAL */}
       {showReceipt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6 shadow-2xl text-neutral-200">
             <button
               onClick={() => setShowReceipt(false)}
@@ -1209,35 +1121,37 @@ export default function KartaPage() {
 
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-neutral-800">
               <Receipt className="text-red-400 shrink-0" size={18} />
-              <h3 className="text-base font-bold text-white">Raqamli Chek</h3>
+              <h3 className="text-base font-bold text-white">
+                {t("karta.receipt.title")}
+              </h3>
             </div>
 
             <div className="space-y-2.5 text-xs sm:text-sm mb-6">
               <div className="flex justify-between py-1 border-b border-neutral-800/50">
-                <span className="text-neutral-500">Mijoz:</span>
+                <span className="text-neutral-500">{t("karta.receipt.client")}</span>
                 <span className="font-medium text-white">{user.name}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-neutral-800/50">
-                <span className="text-neutral-500">Karta raqami:</span>
+                <span className="text-neutral-500">{t("karta.receipt.card")}</span>
                 <span className="font-mono text-white">{cardNumber}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-neutral-800/50">
-                <span className="text-neutral-500">Joriy daraja:</span>
+                <span className="text-neutral-500">{t("karta.receipt.level")}</span>
                 <span className={`font-semibold ${currentLevel.text}`}>{currentLevel.name}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-neutral-800/50">
-                <span className="text-neutral-500">Balans:</span>
+                <span className="text-neutral-500">{t("karta.receipt.balance")}</span>
                 <span className="font-bold text-emerald-400">{formatCoins(currentCoins)} coin</span>
               </div>
               <div className="flex justify-between py-1 border-b border-neutral-800/50">
-                <span className="text-neutral-500">Jami xarajat:</span>
-                <span className="font-medium text-white">{formatCoins(user.totalSpent || 0)} so'm</span>
+                <span className="text-neutral-500">{t("karta.receipt.spent")}</span>
+                <span className="font-medium text-white">{formatCoins(user.totalSpent || 0)} {t("karta.coins.som")}</span>
               </div>
             </div>
 
             {qrDataUrl && (
               <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white mb-4">
-                <img src={qrDataUrl} alt="QR Kod" className="w-32 h-32" />
+                <img src={qrDataUrl} alt="QR" className="w-32 h-32" />
                 <span className="text-[10px] text-neutral-800 font-mono mt-1">{cardNumber}</span>
               </div>
             )}
@@ -1246,15 +1160,15 @@ export default function KartaPage() {
               onClick={() => setShowReceipt(false)}
               className="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs sm:text-sm font-semibold text-white transition"
             >
-              Yopish
+              {t("karta.receipt.close")}
             </button>
           </div>
         </div>
       )}
 
-      {/* SOZLAMALAR MODAL — login va parolni o'zgartirish */}
+      {/* SOZLAMALAR MODAL */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl text-neutral-200 max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setShowSettings(false)}
@@ -1268,35 +1182,35 @@ export default function KartaPage() {
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 shrink-0">
                   <Settings size={16} />
                 </span>
-                <h3 className="text-base font-bold text-white">Sozlamalar</h3>
+                <h3 className="text-base font-bold text-white">
+                  {t("karta.settings.title")}
+                </h3>
               </div>
               <p className="text-[11px] sm:text-xs text-neutral-500 mb-5">
-                Login va parolingizni shu yerda yangilashingiz mumkin.
+                {t("karta.settings.desc")}
               </p>
 
               <form onSubmit={handleSettingsSubmit} className="space-y-5">
-                {/* LOGIN */}
                 <div>
                   <label className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-neutral-400 mb-1.5">
                     <UserRound size={12} />
-                    Login / Telefon raqam
+                    {t("karta.settings.loginLabel")}
                   </label>
                   <input
                     type="text"
                     value={settingsLogin}
                     onChange={(e) => setSettingsLogin(e.target.value)}
-                    placeholder="Login yoki telefon raqam"
+                    placeholder={t("karta.settings.loginPlaceholder")}
                     className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
                   />
                 </div>
 
                 <div className="h-px bg-neutral-800" />
 
-                {/* PAROL */}
                 <div>
                   <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-neutral-400 mb-3">
                     <KeyRound size={12} />
-                    Parolni o'zgartirish
+                    {t("karta.settings.passwordTitle")}
                   </div>
 
                   <div className="space-y-3">
@@ -1305,7 +1219,7 @@ export default function KartaPage() {
                         type={showCurrentPassword ? "text" : "password"}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Joriy parol"
+                        placeholder={t("karta.settings.currentPassword")}
                         autoComplete="current-password"
                         className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
                       />
@@ -1324,7 +1238,7 @@ export default function KartaPage() {
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Yangi parol"
+                        placeholder={t("karta.settings.newPassword")}
                         autoComplete="new-password"
                         className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
                       />
@@ -1363,7 +1277,7 @@ export default function KartaPage() {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Yangi parolni tasdiqlang"
+                        placeholder={t("karta.settings.confirmPassword")}
                         autoComplete="new-password"
                         className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
                       />
@@ -1380,7 +1294,7 @@ export default function KartaPage() {
 
                   <p className="flex items-start gap-1.5 text-[10px] sm:text-[11px] text-neutral-600 mt-2.5">
                     <ShieldCheck size={12} className="mt-0.5 shrink-0" />
-                    Parolni o'zgartirmoqchi bo'lmasangiz, ushbu maydonlarni bo'sh qoldiring.
+                    {t("karta.settings.passwordHint")}
                   </p>
                 </div>
 
@@ -1394,7 +1308,7 @@ export default function KartaPage() {
                 {settingsSuccess && (
                   <p className="flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-400">
                     <CheckCircle2 size={12} />
-                    Sozlamalar muvaffaqiyatli saqlandi!
+                    {t("karta.settings.success")}
                   </p>
                 )}
 
@@ -1404,14 +1318,14 @@ export default function KartaPage() {
                     onClick={() => setShowSettings(false)}
                     className="flex-1 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-xs sm:text-sm font-semibold text-white transition"
                   >
-                    Bekor qilish
+                    {t("karta.settings.cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={settingsSubmitting}
                     className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-xs sm:text-sm font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {settingsSubmitting ? "Saqlanmoqda..." : "Saqlash"}
+                    {settingsSubmitting ? t("karta.settings.saving") : t("karta.settings.save")}
                   </button>
                 </div>
               </form>

@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n"; // yo'lni o'zingizga moslang
 
 const DIAL_CODE = "+998";
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -40,7 +42,7 @@ export default function LoginPage() {
       setLoading(false);
 
       if (!res.ok) {
-        let msg = data.error || "Xatolik";
+        let msg = data.error || t("auth.errors.generic");
         if (data.debug) {
           msg += " — " + JSON.stringify(data.debug);
         }
@@ -52,7 +54,7 @@ export default function LoginPage() {
       router.refresh();
     } catch (err) {
       setLoading(false);
-      setError("Server bilan bog'lanishda xatolik");
+      setError(t("auth.errors.connection"));
     }
   };
 
@@ -64,17 +66,17 @@ export default function LoginPage() {
             href="/"
             className="text-sm text-neutral-500 hover:text-neutral-300 transition"
           >
-            ← Bosh sahifa
+            ← {t("auth.backHome")}
           </Link>
         </div>
 
         <div className="rounded-3xl border border-neutral-800 bg-neutral-900/60 p-8 sm:p-10 shadow-2xl shadow-black/40">
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-              Tizimga kirish
+              {t("auth.login.title")}
             </h1>
             <p className="text-neutral-400 text-sm">
-              Telefon raqam va parol bilan kiring.
+              {t("auth.login.subtitle")}
             </p>
           </div>
 
@@ -87,7 +89,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
-                Telefon raqam
+                {t("auth.phoneLabel")}
               </label>
               <div className="flex items-stretch rounded-xl border border-neutral-700 bg-neutral-950 focus-within:border-red-500/60 focus-within:ring-1 focus-within:ring-red-500/30 transition overflow-hidden">
                 <span className="flex items-center px-4 text-sm font-medium text-neutral-400 bg-neutral-900 border-r border-neutral-700 select-none">
@@ -107,7 +109,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wider">
-                Parol
+                {t("auth.passwordLabel")}
               </label>
               <input
                 type="password"
@@ -124,17 +126,17 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full rounded-xl bg-red-600 py-3.5 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-60 disabled:cursor-not-allowed transition shadow-lg shadow-red-600/20"
             >
-              {loading ? "Kirilmoqda..." : "Kirish"}
+              {loading ? t("auth.login.submitLoading") : t("auth.login.submit")}
             </button>
           </form>
 
           <p className="mt-7 text-center text-sm text-neutral-500">
-            Kartangiz yo&apos;qmi?{" "}
+            {t("auth.login.noCard")}{" "}
             <Link
               href="/register"
               className="text-red-400 hover:text-red-300 font-medium transition"
             >
-              Ro&apos;yxatdan o&apos;tish
+              {t("auth.login.registerLink")}
             </Link>
           </p>
         </div>

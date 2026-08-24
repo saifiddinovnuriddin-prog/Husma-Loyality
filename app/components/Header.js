@@ -4,24 +4,19 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Menu, X, Coins, Globe, ChevronDown } from "lucide-react";
+import { useI18n } from "../../lib/i18n"; // yo'lni o'zingizga moslashtiring
 
 const LANGS = [
-  { code: "UZ", label: "O'zbek" },
-  { code: "RU", label: "Русский" },
-  { code: "EN", label: "English" },
-];
-
-const NAV_LINKS = [
-  { href: "/xonalar", label: "CoinSHop" },
-  { href: "https://husmahotel.uz/booking?date=2026-08-17&nights=1&adults=2&children-age=", label: "Xona olish" },
-  { href: "/karta", label: "Mening kartam" },
+  { code: "uz", label: "O'zbek" },
+  { code: "ru", label: "Русский" },
+  { code: "en", label: "English" },
 ];
 
 function Header() {
+  const { locale, setLocale, t } = useI18n();
   const [me, setMe] = useState(undefined);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [lang, setLang] = useState("UZ");
   const [scrolled, setScrolled] = useState(false);
 
   const langRef = useRef(null);
@@ -36,18 +31,11 @@ function Header() {
 
     fetch("/api/me")
       .then((res) => {
-        // 401 (login qilinmagan) yoki boshqa xatolik bo'lsa —
-        // JSON parse qilishga urinmasdan to'g'ridan-to'g'ri null qilamiz.
-        if (!res.ok) {
-          return null;
-        }
+        if (!res.ok) return null;
         return res.json();
       })
       .then((data) => {
         if (cancelled) return;
-        // /api/me endpoint foydalanuvchi obyektini to'g'ridan-to'g'ri
-        // qaytaradi ({ user: {...} } emas), shuning uchun data.user emas,
-        // data ni o'zini ishlatamiz.
         setMe(data);
       })
       .catch(() => {
@@ -122,7 +110,7 @@ function Header() {
       >
         <span className="flex items-center gap-1.5">
           <Globe size={14} />
-          {lang}
+          {locale.toUpperCase()}
         </span>
         <ChevronDown
           size={14}
@@ -140,17 +128,17 @@ function Header() {
             <button
               key={l.code}
               onClick={() => {
-                setLang(l.code);
+                setLocale(l.code); // "uz" | "ru" | "en"
                 setLangOpen(false);
               }}
               className={`flex w-full items-center justify-between px-3 py-2 text-xs font-medium transition ${
-                lang === l.code
+                locale === l.code
                   ? "bg-red-600/20 text-red-400"
                   : "text-neutral-300 hover:bg-neutral-800 hover:text-white"
               }`}
             >
               {l.label}
-              <span className="text-neutral-500">{l.code}</span>
+              <span className="text-neutral-500">{l.code.toUpperCase()}</span>
             </button>
           ))}
         </div>
@@ -172,6 +160,15 @@ function Header() {
         {typeof me.coins === "number" ? me.coins.toLocaleString() : 0}
       </div>
     ) : null;
+
+  const NAV_LINKS = [
+    { href: "/xonalar", label: t("nav.coinshop") },
+    {
+      href: "https://husmahotel.uz/booking?date=2026-08-17&nights=1&adults=2&children-age=",
+      label: t("nav.booking"),
+    },
+    { href: "/karta", label: t("nav.myCard") },
+  ];
 
   return (
     <header
@@ -220,7 +217,7 @@ function Header() {
                   : "text-neutral-300 hover:text-red-500"
               }`}
             >
-              Admin panel
+              {t("nav.admin")}
             </Link>
           )}
         </nav>
@@ -237,7 +234,7 @@ function Header() {
                 onClick={handleLogout}
                 className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 text-xs font-medium hover:bg-neutral-800 hover:text-white transition"
               >
-                Chiqish
+                {t("nav.logout")}
               </button>
             </div>
           ) : (
@@ -246,7 +243,7 @@ function Header() {
                 href="/login"
                 className="px-4 py-2 text-neutral-200 hover:text-red-500 transition font-medium text-sm"
               >
-                Kirish
+                {t("nav.login")}
               </Link>
             </div>
           )}
@@ -302,7 +299,7 @@ function Header() {
                 <div>
                   <div className="text-white font-medium text-sm">{me.name}</div>
                   <div className="text-neutral-500 text-xs mt-0.5">
-                    Xush kelibsiz
+                    {t("nav.welcome")}
                   </div>
                 </div>
                 <CoinBadge mobile />
@@ -313,13 +310,13 @@ function Header() {
                   href="/login"
                   className="w-full text-center px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-200 font-medium text-sm hover:bg-neutral-800 transition"
                 >
-                  Kirish
+                  {t("nav.login")}
                 </Link>
                 <Link
                   href="/register"
                   className="w-full text-center px-4 py-2.5 rounded-lg bg-red-600 text-white font-medium text-sm hover:bg-red-700 transition"
                 >
-                  Karta ochish
+                  {t("nav.register")}
                 </Link>
               </div>
             )}
@@ -348,7 +345,7 @@ function Header() {
                       : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
                   }`}
                 >
-                  Admin panel
+                  {t("nav.admin")}
                 </Link>
               )}
             </nav>
@@ -362,7 +359,7 @@ function Header() {
                 onClick={handleLogout}
                 className="w-full px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 text-sm font-medium hover:bg-neutral-800 hover:text-white transition"
               >
-                Chiqish
+                {t("nav.logout")}
               </button>
             )}
           </div>
