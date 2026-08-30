@@ -26,12 +26,20 @@ import {
   Diamond as DiamondIcon,
   Star,
   ChevronDown,
+  ChevronRight,
   Settings,
   Eye,
   EyeOff,
   KeyRound,
   UserRound,
   ShieldCheck,
+  Gift,
+  ShoppingCart,
+  BedDouble,
+  ArrowRight,
+  IdCard,
+  Menu,
+  Home,
 } from "lucide-react";
 
 function formatCoins(n) {
@@ -74,9 +82,46 @@ const STRENGTH_COLORS = [
   "bg-emerald-500",
 ];
 
+// Kompakt yuqori navigatsiya (desktop uchun, bo'limlarga sakrash)
+const QUICK_NAV = [
+  { href: "#balans", label: "karta.nav.balance", icon: IdCard },
+  { href: "#darajalar", label: "karta.nav.levels", icon: Crown },
+  { href: "#sovgalar", label: "karta.quick.gifts", icon: Gift },
+  { href: "#buyurtmalar", label: "karta.quick.orders", icon: ShoppingCart },
+  { href: "#xonalar", label: "karta.quick.rooms", icon: BedDouble },
+  { href: "#fikr", label: "karta.feedback.title", icon: MessageSquare },
+];
+
+// Mobil pastki tab-bar (telefon uchun alohida, ilova-uslubidagi navigatsiya)
+const MOBILE_TABS = [
+  { href: "#balans", label: "karta.nav.balance", icon: Home },
+  { href: "#darajalar", label: "karta.nav.levels", icon: Crown },
+  { href: "#sovgalar", label: "karta.quick.gifts", icon: Gift },
+  { href: "#buyurtmalar", label: "karta.quick.orders", icon: ShoppingCart },
+];
+
+// Mobil "Ko'proq" menyusidagi qo'shimcha havolalar
+const MOBILE_MORE_LINKS = [
+  { href: "#xonalar", label: "karta.quick.rooms", icon: BedDouble },
+  { href: "#fikr", label: "karta.feedback.title", icon: MessageSquare },
+];
+
 export default function KartaPage() {
   const { t } = useI18n();
   const router = useRouter();
+
+  // t() ba'zan {n}/{coins} kabi joy egalarini avtomatik almashtirmasligi
+  // mumkin (i18n kutubxonasiga bog'liq) — shuning uchun almashtirishni
+  // o'zimiz, qo'lda bajaramiz. Bu tarjima matnida "{level} uchun {coins}
+  // coin kerak" kabi xom ko'rinishlarni butunlay oldini oladi.
+  function tf(key, vars) {
+    let str = t(key);
+    if (!vars || typeof str !== "string") return str;
+    Object.keys(vars).forEach((k) => {
+      str = str.split(`{${k}}`).join(String(vars[k]));
+    });
+    return str;
+  }
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +131,7 @@ export default function KartaPage() {
 
   const [showReceipt, setShowReceipt] = useState(false);
   const [expandedLevels, setExpandedLevels] = useState(() => new Set());
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [spinStatus, setSpinStatus] = useState(null);
   const [spinStatusLoading, setSpinStatusLoading] = useState(true);
@@ -94,6 +140,8 @@ export default function KartaPage() {
   const [spinResult, setSpinResult] = useState(null);
   const [spinError, setSpinError] = useState(null);
 
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackHoverRating, setFeedbackHoverRating] = useState(0);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
@@ -247,7 +295,7 @@ export default function KartaPage() {
 
   const WHEEL_SEGMENTS = [
     { prize: 0, label: t("karta.wheel.seg0"), short: "0", color: "#3f3f46" },
-    { prize: 5, label: t("karta.wheel.seg5"), short: "5", color: "#f59e0b" },
+    { prize: 5, label: t("karta.wheel.seg5"), short: "5", color: "#0891b2" },
     { prize: 10, label: t("karta.wheel.seg10"), short: "10", color: "#eab308" },
     { prize: 15, label: t("karta.wheel.seg15"), short: "15", color: "#dc2626" },
   ];
@@ -404,7 +452,6 @@ export default function KartaPage() {
         return res.json();
       })
       .then(() => {
-        // Yangi pending paydo bo'lishi mumkin
         setPendingCount((c) => c + 1);
       })
       .catch((err) => {
@@ -476,12 +523,16 @@ export default function KartaPage() {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({
+          message: trimmed,
+          ...(feedbackRating > 0 ? { rating: feedbackRating } : {}),
+        }),
       });
       const data = await res.json();
 
       if (res.ok) {
         setFeedbackMessage("");
+        setFeedbackRating(0);
         setFeedbackSent(true);
         setTimeout(() => setFeedbackSent(false), 3500);
       } else {
@@ -589,6 +640,9 @@ export default function KartaPage() {
     needCoins = Math.max(0, nextLevel.minCoins - levelCoins);
   }
 
+  // Ranglar palitrasi soddalashtirildi: cyan — asosiy amallar/joriy daraja,
+  // gold — darajalar tizimi, green — bajarilgan imtiyozlar,
+  // red — faqat xato/xavfli amallar uchun.
   const tierStyles = {
     Standard: {
       text: "text-neutral-300 border-neutral-500/50",
@@ -629,162 +683,249 @@ export default function KartaPage() {
 
   const style = tierStyles[currentKey] || tierStyles.Standard;
   const cardNumber = user.cardNumber || "•••• •••• •••• ••••";
+  const maskedCardNumber = cardNumber.replace(/\S(?=\S{4})/g, "•");
   const passwordStrength = getPasswordStrength(newPassword);
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 overflow-x-hidden">
-      <div className="max-w-3xl mx-auto px-3 sm:px-5 md:px-6 py-5 sm:py-8 md:py-12 w-full">
+    <main className="min-h-screen bg-neutral-950 text-neutral-100 overflow-x-hidden pb-20 sm:pb-0">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 md:py-12 w-full">
 
-        {/* NAVBAR */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-neutral-900">
-          <div className="min-w-0">
-            <p className="text-[11px] sm:text-sm text-neutral-500 mb-0.5">
-              {t("karta.hello")}
-            </p>
-            <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
-              {user.name}
-            </h1>
+        {/* NAVBAR — mobil va desktop uchun boshqacha tarkib */}
+        <div className="flex flex-col gap-3 mb-5 sm:mb-6 pb-3 sm:pb-4 border-b border-neutral-900">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[11px] sm:text-sm text-neutral-500 mb-0.5">
+                {t("karta.hello")}
+              </p>
+              <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
+                {user.name}
+              </h1>
+            </div>
+
+            {/* Desktop: to'liq tugmalar qatori */}
+            <div className="hidden sm:flex items-center gap-2 shrink-0">
+              <Link
+                href="/"
+                className="text-sm text-neutral-400 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
+              >
+                {t("karta.nav.home")}
+              </Link>
+              <button
+                onClick={openSettings}
+                aria-label={t("karta.nav.settings")}
+                className="flex items-center gap-1 text-sm text-neutral-300 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
+              >
+                <Settings size={13} />
+                {t("karta.nav.settings")}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-sm text-neutral-400 hover:text-red-400 transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
+              >
+                <LogOut size={13} />
+                {t("karta.nav.logout")}
+              </button>
+            </div>
+
+            {/* Mobil: faqat hamburger tugmasi */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label={t("karta.nav.menu")}
+              className="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-neutral-900/60 border border-neutral-800 text-neutral-300 shrink-0"
+            >
+              <Menu size={18} />
+            </button>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/"
-              className="text-[11px] sm:text-sm text-neutral-400 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
-            >
-              {t("karta.nav.home")}
-            </Link>
-            <button
-              onClick={openSettings}
-              className="flex items-center gap-1 text-[11px] sm:text-sm text-neutral-300 hover:text-white transition px-2.5 py-1.5 rounded-lg bg-neutral-900/60 border border-neutral-800 whitespace-nowrap"
-            >
-              <Settings size={13} />
-              {t("karta.nav.settings")}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 text-[11px] sm:text-sm text-red-400 hover:text-red-300 transition px-2.5 py-1.5 rounded-lg bg-red-950/30 border border-red-900/50 font-medium whitespace-nowrap"
-            >
-              <LogOut size={13} />
-              {t("karta.nav.logout")}
-            </button>
-          </div>
+          {/* Desktop: tezkor navigatsiya paneli */}
+          <nav className="hidden sm:flex items-center gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 pb-0.5">
+            {QUICK_NAV.map(({ href, label, icon: Icon }) => (
+              <a
+                key={href}
+                href={href}
+                className="flex items-center gap-1.5 shrink-0 text-xs font-medium text-neutral-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition px-2.5 py-1.5 rounded-full border border-neutral-800 whitespace-nowrap"
+              >
+                <Icon size={12} />
+                {t(label)}
+              </a>
+            ))}
+          </nav>
         </div>
 
-        {/* KARTA */}
-        <div className="mb-4 sm:mb-6">
+        {/* HERO: karta + balans + progress — bitta asosiy blokka birlashtirildi.
+            Butun karta bosiladigan: istalgan joyiga tegish/bosish rekvizitlar
+            (raqamli chek) modalini ochadi. Mobil va desktop uchun ikki xil
+            joylashuv (mobil: vertikal/markazlashgan, desktop: gorizontal qator). */}
+        <div id="balans" className="mb-6 sm:mb-10 scroll-mt-20">
           <div
+            role="button"
+            tabIndex={0}
             onClick={() => setShowReceipt(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setShowReceipt(true);
+            }}
             className={`
-              group cursor-pointer active:scale-[0.99] transition-all duration-300
+              cursor-pointer active:scale-[0.99] sm:active:scale-100 transition-transform duration-150
               rounded-2xl border border-neutral-800 bg-gradient-to-br
               ${style.gradient} p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-2xl
             `}
-            style={{ minHeight: "160px" }}
           >
             <div className={`absolute top-0 right-0 w-24 h-24 sm:w-40 sm:h-40 ${style.glow} rounded-full blur-3xl pointer-events-none`} />
             <div className={`absolute -bottom-6 -left-6 w-24 h-24 sm:w-40 sm:h-40 ${style.glow} rounded-full blur-3xl pointer-events-none`} />
 
-            <div className="relative flex flex-col justify-between gap-4 min-h-[140px]">
-              <div className="flex items-center justify-between gap-2">
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${style.text}`}>
-                  <Crown size={10} />
-                  {currentLevel.name}
-                </span>
+            <div className="relative">
+              {/* Ustki qator: brend + rekvizitlarni ko'rsatish tugmasi
+                  (mobil: faqat ikonka, desktop: matn bilan) */}
+              <div className="flex items-center justify-between gap-2 mb-4 sm:mb-5">
                 <span className="text-[11px] sm:text-sm font-bold tracking-widest text-neutral-300">
                   HUSMA
                 </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowReceipt(true);
+                  }}
+                  aria-label={t("karta.card.showDetails")}
+                  className="flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold text-neutral-200 bg-black/30 hover:bg-black/50 active:bg-black/60 border border-white/10 px-2.5 py-1.5 sm:px-3 rounded-lg transition"
+                >
+                  <IdCard size={13} />
+                  <span className="hidden sm:inline">{t("karta.card.showDetails")}</span>
+                </button>
               </div>
 
-              <div className="flex items-end justify-between gap-2 sm:gap-4">
-                <div className="min-w-0 flex-1">
-                  <p className="text-[9px] sm:text-xs text-neutral-500 mb-1 tracking-wide">
-                    {t("karta.card.number")}
-                  </p>
-                  <p className="text-sm sm:text-lg md:text-2xl font-mono font-semibold tracking-wide text-white break-all leading-tight">
-                    {cardNumber}
-                  </p>
-                  <p className="text-[9px] sm:text-xs text-neutral-500 mt-1.5 uppercase truncate">
-                    {user.name}
-                  </p>
+              {/* MOBIL LAYOUT — vertikal, chapga tekislangan */}
+              <div className="sm:hidden flex flex-col items-start text-left">
+                <p className="text-[11px] text-neutral-400 mb-1">
+                  {t("karta.coins.your")}
+                </p>
+                <p className="text-4xl font-black text-white tracking-tight leading-none mb-3">
+                  {formatCoins(currentCoins)}
+                  <span className="text-base text-neutral-400 ml-1.5 font-semibold">
+                    coin
+                  </span>
+                </p>
+
+                <div
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${style.text} bg-black/20 mb-4`}
+                >
+                  <Crown size={13} />
+                  <span className="text-sm font-bold">{currentLevel.name}</span>
                 </div>
 
-                {qrDataUrl && (
-                  <img
-                    src={qrDataUrl}
-                    alt="QR"
-                    className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0 rounded-md"
-                  />
+                {nextLevel ? (
+                  <div className="w-full">
+                    <div className="h-2 rounded-full bg-black/30 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 transition-all duration-700"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-neutral-400 mt-1.5">
+                      <span className="font-semibold text-neutral-300">{progress}%</span>
+                      <span className="text-right">
+                        {needCoins > 0
+                          ? tf("karta.coins.needToNext", {
+                              coins: formatCoins(needCoins),
+                              level: nextLevel.name,
+                            })
+                          : t("karta.coins.unlocked")}
+                      </span>
+                    </div>
+                    {highestCoins > currentCoins && (
+                      <p className="text-[10px] text-neutral-500 mt-1">
+                        {t("karta.coins.highest")}: {formatCoins(highestCoins)} coin
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-purple-300 flex items-center gap-1.5">
+                    <Sparkles size={12} />
+                    {t("karta.coins.maxLevel")}
+                  </p>
                 )}
-              </div>
-            </div>
-          </div>
-          <p className="text-center text-[10px] sm:text-xs text-neutral-500 mt-1.5 px-1">
-            {t("karta.card.hint")}
-          </p>
-        </div>
 
-        {/* COINLAR */}
-        <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-5 sm:mb-8">
-          <div className="flex items-end justify-between gap-2 mb-3">
-            <div className="min-w-0">
-              <p className="text-[11px] sm:text-sm text-neutral-400 mb-0.5">
-                {t("karta.coins.your")}
-              </p>
-              <p className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
-                {formatCoins(currentCoins)}
-                <span className="text-xs sm:text-base text-red-400 ml-1 font-semibold">
-                  coin
-                </span>
-              </p>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-[9px] sm:text-xs text-neutral-500">
-                {t("karta.coins.currentLevel")}
-              </p>
-              <p className={`text-base sm:text-xl font-bold ${currentLevel.text}`}>
-                {currentLevel.name}
-              </p>
-            </div>
-          </div>
-
-          {nextLevel ? (
-            <div>
-              <div className="flex justify-between text-[10px] sm:text-xs text-neutral-500 mb-1.5 gap-1">
-                <span className="truncate">{currentLevel.name}</span>
-                <span className="text-right shrink-0">
-                  {needCoins > 0
-                    ? `${formatCoins(needCoins)} coin`
-                    : t("karta.coins.unlocked")}
-                </span>
-              </div>
-              <div className="h-1.5 rounded-full bg-neutral-800 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-700"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              {highestCoins > currentCoins && (
-                <p className="text-[9px] sm:text-[11px] text-neutral-600 mt-1.5">
-                  {t("karta.coins.highest")}: {formatCoins(highestCoins)} coin
+                <p className="text-[10px] text-neutral-500 mt-4 pt-3 border-t border-white/10 w-full">
+                  {t("karta.coins.totalSpent")}: {formatCoins(user.totalSpent || 0)} {t("karta.coins.som")}
                 </p>
-              )}
-            </div>
-          ) : (
-            <p className="text-[11px] sm:text-sm text-purple-300 flex items-center gap-1.5">
-              <Sparkles size={12} />
-              {t("karta.coins.maxLevel")}
-            </p>
-          )}
 
-          <p className="text-[11px] sm:text-sm text-neutral-500 mt-2.5">
-            {t("karta.coins.totalSpent")}: {formatCoins(user.totalSpent || 0)} {t("karta.coins.som")}
-          </p>
+                <p className="flex items-center gap-1 text-[10px] text-neutral-600 mt-2">
+                  <IdCard size={11} />
+                  {t("karta.card.hint")}
+                </p>
+              </div>
+
+              {/* DESKTOP LAYOUT — gorizontal qator */}
+              <div className="hidden sm:block">
+                <div className="flex flex-wrap items-end justify-between gap-4 mb-5">
+                  <div className="min-w-0">
+                    <p className="text-sm text-neutral-400 mb-1">
+                      {t("karta.coins.your")}
+                    </p>
+                    <p className="text-4xl md:text-5xl font-black text-white tracking-tight leading-none">
+                      {formatCoins(currentCoins)}
+                      <span className="text-lg text-neutral-400 ml-1.5 font-semibold">
+                        coin
+                      </span>
+                    </p>
+                  </div>
+
+                  <div
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${style.text} bg-black/20`}
+                  >
+                    <Crown size={14} />
+                    <span className="text-base font-bold">
+                      {currentLevel.name}
+                    </span>
+                  </div>
+                </div>
+
+                {nextLevel ? (
+                  <div>
+                    <div className="flex justify-between text-xs text-neutral-300 mb-1.5 gap-1">
+                      <span className="truncate font-medium">{currentLevel.name}</span>
+                      <span className="text-right shrink-0 font-medium">
+                        {needCoins > 0
+                          ? tf("karta.coins.needToNext", {
+                              coins: formatCoins(needCoins),
+                              level: nextLevel.name,
+                            })
+                          : t("karta.coins.unlocked")}
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-black/30 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 transition-all duration-700"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-neutral-400 mt-1.5">
+                      {progress}%
+                      {highestCoins > currentCoins && (
+                        <span className="ml-2 text-neutral-500">
+                          ({t("karta.coins.highest")}: {formatCoins(highestCoins)} coin)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-purple-300 flex items-center gap-1.5">
+                    <Sparkles size={12} />
+                    {t("karta.coins.maxLevel")}
+                  </p>
+                )}
+
+                <p className="text-sm text-neutral-400 mt-4 pt-3 border-t border-white/10">
+                  {t("karta.coins.totalSpent")}: {formatCoins(user.totalSpent || 0)} {t("karta.coins.som")}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* BARABAN */}
-        <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-5 sm:mb-8">
+        <div id="wheel" className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-6 sm:mb-10 scroll-mt-20">
           <div className="flex items-center gap-1.5 mb-1">
-            <Dices size={15} className="text-red-400 shrink-0" />
+            <Dices size={15} className="text-cyan-400 shrink-0" />
             <h2 className="text-sm sm:text-lg font-bold text-white">
               {t("karta.wheel.title")}
             </h2>
@@ -808,7 +949,7 @@ export default function KartaPage() {
                   height: 0,
                   borderLeft: "8px solid transparent",
                   borderRight: "8px solid transparent",
-                  borderTop: "12px solid #ef4444",
+                  borderTop: "12px solid #22d3ee",
                 }}
               />
 
@@ -838,7 +979,7 @@ export default function KartaPage() {
 
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="h-7 w-7 sm:h-10 sm:w-10 rounded-full bg-neutral-950 border-2 border-neutral-700 flex items-center justify-center">
-                  <Dices size={12} className="sm:w-4 sm:h-4 text-red-400" />
+                  <Dices size={12} className="sm:w-4 sm:h-4 text-cyan-400" />
                 </div>
               </div>
             </div>
@@ -852,7 +993,7 @@ export default function KartaPage() {
                 <div>
                   {spinResult > 0 ? (
                     <p className="text-sm sm:text-lg font-bold text-emerald-400 mb-1">
-                      {t("karta.wheel.win", { prize: spinResult })}
+                      {tf("karta.wheel.win", { prize: spinResult })}
                     </p>
                   ) : (
                     <p className="text-sm sm:text-lg font-bold text-neutral-300 mb-1">
@@ -868,7 +1009,7 @@ export default function KartaPage() {
                   <button
                     onClick={handleSpin}
                     disabled={isSpinning}
-                    className="w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-cyan-500 active:bg-cyan-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSpinning ? t("karta.wheel.spinning") : t("karta.wheel.spin")}
                   </button>
@@ -902,15 +1043,19 @@ export default function KartaPage() {
         </div>
 
         {/* DARAJALAR */}
-        <div className="mb-6 sm:mb-10">
+        <div id="darajalar" className="mb-6 sm:mb-10 scroll-mt-20">
           <div className="flex items-center gap-1.5 mb-3.5 sm:mb-5">
             <Crown size={15} className="text-amber-400 shrink-0" />
             <h2 className="text-base sm:text-xl font-bold text-white">
               {t("karta.levelsTitle")}
             </h2>
+            <span className="sm:hidden ml-auto text-[10px] text-neutral-600">
+              {t("karta.swipeHint")}
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5 items-start">
+          {/* Mobil: gorizontal snap-scroll karusel. Desktop: grid */}
+          <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3.5 overflow-x-auto sm:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
             {LEVELS.map((level) => {
               const isUnlocked = levelCoins >= level.minCoins;
               const isCurrent = level.key === currentKey;
@@ -925,10 +1070,11 @@ export default function KartaPage() {
                 <div
                   key={level.key}
                   className={`
-                    rounded-xl border p-3 sm:p-4 transition-all
+                    flex flex-col rounded-xl border p-3 sm:p-4 transition-all min-h-[220px]
+                    w-[78vw] max-w-[280px] shrink-0 snap-start sm:w-auto sm:max-w-none
                     ${
                       isCurrent
-                        ? `${level.border} bg-gradient-to-br ${level.color} ring-1 ring-amber-500/30`
+                        ? `${level.border} bg-gradient-to-br ${level.color} ring-1 ring-cyan-400/40`
                         : isUnlocked
                         ? "border-neutral-700 bg-neutral-900/60"
                         : "border-neutral-800/60 bg-neutral-900/30 opacity-70"
@@ -954,7 +1100,7 @@ export default function KartaPage() {
                             {level.name}
                           </h3>
                           {isCurrent && (
-                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500 text-neutral-950 shrink-0">
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500 text-neutral-950 shrink-0">
                               {t("karta.current")}
                             </span>
                           )}
@@ -971,7 +1117,7 @@ export default function KartaPage() {
                     </span>
                   </div>
 
-                  <ul className="space-y-1.5">
+                  <ul className="space-y-1.5 flex-1">
                     {displayedPerks.map((perk) => (
                       <li key={perk} className="flex items-start gap-1.5 text-[11px] sm:text-[12.5px] leading-snug">
                         {isUnlocked ? (
@@ -986,85 +1132,178 @@ export default function KartaPage() {
                     ))}
                   </ul>
 
-                  {hasMore && (
-                    <button
-                      onClick={() => toggleLevelExpanded(level.key)}
-                      className="mt-2 flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-neutral-400 hover:text-white transition"
-                    >
-                      {isExpanded
-                        ? t("karta.showLess")
-                        : t("karta.showMore", { n: level.perks.length - LEVEL_PERKS_PREVIEW })}
-                      <ChevronDown
-                        size={12}
-                        className={`transition-transform duration-200 ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  )}
+                  <div className="mt-2">
+                    {hasMore && (
+                      <button
+                        onClick={() => toggleLevelExpanded(level.key)}
+                        className="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-neutral-400 hover:text-cyan-300 transition"
+                      >
+                        {isExpanded
+                          ? t("karta.showLess")
+                          : tf("karta.showMore", { n: level.perks.length - LEVEL_PERKS_PREVIEW })}
+                        <ChevronDown
+                          size={12}
+                          className={`transition-transform duration-200 ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                    )}
 
-                  {!isUnlocked && (
-                    <p className="mt-2 text-[9px] sm:text-[11px] text-neutral-600">
-                      {t("karta.needCoins", { coins: formatCoins(level.minCoins) })}
-                    </p>
-                  )}
+                    {!isUnlocked && (
+                      <p className="mt-1.5 text-[9px] sm:text-[11px] text-neutral-600">
+                        {tf("karta.needCoins", { coins: formatCoins(level.minCoins) })}
+                      </p>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* TEZKOR AMALLAR */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 mb-6 sm:mb-10">
+        {/* TEZKOR AMALLAR — mobilda uzun ro'yxat qatorlari, desktopda karta-grid */}
+
+        {/* MOBIL: skrinshotdagi profil-menyu uslubida uzun qatorlar */}
+        <div className="sm:hidden rounded-xl border border-neutral-800 bg-neutral-900/50 divide-y divide-neutral-800 mb-6 overflow-hidden">
+          <Link
+            id="sovgalar"
+            href="/sovgalar"
+            className="flex items-center gap-3 px-4 py-4 active:bg-neutral-800/60 transition scroll-mt-20"
+          >
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shrink-0">
+              <Gift size={16} />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-medium text-white">
+                {t("karta.quick.gifts")}
+              </span>
+              <span className="block text-[11px] text-neutral-500 truncate">
+                {t("karta.quick.giftsDesc")}
+              </span>
+            </span>
+            <ChevronRight size={18} className="text-neutral-600 shrink-0" />
+          </Link>
+
+          <Link
+            id="buyurtmalar"
+            href="/korzinka"
+            className="flex items-center gap-3 px-4 py-4 active:bg-neutral-800/60 transition scroll-mt-20"
+          >
+            <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shrink-0">
+              <ShoppingCart size={16} />
+              {pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-bold text-white shadow">
+                  {pendingCount > 99 ? "99+" : pendingCount}
+                </span>
+              )}
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-medium text-white">
+                {t("karta.quick.orders")}
+              </span>
+              <span className="block text-[11px] text-neutral-500 truncate">
+                {t("karta.quick.ordersDesc")}
+              </span>
+            </span>
+            <ChevronRight size={18} className="text-neutral-600 shrink-0" />
+          </Link>
+
+          <Link
+            id="xonalar"
+            href="https://husmahotel.uz/booking?date=2026-08-15&nights=1&adults=2&children-age="
+            className="flex items-center gap-3 px-4 py-4 active:bg-neutral-800/60 transition scroll-mt-20"
+          >
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shrink-0">
+              <BedDouble size={16} />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-medium text-white">
+                {t("karta.quick.rooms")}
+              </span>
+              <span className="block text-[11px] text-neutral-500 truncate">
+                {t("karta.quick.roomsDesc")}
+              </span>
+            </span>
+            <ChevronRight size={18} className="text-neutral-600 shrink-0" />
+          </Link>
+        </div>
+
+        {/* DESKTOP: karta-grid */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 mb-6 sm:mb-10">
           <Link
             href="/sovgalar"
-            className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-red-500/40 active:border-red-500/60 transition group"
+            className="group flex flex-col justify-between rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-cyan-500/50 active:border-cyan-500/70 transition"
           >
-            <div className="text-xl mb-1.5 sm:mb-3">🎁</div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
-              {t("karta.quick.gifts")}
-            </h3>
-            <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
-              {t("karta.quick.giftsDesc")}
-            </p>
+            <div>
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 mb-2.5">
+                <Gift size={16} />
+              </div>
+              <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition">
+                {t("karta.quick.gifts")}
+              </h3>
+              <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
+                {t("karta.quick.giftsDesc")}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-cyan-300 mt-3">
+              {t("karta.quick.cta")}
+              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </Link>
 
           <Link
             href="/korzinka"
-            className="relative rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-red-500/40 active:border-red-500/60 transition group"
+            className="group relative flex flex-col justify-between rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-cyan-500/50 active:border-cyan-500/70 transition"
           >
             {pendingCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-bold text-white shadow-lg z-10">
                 {pendingCount > 99 ? "99+" : pendingCount}
               </span>
             )}
-            <div className="text-xl mb-1.5 sm:mb-3">🛒</div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
-              {t("karta.quick.orders")}
-            </h3>
-            <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
-              {t("karta.quick.ordersDesc")}
-            </p>
+            <div>
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 mb-2.5">
+                <ShoppingCart size={16} />
+              </div>
+              <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition">
+                {t("karta.quick.orders")}
+              </h3>
+              <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
+                {t("karta.quick.ordersDesc")}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-cyan-300 mt-3">
+              {t("karta.quick.cta")}
+              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </Link>
 
           <Link
             href="https://husmahotel.uz/booking?date=2026-08-15&nights=1&adults=2&children-age="
-            className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-red-500/40 active:border-red-500/60 transition group"
+            className="group flex flex-col justify-between rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 hover:border-cyan-500/50 active:border-cyan-500/70 transition"
           >
-            <div className="text-xl mb-1.5 sm:mb-3">🛏️</div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-red-300 transition">
-              {t("karta.quick.rooms")}
-            </h3>
-            <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
-              {t("karta.quick.roomsDesc")}
-            </p>
+            <div>
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 mb-2.5">
+                <BedDouble size={16} />
+              </div>
+              <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition">
+                {t("karta.quick.rooms")}
+              </h3>
+              <p className="text-[11px] sm:text-sm text-neutral-500 mt-0.5">
+                {t("karta.quick.roomsDesc")}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-cyan-300 mt-3">
+              {t("karta.quick.cta")}
+              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </Link>
         </div>
 
         {/* FIKR VA TAKLIFLAR */}
-        <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-6 sm:mb-10">
+        <div id="fikr" className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-3.5 sm:p-5 md:p-6 mb-6 sm:mb-10 scroll-mt-20">
           <div className="flex items-center gap-1.5 mb-1">
-            <MessageSquare size={15} className="text-red-400 shrink-0" />
+            <MessageSquare size={15} className="text-cyan-400 shrink-0" />
             <h2 className="text-sm sm:text-lg font-bold text-white">
               {t("karta.feedback.title")}
             </h2>
@@ -1073,13 +1312,45 @@ export default function KartaPage() {
             {t("karta.feedback.desc")}
           </p>
 
-          <form onSubmit={handleFeedbackSubmit} className="space-y-2.5">
+          <form onSubmit={handleFeedbackSubmit} className="space-y-3">
+            {/* Yulduzcha baho */}
+            <div>
+              <p className="text-[11px] sm:text-xs text-neutral-400 mb-1.5">
+                {t("karta.feedback.ratingLabel")}
+              </p>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const filled = (feedbackHoverRating || feedbackRating) >= n;
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setFeedbackRating(n)}
+                      onMouseEnter={() => setFeedbackHoverRating(n)}
+                      onMouseLeave={() => setFeedbackHoverRating(0)}
+                      aria-label={`${n} star`}
+                      className="p-0.5"
+                    >
+                      <Star
+                        size={22}
+                        className={
+                          filled
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-neutral-700"
+                        }
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <textarea
               rows={3}
               value={feedbackMessage}
               onChange={(e) => setFeedbackMessage(e.target.value)}
               placeholder={t("karta.feedback.placeholder")}
-              className="w-full rounded-xl border border-neutral-800 bg-neutral-950 p-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition resize-none"
+              className="w-full rounded-xl border border-neutral-800 bg-neutral-950 p-3 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-cyan-500/50 focus:outline-none transition resize-none"
             />
 
             {feedbackError && (
@@ -1099,7 +1370,7 @@ export default function KartaPage() {
             <button
               type="submit"
               disabled={feedbackSubmitting || !feedbackMessage.trim()}
-              className="flex items-center justify-center gap-1.5 w-full sm:w-auto rounded-xl bg-red-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-red-500 active:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
+              className="flex items-center justify-center gap-1.5 w-full sm:w-auto rounded-xl bg-cyan-600 px-5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-cyan-500 active:bg-cyan-700 transition disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
             >
               <Send size={13} />
               {feedbackSubmitting ? t("karta.feedback.sending") : t("karta.feedback.send")}
@@ -1108,7 +1379,92 @@ export default function KartaPage() {
         </div>
       </div>
 
-      {/* RAQAMLI CHEK MODAL */}
+      {/* MOBIL PASTKI TAB-BAR — faqat telefon uchun, ilova-uslubidagi navigatsiya */}
+      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-neutral-950/95 backdrop-blur border-t border-neutral-900 pb-[env(safe-area-inset-bottom)]">
+        <div className="flex items-stretch justify-between px-1">
+          {MOBILE_TABS.map(({ href, label, icon: Icon }) => (
+            <a
+              key={href}
+              href={href}
+              className="flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-neutral-400 active:text-cyan-300 transition"
+            >
+              <Icon size={18} />
+              {t(label)}
+            </a>
+          ))}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-neutral-400 active:text-cyan-300 transition"
+          >
+            <Menu size={18} />
+            {t("karta.nav.more")}
+          </button>
+        </div>
+      </nav>
+
+      {/* MOBIL MENYU SHEET — sozlamalar, chiqish va qo'shimcha bo'limlar */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden fixed inset-0 z-50 flex items-end bg-black/70 backdrop-blur-sm">
+          <div
+            className="absolute inset-0"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="relative w-full rounded-t-2xl border-t border-neutral-800 bg-neutral-900 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl">
+            <div className="w-10 h-1 rounded-full bg-neutral-700 mx-auto mb-4" />
+
+            <div className="space-y-0 divide-y divide-neutral-800 mb-3 rounded-xl overflow-hidden border border-neutral-800">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-4 text-sm font-medium text-neutral-200 active:bg-neutral-800 transition"
+              >
+                <Home size={17} className="text-neutral-400 shrink-0" />
+                <span className="flex-1">{t("karta.nav.home")}</span>
+                <ChevronRight size={17} className="text-neutral-600 shrink-0" />
+              </Link>
+              {MOBILE_MORE_LINKS.map(({ href, label, icon: Icon }) => (
+                <a
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-4 text-sm font-medium text-neutral-200 active:bg-neutral-800 transition"
+                >
+                  <Icon size={17} className="text-neutral-400 shrink-0" />
+                  <span className="flex-1">{t(label)}</span>
+                  <ChevronRight size={17} className="text-neutral-600 shrink-0" />
+                </a>
+              ))}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openSettings();
+                }}
+                className="w-full flex items-center gap-3 px-4 py-4 text-sm font-medium text-neutral-200 active:bg-neutral-800 transition"
+              >
+                <Settings size={17} className="text-neutral-400 shrink-0" />
+                <span className="flex-1 text-left">{t("karta.nav.settings")}</span>
+                <ChevronRight size={17} className="text-neutral-600 shrink-0" />
+              </button>
+            </div>
+
+            <div className="h-px bg-neutral-800 mb-3" />
+
+            {/* Chiqish shu yerda ham oddiy, outline — xavfli amal sifatida bo'rttirilmagan */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLogout();
+              }}
+              className="w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold text-neutral-300 border border-neutral-800 active:text-red-400 active:border-red-900/50 transition"
+            >
+              <LogOut size={16} />
+              {t("karta.nav.logout")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* RAQAMLI CHEK / REKVIZITLAR MODAL */}
       {showReceipt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm">
           <div className="relative w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-5 sm:p-6 shadow-2xl text-neutral-200">
@@ -1120,7 +1476,7 @@ export default function KartaPage() {
             </button>
 
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-neutral-800">
-              <Receipt className="text-red-400 shrink-0" size={18} />
+              <Receipt className="text-cyan-400 shrink-0" size={18} />
               <h3 className="text-base font-bold text-white">
                 {t("karta.receipt.title")}
               </h3>
@@ -1179,7 +1535,7 @@ export default function KartaPage() {
 
             <div className="p-5 sm:p-6">
               <div className="flex items-center gap-2 mb-1">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 shrink-0">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
                   <Settings size={16} />
                 </span>
                 <h3 className="text-base font-bold text-white">
@@ -1201,7 +1557,7 @@ export default function KartaPage() {
                     value={settingsLogin}
                     onChange={(e) => setSettingsLogin(e.target.value)}
                     placeholder={t("karta.settings.loginPlaceholder")}
-                    className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                    className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-cyan-500/50 focus:outline-none transition"
                   />
                 </div>
 
@@ -1221,7 +1577,7 @@ export default function KartaPage() {
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder={t("karta.settings.currentPassword")}
                         autoComplete="current-password"
-                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-cyan-500/50 focus:outline-none transition"
                       />
                       <button
                         type="button"
@@ -1240,7 +1596,7 @@ export default function KartaPage() {
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder={t("karta.settings.newPassword")}
                         autoComplete="new-password"
-                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-cyan-500/50 focus:outline-none transition"
                       />
                       <button
                         type="button"
@@ -1279,7 +1635,7 @@ export default function KartaPage() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder={t("karta.settings.confirmPassword")}
                         autoComplete="new-password"
-                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-red-500/50 focus:outline-none transition"
+                        className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3.5 py-2.5 pr-10 text-xs sm:text-sm text-white placeholder-neutral-600 focus:border-cyan-500/50 focus:outline-none transition"
                       />
                       <button
                         type="button"
@@ -1323,7 +1679,7 @@ export default function KartaPage() {
                   <button
                     type="submit"
                     disabled={settingsSubmitting}
-                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 active:bg-red-700 text-xs sm:text-sm font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-xs sm:text-sm font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {settingsSubmitting ? t("karta.settings.saving") : t("karta.settings.save")}
                   </button>

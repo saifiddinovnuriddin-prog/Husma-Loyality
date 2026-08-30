@@ -1,7 +1,7 @@
 {
   "nav": {
-    "coinshop": "Coin Shop",
-    "booking": "Book a Room",
+    "coinshop": "CoinShop",
+    "booking": "Booking",
     "myCard": "My Card",
     "admin": "Admin Panel",
     "login": "Log In",
@@ -11,145 +11,145 @@
   },
   "launch": {
     "badge": "Just Launched",
-    "title": "Be Among the First — Unlock Exclusive Privileges",
-    "desc": "Get your Husma loyalty card, earn 1 coin for every 1,000 UZS spent, and unlock special VIP tiers.",
-    "perk1Title": "50,000 UZS Welcome Discount",
-    "perk1Desc": "Valid across Husma Hotel, Husma Fit, and Mavi Restaurant upon installing the app.",
-    "perk2Title": "Seamless Earning",
-    "perk2Desc": "Receive 1 coin per 1,000 UZS spent to help you level up faster.",
-    "perk3Title": "Early Access",
-    "perk3Desc": "First access to new rewards, room availability, and special promotions."
+    "title": "Be among the first — get exclusive privileges",
+    "desc": "Open a Husma loyalty card, earn 1 coin for every 1,000 UZS, and reach VIP levels.",
+    "perk1Title": "50,000 UZS Welcome discount",
+    "perk1Desc": "Valid at Husma, Husma Fit, and Mavi restaurant when you install the app.",
+    "perk2Title": "Free to earn",
+    "perk2Desc": "1 coin for every 1,000 UZS helps you reach levels faster.",
+    "perk3Title": "Early access",
+    "perk3Desc": "Be the first to access new gifts, rooms, and promotions."
   },
   "levels": {
-    "badge": "Tiers",
-    "title": "Husma Card Tiers — Higher Tiers, Bigger VIP Perks",
-    "desc": "Upgrade your tier by accumulating coins. Every level offers unique discounts and bonuses.",
-    "cta": "Get Card & Upgrade Tier",
+    "badge": "Levels",
+    "title": "Husma card levels — the higher you go, the more VIP perks",
+    "desc": "Earn coins and level up. Each level comes with its own discounts and bonuses.",
+    "cta": "Open a card and level up",
     "standard": {
-      "1": "50,000 UZS discount (Upon app installation)",
-      "2": "Valid at Husma Fit and Mavi Restaurant",
+      "1": "50,000 UZS discount (when you install the app)",
+      "2": "Valid at Husma Fit and Mavi restaurant",
       "3": "1 coin for every 1,000 UZS"
     },
     "bronze": {
-      "1": "VIP 1 Fruit Basket (in room upon arrival)",
-      "2": "5% discount on laundry services",
+      "1": "VIP 1 fruit basket (in-room on arrival)",
+      "2": "5% laundry discount",
       "3": "5% discount at Husma Spa and Fitness"
     },
     "silver": {
       "1": "Free room upgrade (subject to availability)",
-      "2": "5% discount on room bookings",
-      "3": "5% discount at Mavi Restaurant",
-      "4": "VIP 2 Fruit Basket in room"
+      "2": "5% discount on rooms",
+      "3": "5% discount at Mavi restaurant",
+      "4": "VIP 2 fruit basket in-room"
     },
     "gold": {
-      "1": "Early check-in / Late check-out (subject to availability)",
-      "2": "Free airport/station shuttle",
-      "3": "10% discount on room bookings",
-      "4": "10% discount on Mavi Restaurant and Laundry",
-      "5": "VIP 3 Fruit Basket in room"
+      "1": "Early check-in / late check-out (subject to availability)",
+      "2": "Free airport/station transfer",
+      "3": "10% discount on rooms",
+      "4": "10% discount at Mavi and laundry",
+      "5": "VIP 3 fruit basket in-room"
     },
     "platinum": {
       "1": "Guaranteed early check-in / late check-out",
       "2": "Guaranteed room upgrade",
-      "3": "Business Class airport/station transfer",
-      "4": "10% discount on rooms, 20% on Laundry",
-      "5": "10% discount at Mavi Restaurant",
-      "6": "VIP 4 Fruit Basket + Level 1 departure gift 🎁"
+      "3": "Business-class airport/station transfer",
+      "4": "10% off rooms, 20% off laundry",
+      "5": "10% discount at Mavi restaurant",
+      "6": "VIP 4 fruit basket + Level 1 gift on departure 🎁"
     },
     "diamond": {
-      "1": "Early check-in / Late check-out",
+      "1": "Early check-in / late check-out",
       "2": "Free upgrade to Suite (subject to availability)",
-      "3": "Business Class airport/station transfer",
-      "4": "15% discount on rooms, 10% at Mavi",
-      "5": "2 free laundry items per day",
-      "6": "VIP 5 Fruit Basket (refreshed daily)",
-      "7": "Level 2 departure gift 🎁"
+      "3": "Business-class airport/station transfer",
+      "4": "15% off rooms, 10% off at Mavi",
+      "5": "2 free laundry loads per day",
+      "6": "VIP 5 fruit basket (refreshed daily)",
+      "7": "Level 2 gift on departure 🎁"
     },
     "vip": {
-      "1": "Early check-in / Late check-out",
+      "1": "Early check-in / late check-out",
       "2": "Free upgrade to Suite (subject to availability)",
-      "3": "Business Class airport/station transfer",
-      "4": "15% discount on rooms, 15% at Mavi",
-      "5": "Completely free laundry services",
-      "6": "VIP 6 Fruit Basket (refreshed daily)",
-      "7": "Level 3 departure gift 🎁"
+      "3": "Business-class airport/station transfer",
+      "4": "15% off rooms, 15% off at Mavi",
+      "5": "Fully free laundry",
+      "6": "VIP 6 fruit basket (refreshed daily)",
+      "7": "Level 3 gift on departure 🎁"
     }
   },
   "steps": {
-    "badge": "Simple Process",
-    "title": "How It Works",
-    "desc": "3 simple steps — collect coins and redeem them for VIP tiers and rewards.",
+    "badge": "Simple process",
+    "title": "How does it work?",
+    "desc": "Just 3 steps — earn coins and trade them for VIP levels and gifts.",
     "1Title": "Install the app and open a card",
-    "1Desc": "Register in 1 minute — get a 50,000 UZS discount and a welcome bonus.",
-    "2Title": "Earn coins on purchases",
-    "2Desc": "Get 1 coin credited automatically for every 1,000 UZS spent.",
-    "3Title": "Upgrade tier and redeem rewards",
-    "3Desc": "Use earned coins to upgrade your status and claim exclusive VIP benefits."
+    "1Desc": "Sign up in 1 minute — get a 50,000 UZS discount and a starter bonus.",
+    "2Title": "Earn coins on your purchases",
+    "2Desc": "1 coin is credited automatically for every 1,000 UZS.",
+    "3Title": "Level up and get gifts",
+    "3Desc": "Trade coins for levels, VIP services, and exclusive gifts."
   },
   "gifts": {
     "badge": "Catalog",
-    "title": "Rewards Catalog",
-    "desc": "Exchange your coins for the following rewards.",
-    "seeAll": "View All",
-    "1": "Free Breakfast (1 person)",
-    "2": "Late Checkout",
-    "3": "Back Massage (30 min)",
-    "4": "Room Upgrade",
-    "5": "1 Free Night Stay",
-    "6": "Presidential Suite — 1 Night"
+    "title": "Gift catalog",
+    "desc": "Trade your coins for the following gifts.",
+    "seeAll": "See all",
+    "1": "Free breakfast (1 person)",
+    "2": "Late checkout",
+    "3": "Back massage (30 min)",
+    "4": "Room category upgrade",
+    "5": "1 free night's stay",
+    "6": "Presidential Suite — 1 night"
   },
   "features": {
-    "badge": "Advantages",
-    "title": "Why Husma Card?",
-    "desc": "The Husma system offers transparent, clear, and real privileges.",
-    "1Title": "Earn Coins",
-    "1Desc": "Earn 1 coin for every 1,000 UZS spent (including Husma Fit and Mavi Restaurant).",
-    "2Title": "Rewards & Discounts",
-    "2Desc": "Enjoy exclusive discounts for Mavi Restaurant, Spa, Fitness, and Rooms.",
-    "3Title": "Welcome Bonus",
-    "3Desc": "Get a 50,000 UZS discount applied to your balance right after installation.",
-    "4Title": "Invite Friends",
-    "4Desc": "Invite friends to register and both of you will receive bonus coins.",
-    "5Title": "Birthday Gift",
-    "5Desc": "Special coin package and surprise gifts every year on your birthday.",
-    "6Title": "Always on Your Phone",
-    "6Desc": "No plastic required. Manage your tier, coins, and discounts directly on your smartphone."
+    "badge": "Benefits",
+    "title": "Why the Husma card?",
+    "desc": "The Husma system is transparent, easy to understand, and gives you real value.",
+    "1Title": "Earn coins",
+    "1Desc": "1 coin for every 1,000 UZS (including Husma Fit and Mavi restaurant).",
+    "2Title": "Gifts and discounts",
+    "2Desc": "Exclusive discounts at Mavi restaurant, Spa, fitness, and on rooms.",
+    "3Title": "Welcome bonus",
+    "3Desc": "Installing the app credits your balance with a 50,000 UZS discount.",
+    "4Title": "Invite friends",
+    "4Desc": "When a friend opens a card, you both get bonus coins.",
+    "5Title": "Birthday gift",
+    "5Desc": "Every year on your birthday — a special coin package and surprises.",
+    "6Title": "Always in your phone",
+    "6Desc": "No plastic card needed. All levels, coins, and discounts live in your smartphone."
   },
   "faq": {
     "badge": "FAQ",
-    "title": "Frequently Asked Questions",
-    "desc": "Have questions? Find your answers right here.",
-    "1q": "Is there a fee for the card?",
-    "1a": "No. Registration and issuing the card are completely free.",
-    "2q": "How are coins calculated?",
-    "2a": "You earn 1 coin for every 1,000 UZS spent.",
-    "3q": "Where can I use the 50,000 UZS discount bonus?",
-    "3a": "This discount is awarded upon installation and can be used at Husma Hotel, Husma Fit, and Mavi Restaurant.",
-    "4q": "How do tier levels (Bronze, Silver...) increase?",
-    "4a": "You automatically reach higher levels as you collect coins (e.g., Bronze at 99,000 coins, VIP tier at 999,000 coins)."
+    "title": "Frequently asked questions",
+    "desc": "Got questions? Find the answers here.",
+    "1q": "Do I have to pay for the card?",
+    "1a": "No. Signing up and opening a card are completely free.",
+    "2q": "How are coins earned?",
+    "2a": "1 coin is earned for every 1,000 UZS spent.",
+    "3q": "Where can I use the 50,000 UZS discount?",
+    "3a": "The discount is granted when you install the app and is valid at Husma hotel, Husma Fit, and Mavi restaurant.",
+    "4q": "How do levels (Bronze, Silver...) increase?",
+    "4a": "Once you earn the required number of coins, you move up to the corresponding level (e.g., 99,000 — Bronze, 999,000 — VIP)."
   },
   "cta": {
-    "badge": "Welcome Bonus",
-    "title": "Get Your Card Today — Claim 50,000 UZS Discount Instantly",
-    "desc": "Free registration. Bonus credited immediately to your balance.",
-    "secure": "Your information is securely stored",
-    "button": "Free Card + 50,000 UZS"
+    "badge": "Welcome bonus",
+    "title": "Open a card today — the 50,000 UZS discount is yours instantly",
+    "desc": "Registration is free. The bonus is credited to your balance.",
+    "secure": "Your data is secure",
+    "button": "Free card + 50,000 UZS"
   },
   "hero": {
-    "badge": "Guest Card • Coin System",
+    "badge": "Guest card • Coin system",
     "title": {
-      "part1": "Turn every night into",
-      "highlight": "coins",
+      "part1": "Turn every night",
+      "highlight": "into coins",
       "part2": "— with Husma!"
     },
-    "description": "Earn coins with every payment using your Husma Card. Exchange coins for free breakfast, spa, room upgrades, and other special rewards.",
+    "description": "With the Husma card, every payment earns coins. Collect them and trade for a free breakfast, spa, room upgrade, and other gifts.",
     "cta": {
-      "primary": "Get Card + 50 Coins",
-      "secondary": "View Rewards"
+      "primary": "Open a card + 50 coin",
+      "secondary": "View gifts"
     },
     "stats": {
-      "level": "Tier Level",
-      "welcomeCoin": "Welcome Coins",
+      "level": "Level",
+      "welcomeCoin": "Welcome coin",
       "multiplier": "Multiplier"
     },
     "phone": {
@@ -158,34 +158,34 @@
     }
   },
   "auth": {
-    "backHome": "Home",
-    "phoneLabel": "Phone Number",
+    "backHome": "Back to home",
+    "phoneLabel": "Phone number",
     "passwordLabel": "Password",
     "errors": {
       "generic": "Error",
-      "connection": "Server connection error",
-      "noResponse": "Server did not respond (API not found)"
+      "connection": "Error connecting to the server",
+      "noResponse": "The server did not respond (API not found)"
     },
     "login": {
-      "title": "Log In",
+      "title": "Sign in",
       "subtitle": "Sign in with your phone number and password.",
-      "submit": "Log In",
-      "submitLoading": "Logging in...",
+      "submit": "Log in",
+      "submitLoading": "Signing in...",
       "noCard": "Don't have a card?",
-      "registerLink": "Register"
+      "registerLink": "Sign up"
     },
     "register": {
-      "bonusBadge": "+50 Coins Bonus",
-      "title": "Get Your Card",
-      "subtitle": "Register now to receive 50 coins immediately, redeemable for rewards later.",
-      "nameLabel": "First Name",
-      "surnameLabel": "Last Name",
+      "bonusBadge": "+50 coin bonus",
+      "title": "Open your card",
+      "subtitle": "Sign up and get 50 coin right away. Then you can trade them for gifts.",
+      "nameLabel": "First name",
+      "surnameLabel": "Last name",
       "countryLabel": "Country",
       "passwordPlaceholder": "at least 6 characters",
-      "submit": "Get Card + 50 Coins",
+      "submit": "Open a card + 50 coin",
       "submitLoading": "Creating...",
       "haveCard": "Already have a card?",
-      "loginLink": "Log In",
+      "loginLink": "Log in",
       "countries": {
         "UZ": "Uzbekistan",
         "KZ": "Kazakhstan",
@@ -197,13 +197,13 @@
     }
   },
   "sovgalar": {
-    "badge": "Spend Your Coins",
-    "title": "Rewards & Services",
-    "desc": "Exchange your saved coins for Spa, Restaurant, and Hotel services.",
+    "badge": "Spend your coins",
+    "title": "Gifts and services",
+    "desc": "Trade your earned coins for spa, restaurant, and hotel services.",
     "balance": {
-      "needLogin": "To view balance",
-      "login": "Log In →",
-      "your": "Your Balance"
+      "needLogin": "To see your balance",
+      "login": "Log in →",
+      "your": "Your balance"
     },
     "tabs": {
       "spa": "Spa & Pool",
@@ -211,179 +211,187 @@
       "hotel": "Husma Hotel"
     },
     "history": {
-      "title": "Your Orders",
+      "title": "Your orders",
       "pending": "Pending",
       "completed": "Completed"
     },
     "btn": {
       "redeem": "Redeem",
       "redeemed": "Selected ✓",
-      "login": "Log In",
+      "login": "Log in",
       "notEnough": "Not enough coins"
     },
     "msg": {
-      "notEnough": "Not enough coins — requires {coins} coins for \"{name}\".",
-      "success": "\"{name}\" successfully selected! Show your card at reception.",
+      "notEnough": "Not enough coins — \"{name}\" requires {coins} coins.",
+      "success": "\"{name}\" was selected successfully! Show your card at the front desk.",
       "error": "An error occurred",
-      "network": "Network error. Please try again."
+      "network": "Connection error. Please try again."
     },
     "banner": {
-      "title": "Need More Coins?",
-      "desc": "Earn more coins with every room booking. Every night brings new coins.",
-      "cta": "View Rooms"
+      "title": "Short on coins?",
+      "desc": "Book a room and your coins will keep adding up. Every night earns new coins.",
+      "cta": "View rooms"
     },
     "gifts": {
-      "101": { "name": "Fitness Gym (1 Day)", "desc": "Daily access to the fitness gym (100,000 UZS)" },
-      "102": { "name": "Swimming Pool (1 Day)", "desc": "Daily pool and lounge area access (140,000 UZS)" },
-      "103": { "name": "Fitness + Pool (1 Day)", "desc": "1-day pass for gym and pool (200,000 UZS)" },
-      "104": { "name": "Full SPA Complex", "desc": "Fitness, pool, hammam, Finnish sauna, jacuzzi (250,000 UZS)" },
-      "105": { "name": "Therapeutic Massage (60 min)", "desc": "Full-body wellness massage (450,000 UZS)" },
-      "106": { "name": "Aromatherapy Massage (60 min)", "desc": "Relaxing massage with aromatic oils (500,000 UZS)" },
-      "107": { "name": "Sports Massage (45 min)", "desc": "Intensive muscle recovery massage (400,000 UZS)" },
-      "108": { "name": "Fire Massage (50 min)", "desc": "Healing massage using traditional fire therapy techniques (400,000 UZS)" },
-      "109": { "name": "Back Massage (30 min)", "desc": "Targeted relief for back and spine areas (250,000 UZS)" },
-      "110": { "name": "Honey Massage (40 min)", "desc": "Skin-cleansing massage with natural honey (400,000 UZS)" },
-      "111": { "name": "Chocolate Massage (40 min)", "desc": "Nourishing chocolate body massage (400,000 UZS)" },
-      "112": { "name": "Peeling + Scrub + Body Wash (30 min)", "desc": "Deep skin cleansing and exfoliating service (400,000 UZS)" },
-      "113": { "name": "Foam Wash (30 min)", "desc": "Traditional hammam foam wash (250,000 UZS)" },
-      "114": { "name": "Full SPA VIP Package (90 min)", "desc": "Complete VIP complex massage and care (850,000 UZS)" },
-      "115": { "name": "Kids Swimming (12 Sessions)", "desc": "Subscription for children aged 4-12 (600,000 UZS)" },
-      "116": { "name": "SPA Membership (1 Month)", "desc": "1-month full SPA subscription (1,600,000 UZS)" },
-      "201": { "name": "Welcome Fruit Basket", "desc": "Fresh fruit and treats basket ready in your room upon check-in. (≈ 50,000 UZS)" },
-      "202": { "name": "Free Breakfast (1 Person)", "desc": "Full breakfast for one at Mavi Restaurant. (≈ 80,000 UZS)" },
-      "203": { "name": "Dinner for 2", "desc": "Romantic dinner for two at Mavi Restaurant. (≈ 400,000 UZS)" },
-      "301": { "name": "Late Checkout", "desc": "Option to extend room check-out time by up to 3 hours. (≈ 100,000 UZS)" },
-      "302": { "name": "Laundry Service", "desc": "Complimentary single-use laundry and ironing service during stay. (≈ 60,000 UZS)" },
-      "303": { "name": "Airport Pick-up (Transfer)", "desc": "Free private car transfer from airport to hotel. (≈ 250,000 UZS)" },
-      "304": { "name": "Room Upgrade", "desc": "Free upgrade to the next room category on next booking. (≈ 500,000 UZS)" },
-      "305": { "name": "1 Night Free Stay", "desc": "Complimentary one-night stay in a Standard Room. (≈ 900,000 UZS)" },
-      "306": { "name": "Presidential Suite — 1 Night", "desc": "1-night complimentary VIP stay in the top-tier Presidential Suite. (≈ 5,000,000 UZS)" }
+      "101": { "name": "Gym (1 day)", "desc": "Day access to the fitness center (100,000 UZS)" },
+      "102": { "name": "Pool (1 day)", "desc": "Day access to the pool and lounge area (140,000 UZS)" },
+      "103": { "name": "Gym + Pool (1 day)", "desc": "1 day of gym and pool access (200,000 UZS)" },
+      "104": { "name": "Full spa complex", "desc": "Gym, pool, hammam, Finnish sauna, jacuzzi (250,000 UZS)" },
+      "105": { "name": "Wellness massage (60 min)", "desc": "A full-body wellness massage (450,000 UZS)" },
+      "106": { "name": "Aromatherapy (60 min)", "desc": "A relaxing massage with aromatic oils (500,000 UZS)" },
+      "107": { "name": "Sports massage (45 min)", "desc": "An intensive sports massage for muscle recovery (400,000 UZS)" },
+      "108": { "name": "Fire massage (50 min)", "desc": "A therapeutic massage using a special fire technique (400,000 UZS)" },
+      "109": { "name": "Back massage (30 min)", "desc": "Relaxation for your back and spine (250,000 UZS)" },
+      "110": { "name": "Honey massage (40 min)", "desc": "A cleansing massage with natural honey (400,000 UZS)" },
+      "111": { "name": "Chocolate massage (40 min)", "desc": "A nourishing chocolate body massage (400,000 UZS)" },
+      "112": { "name": "Peel + scrub + wash (30 min)", "desc": "Deep skin cleansing (400,000 UZS)" },
+      "113": { "name": "Foam wash (30 min)", "desc": "Traditional hammam foam wash (250,000 UZS)" },
+      "114": { "name": "Full-package massage (90 min)", "desc": "A complete VIP massage and care package (850,000 UZS)" },
+      "115": { "name": "Kids' swimming (12 sessions)", "desc": "A subscription for children aged 4–12 (600,000 UZS)" },
+      "116": { "name": "Spa subscription (1 month)", "desc": "A full monthly spa subscription (1,600,000 UZS)" },
+      "201": { "name": "Welcome fruit basket", "desc": "Fruit and sweets in your room at check-in (≈ 50,000 UZS)" },
+      "202": { "name": "Free breakfast (1 person)", "desc": "A full breakfast for one at Mavi restaurant (≈ 80,000 UZS)" },
+      "203": { "name": "Dinner for two", "desc": "A romantic dinner for two at Mavi restaurant (≈ 400,000 UZS)" },
+      "301": { "name": "Late checkout", "desc": "Check out 3 hours later than the standard time (≈ 100,000 UZS)" },
+      "302": { "name": "Laundry", "desc": "One free wash and iron during your stay (≈ 60,000 UZS)" },
+      "303": { "name": "Airport transfer", "desc": "A private transfer from the airport to the hotel (≈ 250,000 UZS)" },
+      "304": { "name": "Room category upgrade", "desc": "A free upgrade to the next category on your next booking (≈ 500,000 UZS)" },
+      "305": { "name": "1 free night's stay", "desc": "One free night in a standard room (≈ 900,000 UZS)" },
+      "306": { "name": "Presidential Suite — 1 night", "desc": "One night in the Presidential Suite (≈ 5,000,000 UZS)" }
     }
   },
   "karta": {
     "loading": "Loading...",
-    "hello": "Hello,",
+    "hello": "Hi,",
     "nav": {
       "home": "Home",
       "settings": "Settings",
-      "logout": "Log Out",
-      "korzinka": "Cart"
+      "logout": "Log out",
+      "korzinka": "Cart",
+      "balance": "Balance",
+      "levels": "Levels",
+      "menu": "Menu",
+      "more": "More"
     },
     "card": {
       "number": "CARD NUMBER",
-      "hint": "💡 Tap card to view digital receipt"
+      "hint": "💡 Tap the card to view your digital receipt",
+      "showDetails": "Show details"
     },
     "coins": {
-      "your": "Your Coins",
-      "currentLevel": "Current Tier",
+      "your": "Your coins",
+      "currentLevel": "Current level",
       "unlocked": "Unlocked!",
-      "highest": "Highest Tier",
-      "maxLevel": "Highest Tier — VIP",
-      "totalSpent": "Total Spent",
-      "som": "UZS"
+      "highest": "Highest",
+      "maxLevel": "Maximum level — VIP",
+      "totalSpent": "Total spent",
+      "som": "UZS",
+      "needToNext": "Need {coins} coin for {level}"
     },
     "wheel": {
-      "title": "Daily Fortune Wheel",
-      "desc": "Spin once daily for free — win 0, 5, 10, or 15 coins!",
+      "title": "Daily wheel",
+      "desc": "Spin once a day for free — win 0, 5, 10, or 15 coins!",
       "checking": "Checking...",
       "spin": "Spin",
       "spinning": "Spinning...",
-      "win": "Congratulations! +{prize} coins 🎉",
-      "lose": "Better luck next time! Try again tomorrow.",
+      "win": "Congrats! +{prize} coin 🎉",
+      "lose": "No win this time. Try again tomorrow!",
       "tomorrow": "You can spin for free again tomorrow.",
-      "already": "You have already spun the wheel today.",
-      "todayPrize": "Today's Prize",
-      "noPrize": "No win",
+      "already": "You've already spun the wheel today.",
+      "todayPrize": "Today's prize",
+      "noPrize": "no prize",
       "tryTomorrow": "Try again tomorrow.",
-      "seg0": "No win",
-      "seg5": "5 coins",
-      "seg10": "10 coins",
-      "seg15": "15 coins"
+      "seg0": "No prize",
+      "seg5": "5 coin",
+      "seg10": "10 coin",
+      "seg15": "15 coin"
     },
-    "levelsTitle": "Tiers",
+    "levelsTitle": "Levels",
     "current": "CURRENT",
     "showLess": "Show less",
-    "showMore": "Show {n} more perks",
-    "needCoins": "{coins} coins required",
+    "showMore": "{n} more perks",
+    "needCoins": "Need {coins} coin",
+    "swipeHint": "Swipe →",
     "levels": {
       "standard": {
-        "1": "50,000 UZS discount upon app installation (Valid at Husma Fit and Mavi Restaurant)",
-        "2": "1% coin cashback on all purchases (1 coin = 1 UZS)"
+        "1": "50,000 UZS discount when you install the app (Husma Fit, Mavi restaurant)",
+        "2": "1% coin cashback on every purchase (1 coin = 1 UZS)"
       },
       "bronze": {
-        "1": "VIP 1 fruit basket in room on arrival",
-        "2": "5% discount on laundry services",
-        "3": "5% discount on Husma Spa and Fitness services",
-        "gift": "Welcome Fruit Basket (VIP 1)"
+        "1": "VIP 1 fruit basket in-room on arrival",
+        "2": "5% laundry discount",
+        "3": "5% discount at Husma Spa and Fitness",
+        "gift": "Welcome fruit basket (VIP 1)"
       },
       "silver": {
-        "1": "Free room upgrade subject to availability",
+        "1": "Free upgrade, subject to availability",
         "2": "5% discount on rooms",
-        "3": "5% discount at Mavi Restaurant",
-        "4": "VIP 2 fruit basket in room on arrival",
-        "gift": "Welcome Fruit Basket (VIP 2)"
+        "3": "5% discount at Mavi restaurant",
+        "4": "VIP 2 fruit basket in-room",
+        "gift": "Welcome fruit basket (VIP 2)"
       },
       "gold": {
-        "1": "Free early check-in subject to availability",
-        "2": "Free late check-out subject to availability",
-        "3": "Free airport/station shuttle",
+        "1": "Free early check-in, subject to availability",
+        "2": "Free late check-out, subject to availability",
+        "3": "Free airport/station transfer",
         "4": "10% discount on rooms",
-        "5": "10% discount on laundry",
-        "6": "10% discount at Mavi Restaurant",
-        "7": "VIP 3 fruit basket in room on arrival",
-        "gift": "Welcome Fruit Basket (VIP 3)"
+        "5": "10% laundry discount",
+        "6": "10% discount at Mavi restaurant",
+        "7": "VIP 3 fruit basket in-room",
+        "gift": "Welcome fruit basket (VIP 3)"
       },
       "platinum": {
         "1": "Free early check-in",
         "2": "Free late check-out",
         "3": "Free room upgrade",
-        "4": "Free Business Class airport/station transfer",
+        "4": "Business-class airport/station transfer",
         "5": "10% discount on rooms",
-        "6": "20% discount on laundry",
-        "7": "10% discount at Mavi Restaurant",
-        "8": "VIP 4 fruit basket in room on arrival",
-        "9": "Level 1 departure gift 🎁",
-        "gift": "Welcome Fruit Basket (VIP 4)"
+        "6": "20% laundry discount",
+        "7": "10% discount at Mavi restaurant",
+        "8": "VIP 4 fruit basket in-room",
+        "9": "Level 1 gift on departure 🎁",
+        "gift": "Welcome fruit basket (VIP 4)"
       },
       "diamond": {
         "1": "Free early check-in",
         "2": "Free late check-out",
-        "3": "Free upgrade to Suite subject to availability",
-        "4": "Free Business Class airport/station transfer",
+        "3": "Free upgrade to Suite, subject to availability",
+        "4": "Business-class airport/station transfer",
         "5": "15% discount on rooms",
-        "6": "2 free laundry items daily",
-        "7": "10% discount at Mavi Restaurant",
-        "8": "VIP 5 fruit basket on arrival and refreshed daily",
-        "9": "Level 2 departure gift 🎁",
-        "gift": "Welcome Fruit Basket (VIP 5)"
+        "6": "2 free laundry loads per day",
+        "7": "10% discount at Mavi restaurant",
+        "8": "VIP 5 fruit basket (refreshed daily)",
+        "9": "Level 2 gift on departure 🎁",
+        "gift": "Welcome fruit basket (VIP 5)"
       },
       "vip": {
         "1": "Free early check-in",
         "2": "Free late check-out",
-        "3": "Free upgrade to Suite subject to availability",
-        "4": "Free Business Class airport/station transfer",
+        "3": "Free upgrade to Suite, subject to availability",
+        "4": "Business-class airport/station transfer",
         "5": "15% discount on rooms",
-        "6": "Free laundry service",
-        "7": "15% discount at Mavi Restaurant",
-        "8": "VIP 6 fruit basket on arrival and refreshed daily",
-        "9": "Level 3 departure gift 🎁",
-        "gift": "Welcome Fruit Basket (VIP 6)"
+        "6": "Fully free laundry",
+        "7": "15% discount at Mavi restaurant",
+        "8": "VIP 6 fruit basket (refreshed daily)",
+        "9": "Level 3 gift on departure 🎁",
+        "gift": "Welcome fruit basket (VIP 6)"
       }
     },
     "quick": {
-      "orders": "My Orders",
-      "ordersDesc": "Redeemed rewards and tier gifts",
-      "gifts": "Exchange Rewards",
-      "giftsDesc": "Exchange your coins for rewards",
-      "rooms": "View Rooms",
-      "roomsDesc": "Make a new booking to earn coins"
+      "orders": "My orders",
+      "ordersDesc": "Redeemed gifts and level gifts",
+      "gifts": "Redeem gifts",
+      "giftsDesc": "Trade your coins for gifts",
+      "rooms": "View rooms",
+      "roomsDesc": "Book a room and earn coins",
+      "cta": "View more"
     },
     "history": {
-      "title": "Redeemed Rewards",
+      "title": "Redeemed gifts",
       "loading": "Loading history...",
-      "empty": "No rewards redeemed yet",
-      "seeGifts": "View Rewards →",
-      "gift": "Reward"
+      "empty": "Nothing redeemed yet",
+      "seeGifts": "View gifts →",
+      "gift": "Gift"
     },
     "status": {
       "pending": "Pending",
@@ -391,41 +399,42 @@
       "cancelled": "Cancelled"
     },
     "feedback": {
-      "title": "Feedback & Suggestions",
-      "desc": "Share your thoughts and suggestions regarding our service quality.",
+      "title": "Feedback",
+      "desc": "Leave a comment or suggestion about our service quality.",
       "placeholder": "Write your feedback...",
       "send": "Send",
       "sending": "Sending...",
-      "sent": "Your feedback was successfully sent!"
+      "sent": "Your feedback was sent successfully!",
+      "ratingLabel": "How would you rate the service?"
     },
     "receipt": {
-      "title": "Digital Receipt",
+      "title": "Digital receipt",
       "client": "Client:",
-      "card": "Card Number:",
-      "level": "Current Tier:",
+      "card": "Card number:",
+      "level": "Current level:",
       "balance": "Balance:",
-      "spent": "Total Spent:",
+      "spent": "Total spent:",
       "close": "Close"
     },
     "settings": {
       "title": "Settings",
-      "desc": "Update your login credentials and password here.",
-      "loginLabel": "Login / Phone Number",
+      "desc": "You can update your login and password here.",
+      "loginLabel": "Login / Phone number",
       "loginPlaceholder": "Login or phone number",
-      "passwordTitle": "Change Password",
-      "currentPassword": "Current Password",
-      "newPassword": "New Password",
-      "confirmPassword": "Confirm New Password",
-      "passwordHint": "Leave these fields blank if you do not want to change your password.",
+      "passwordTitle": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "passwordHint": "Leave these fields empty if you don't want to change your password.",
       "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
       "success": "Settings saved successfully!",
-      "errCurrent": "Enter current password",
-      "errMin": "New password must be at least 6 characters",
-      "errMatch": "New passwords do not match",
-      "errLogin": "Login cannot be blank",
-      "strength0": "Very Weak",
+      "errCurrent": "Enter your current password",
+      "errMin": "The new password must be at least 6 characters",
+      "errMatch": "The new passwords don't match",
+      "errLogin": "Login cannot be empty",
+      "strength0": "Very weak",
       "strength1": "Weak",
       "strength2": "Medium",
       "strength3": "Good",
@@ -438,14 +447,14 @@
   },
   "korzinka": {
     "badge": "Orders",
-    "title": "Your Orders",
-    "desc": "Redeemed rewards and tier gifts appear here.",
+    "title": "Your orders",
+    "desc": "Redeemed gifts and level gifts are shown here.",
     "loading": "Loading...",
-    "needLogin": "Log in to view orders",
-    "login": "Log In",
-    "empty": "No rewards redeemed yet",
-    "goGifts": "View Rewards",
-    "gift": "Reward",
+    "needLogin": "Log in to see your orders",
+    "login": "Log in",
+    "empty": "Nothing redeemed yet",
+    "goGifts": "View gifts",
+    "gift": "Gift",
     "status": {
       "pending": "Pending",
       "completed": "Completed",

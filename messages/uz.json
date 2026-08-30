@@ -1,7 +1,7 @@
 {
   "nav": {
     "coinshop": "CoinShop",
-    "booking": "Band qilish",
+    "booking": "Bron qilish",
     "myCard": "Mening kartam",
     "admin": "Admin panel",
     "login": "Kirish",
@@ -12,139 +12,139 @@
   "launch": {
     "badge": "Yangi ishga tushdi",
     "title": "Birinchilardan bo'ling — eksklyuziv imtiyozlarga ega bo'ling",
-    "desc": "Husma sodiqlik kartasini oching, har 1000 so'm uchun 1 coin yiging va VIP darajalarga erishing.",
-    "perk1Title": "Welcome 50 000 so'm chegirma",
-    "perk1Desc": "Chegirma ilovani o'rnatganda Husma, Husma Fit va Mavi restoranida amal qiladi.",
-    "perk2Title": "Bepul yig'ish",
-    "perk2Desc": "Har 1000 so'm uchun 1 coin sizga darajalarga tezroq erishishga yordam beradi.",
-    "perk3Title": "Erta kirish imkoniyati",
-    "perk3Desc": "Yangi sovg'alar, xonalar va aksiyalarga birinchilardan bo'lib kiring."
+    "desc": "Husma sodiqlik kartasini oching, har 1000 so'mga 1 coin to'plang va VIP darajalarga erishing.",
+    "perk1Title": "50 000 so'mlik Welcome chegirma",
+    "perk1Desc": "Ilovani o'rnatganda Husma, Husma Fit va Mavi restoranida amal qiladi.",
+    "perk2Title": "Bepul to'plash",
+    "perk2Desc": "Har 1000 so'mga 1 coin — darajalarga tezroq yetishga yordam beradi.",
+    "perk3Title": "Erta kirish huquqi",
+    "perk3Desc": "Yangi sovg'alar, xonalar va aksiyalarga birinchilardan bo'lib ega bo'ling."
   },
   "levels": {
     "badge": "Darajalar",
-    "title": "Husma karta darajalari — qanchalik yuqori bo'lsa, shuncha ko'p VIP imtiyozlar",
-    "desc": "Coinlarni yiging va darajangizni oshiring. Har bir daraja o'z chegirmalari va bonuslariga ega.",
-    "cta": "Karta ochish va darajani oshirish",
+    "title": "Husma karta darajalari — qanchalik yuqori, shunchalik ko'p VIP imtiyoz",
+    "desc": "Coin to'plang va darajangizni oshiring. Har bir daraja o'z chegirma va bonuslarini beradi.",
+    "cta": "Karta oching va darajangizni oshiring",
     "standard": {
-      "1": "50 000 so'm chegirma (ilovani o'rnatganda)",
+      "1": "50 000 so'mlik chegirma (ilovani o'rnatganda)",
       "2": "Husma Fit va Mavi restoranida amal qiladi",
-      "3": "Har 1000 so'm uchun 1 coin"
+      "3": "Har 1000 so'mga 1 coin"
     },
     "bronze": {
-      "1": "VIP 1 meva savati (xonaga kirganda)",
-      "2": "Kiyim yuvish xizmatiga 5% chegirma",
-      "3": "Husma Spa va Fitness uchun 5% chegirma"
+      "1": "VIP 1 mevali savat (kirishda xonada)",
+      "2": "Kir yuvishga 5% chegirma",
+      "3": "Husma Spa va Fitnessda 5% chegirma"
     },
     "silver": {
-      "1": "Xonani bepul upgrade qilish (mavjud bo'lsa)",
+      "1": "Bepul xona upgrade (mavjud bo'lsa)",
       "2": "Xonalarga 5% chegirma",
       "3": "Mavi restoranida 5% chegirma",
-      "4": "Xonada VIP 2 meva savati"
+      "4": "Xonada VIP 2 mevali savat"
     },
     "gold": {
-      "1": "Erta kirish / kech ketish (mavjud bo'lsa)",
+      "1": "Erta check-in / kech check-out (mavjud bo'lsa)",
       "2": "Aeroport/vokzalga bepul transfer",
       "3": "Xonalarga 10% chegirma",
-      "4": "Mavi va kiyim yuvishga 10% chegirma",
-      "5": "Xonada VIP 3 meva savati"
+      "4": "Mavi va kir yuvishda 10% chegirma",
+      "5": "Xonada VIP 3 mevali savat"
     },
     "platinum": {
-      "1": "Kafolatlangan erta kirish / kech ketish",
+      "1": "Kafolatlangan erta check-in / kech check-out",
       "2": "Kafolatlangan xona upgrade",
       "3": "Aeroport/vokzalga biznes-klass transfer",
-      "4": "Xonaga 10%, kiyim yuvishga 20% chegirma",
+      "4": "Xonaga 10%, kir yuvishga 20% chegirma",
       "5": "Mavi restoranida 10% chegirma",
-      "6": "VIP 4 meva savati + chiqishda Level 1 sovg'asi 🎁"
+      "6": "VIP 4 mevali savat + chiqishda Level 1 sovg'a 🎁"
     },
     "diamond": {
-      "1": "Erta kirish / kech ketish",
-      "2": "Suite xonasigacha bepul upgrade (mavjud bo'lsa)",
+      "1": "Erta check-in / kech check-out",
+      "2": "Suite'gacha bepul upgrade (mavjud bo'lsa)",
       "3": "Aeroport/vokzalga biznes-klass transfer",
-      "4": "Xonalarga 15%, Mavi-da 10% chegirma",
-      "5": "Kuningizga 2 ta bepul kiyim yuvish",
-      "6": "VIP 5 meva savati (har kuni yangilanadi)",
-      "7": "Chiqishda Level 2 sovg'asi 🎁"
+      "4": "Xonalarga 15%, Mavi'da 10% chegirma",
+      "5": "Kuniga 2 marta bepul kir yuvish",
+      "6": "VIP 5 mevali savat (har kuni yangilanadi)",
+      "7": "Chiqishda Level 2 sovg'a 🎁"
     },
     "vip": {
-      "1": "Erta kirish / kech ketish",
-      "2": "Suite xonasigacha bepul upgrade (mavjud bo'lsa)",
+      "1": "Erta check-in / kech check-out",
+      "2": "Suite'gacha bepul upgrade (mavjud bo'lsa)",
       "3": "Aeroport/vokzalga biznes-klass transfer",
-      "4": "Xonalarga 15%, Mavi-da 15% chegirma",
-      "5": "To'liq bepul kiyim yuvish",
-      "6": "VIP 6 meva savati (har kuni yangilanadi)",
-      "7": "Chiqishda Level 3 sovg'asi 🎁"
+      "4": "Xonalarga 15%, Mavi'da 15% chegirma",
+      "5": "To'liq bepul kir yuvish",
+      "6": "VIP 6 mevali savat (har kuni yangilanadi)",
+      "7": "Chiqishda Level 3 sovg'a 🎁"
     }
   },
   "steps": {
     "badge": "Oddiy jarayon",
     "title": "Bu qanday ishlaydi?",
-    "desc": "Bor-yo'g'i 3 qadam — coin yiging va VIP darajalar hamda sovg'alarga almashtiring.",
-    "1Title": "Ilovani o'rnating va kartangizni oching",
-    "1Desc": "1 daqiqada ro'yxatdan o'ting — 50 000 so'm chegirma va boshlang'ich bonusga ega bo'ling.",
-    "2Title": "Xaridlardan coin yiging",
-    "2Desc": "Har bir sarflangan 1000 so'm uchun 1 coin avtomatik ravishda beriladi.",
+    "desc": "Bor-yo'g'i 3 qadam — coin to'plang va VIP darajalar hamda sovg'alarga almashtiring.",
+    "1Title": "Ilovani o'rnating va karta oching",
+    "1Desc": "1 daqiqada ro'yxatdan o'ting — 50 000 so'm chegirma va boshlang'ich bonus oling.",
+    "2Title": "Xaridlardan coin to'plang",
+    "2Desc": "Har 1000 so'mga avtomatik 1 coin hisoblanadi.",
     "3Title": "Darajani oshiring va sovg'alar oling",
-    "3Desc": "Coinlarni darajalarga, VIP xizmatlarga va eksklyuziv sovg'alarga almashtiring."
+    "3Desc": "Coin'larni darajalar, VIP xizmatlar va eksklyuziv sovg'alarga almashtiring."
   },
   "gifts": {
     "badge": "Katalog",
     "title": "Sovg'alar katalogi",
-    "desc": "Coinlaringizni ushbu sovg'alarga almashtiring.",
-    "seeAll": "Barchasini ko'rish",
+    "desc": "Coin'larni quyidagi sovg'alarga almashtiring.",
+    "seeAll": "Hammasini ko'rish",
     "1": "Bepul nonushta (1 kishi)",
-    "2": "Kech ketish (Late checkout)",
-    "3": "Bel massaji (30 daq)",
+    "2": "Kech chiqish (Late checkout)",
+    "3": "Orqa massaji (30 daqiqa)",
     "4": "Xona toifasini oshirish",
-    "5": "1 kecha bepul yashash",
+    "5": "1 kecha bepul turar joy",
     "6": "Presidential Suite — 1 kecha"
   },
   "features": {
     "badge": "Afzalliklar",
-    "title": "Nega aynan Husma kartasi?",
-    "desc": "Husma tizimi — shaffof, tushunarli va haqiqiy foyda keltiradi.",
-    "1Title": "Coin yig'ish",
-    "1Desc": "Har 1000 so'm uchun 1 coin (Husma Fit va Mavi restorani ham kiradi).",
+    "title": "Nima uchun Husma kartasi?",
+    "desc": "Husma tizimi — shaffof, tushunarli va real foyda beradi.",
+    "1Title": "Coin to'plash",
+    "1Desc": "Har 1000 so'mga 1 coin (Husma Fit va Mavi restorani ham kiradi).",
     "2Title": "Sovg'alar va chegirmalar",
-    "2Desc": "Mavi restorani, Spa, fitnes va xonalarga eksklyuziv chegirmalar.",
-    "3Title": "Welcome-bonus",
-    "3Desc": "Ilovan o'rnatganingizda balansga 50 000 so'm chegirma beriladi.",
-    "4Title": "Do'stlaringizni taklif qiling",
-    "4Desc": "Do'stingiz karta ochganda — ikkingiz ham qo'shimcha bonus coinlar olasiz.",
-    "5Title": "Tug'ilgan kun uchun sovg'a",
-    "5Desc": "Har yili tug'ilgan kuningizda — maxsus coin toplamlari va syurprizlar.",
-    "6Title": "Har doim telefonda",
-    "6Desc": "Plastik karta shart emas. Barcha darajalar, coinlar va chegirmalar smartfonda."
+    "2Desc": "Mavi restorani, Spa, fitnes va xonalarda eksklyuziv chegirmalar.",
+    "3Title": "Welcome bonus",
+    "3Desc": "Ilovani o'rnatganda balansga 50 000 so'mlik chegirma tushadi.",
+    "4Title": "Do'stlarni taklif qiling",
+    "4Desc": "Do'stingiz karta ochsa — ikkalangiz ham qo'shimcha bonus coin olasiz.",
+    "5Title": "Tug'ilgan kun sovg'asi",
+    "5Desc": "Har yili tug'ilgan kuningizda — maxsus coin paketi va sovg'alar.",
+    "6Title": "Doim telefoningizda",
+    "6Desc": "Plastik karta shart emas. Barcha darajalar, coin va chegirmalar smartfoningizda."
   },
   "faq": {
-    "badge": "Savol-javoblar",
-    "title": "Ko'p beriladigan savollar",
-    "desc": "Agar savollaringiz bo'lsa — javoblar shu yerda.",
-    "1q": "Karta uchun to'lov qilish kerakmi?",
-    "1a": "Yo'q. Ro'yxatdan o'tish va karta ochish to'liq bepul.",
-    "2q": "Coinlar qanday hisoblanadi?",
-    "2a": "Har bir sarflangan 1000 so'm uchun 1 coin beriladi.",
-    "3q": "50 000 so'mlik chegirmadan qayerda foydalanish mumkin?",
+    "badge": "Savol-javob",
+    "title": "Tez-tez so'raladigan savollar",
+    "desc": "Savollaringiz bo'lsa — javoblar shu yerda.",
+    "1q": "Karta uchun to'lov kerakmi?",
+    "1a": "Yo'q. Ro'yxatdan o'tish va karta ochish butunlay bepul.",
+    "2q": "Coin qanday hisoblanadi?",
+    "2a": "Har sarflangan 1000 so'mga 1 coin hisoblanadi.",
+    "3q": "50 000 so'mlik chegirmani qayerda ishlatsam bo'ladi?",
     "3a": "Chegirma ilovani o'rnatganda beriladi va Husma mehmonxonasi, Husma Fit hamda Mavi restoranida amal qiladi.",
     "4q": "Darajalar (Bronze, Silver...) qanday oshadi?",
-    "4a": "Kerakli miqdordagi coinlarni yig'ganingizdan so'ng avtomatik ravishda tegishli darajaga o'tasiz (masalan, 99 000 — Bronze, 999 000 — VIP)."
+    "4a": "Kerakli miqdorda coin to'plagach, tegishli darajaga o'tasiz (masalan, 99 000 — Bronze, 999 000 — VIP)."
   },
   "cta": {
-    "badge": "Welcome-bonus",
-    "title": "Kartangizni bugun oching — 50 000 so'm chegirma darhol sizniki",
-    "desc": "Ro'yxatdan o'tish bepul. Bonus balansingizga o'tkaziladi.",
+    "badge": "Welcome bonus",
+    "title": "Bugun karta oching — 50 000 so'mlik chegirma darhol sizniki",
+    "desc": "Ro'yxatdan o'tish bepul. Bonus balansingizga tushadi.",
     "secure": "Ma'lumotlaringiz xavfsiz",
     "button": "Bepul karta + 50 000 so'm"
   },
   "hero": {
     "badge": "Mehmon kartasi • Coin tizimi",
     "title": {
-      "part1": "Har bir tunni",
-      "highlight": "coinlarga",
+      "part1": "Har bir kechani",
+      "highlight": "coin'ga",
       "part2": "aylantiring — Husma bilan!"
     },
-    "description": "Husma kartasi bilan har bir to'lov coinlar olib keladi. Ularni yiging va bepul nonushta, spa, xona upgrade hamda boshqa sovg'alarga almashtiring.",
+    "description": "Husma kartasi bilan har bir to'lov coin keltiradi. Ularni to'plang va bepul nonushta, spa, xona upgrade va boshqa sovg'alarga almashtiring.",
     "cta": {
-      "primary": "Karta ochish + 50 coin",
+      "primary": "Karta oching + 50 coin",
       "secondary": "Sovg'alarni ko'rish"
     },
     "stats": {
@@ -163,12 +163,12 @@
     "passwordLabel": "Parol",
     "errors": {
       "generic": "Xatolik",
-      "connection": "Server bilan ulanishda xatolik",
+      "connection": "Server bilan aloqa xatoligi",
       "noResponse": "Server javob bermadi (API topilmadi)"
     },
     "login": {
       "title": "Tizimga kirish",
-      "subtitle": "Telefon raqamingiz va parolingiz orqali kiring.",
+      "subtitle": "Telefon raqami va parol yordamida kiring.",
       "submit": "Kirish",
       "submitLoading": "Kirilmoqda...",
       "noCard": "Kartangiz yo'qmi?",
@@ -176,13 +176,13 @@
     },
     "register": {
       "bonusBadge": "+50 coin bonus",
-      "title": "Kartangizni oching",
-      "subtitle": "Ro'yxatdan o'ting va darhol 50 coin oling. Keyin ularni sovg'alarga almashtirishingiz mumkin.",
+      "title": "O'z kartangizni oching",
+      "subtitle": "Ro'yxatdan o'ting va darhol 50 coin oling. Keyin sovg'alarga almashtirishingiz mumkin.",
       "nameLabel": "Ism",
       "surnameLabel": "Familiya",
-      "countryLabel": "Mamlakat",
-      "passwordPlaceholder": "kamida 6 ta belgi",
-      "submit": "Karta ochish + 50 coin",
+      "countryLabel": "Davlat",
+      "passwordPlaceholder": "kamida 6 belgi",
+      "submit": "Karta oching + 50 coin",
       "submitLoading": "Yaratilmoqda...",
       "haveCard": "Kartangiz bormi?",
       "loginLink": "Kirish",
@@ -197,16 +197,16 @@
     }
   },
   "sovgalar": {
-    "badge": "Coinlaringizni sarflang",
+    "badge": "Coin'laringizni sarflang",
     "title": "Sovg'alar va xizmatlar",
-    "desc": "Yig'ilgan coinlarni SPA, restoran va mehmonxona xizmatlariga almashtiring.",
+    "desc": "To'plangan coin'larni SPA, restoran va mehmonxona xizmatlariga almashtiring.",
     "balance": {
       "needLogin": "Balansni ko'rish uchun",
       "login": "Kirish →",
       "your": "Sizning balansingiz"
     },
     "tabs": {
-      "spa": "SPA va havza",
+      "spa": "SPA va basseyn",
       "restaurant": "Mavi restorani",
       "hotel": "Husma mehmonxonasi"
     },
@@ -219,45 +219,45 @@
       "redeem": "Almashtirish",
       "redeemed": "Tanlandi ✓",
       "login": "Kirish",
-      "notEnough": "Coinlar yetarli emas"
+      "notEnough": "Coin yetarli emas"
     },
     "msg": {
-      "notEnough": "Coinlar yetarli emas — «{name}» uchun {coins} coin kerak.",
-      "success": "«{name}» muvaffaqiyatli tanlandi! Kartangizni qabulxonada (resepshen) ko'rsating.",
+      "notEnough": "Coin yetarli emas — «{name}» uchun {coins} coin kerak.",
+      "success": "«{name}» muvaffaqiyatli tanlandi! Kartangizni resepshenda ko'rsating.",
       "error": "Xatolik yuz berdi",
-      "network": "Ulanishda xatolik. Qaytadan urinib ko'ring."
+      "network": "Aloqa xatoligi. Qayta urinib ko'ring."
     },
     "banner": {
-      "title": "Coinlar yetmayaptimi?",
-      "desc": "Xonalarni band qiling — coinlar yig'ilib boradi. Har bir kecha — yangi coinlar.",
+      "title": "Coin yetishmayaptimi?",
+      "desc": "Xonalarni bron qiling — coin to'planaveradi. Har bir kecha — yangi coin.",
       "cta": "Xonalarni ko'rish"
     },
     "gifts": {
-      "101": { "name": "Fitnes zal (1 kun)", "desc": "Fitnes zaliga bir kunlik kirish (100 000 so'm)" },
-      "102": { "name": "Suzish havzasi (1 kun)", "desc": "Havza va dam olish zonasiga bir kunlik kirish (140 000 so'm)" },
-      "103": { "name": "Fitnes + Havza (1 kun)", "desc": "1 kunlik zal va havza (200 000 so'm)" },
-      "104": { "name": "To'liq SPA-kompleks", "desc": "Fitnes, havza, hammom, fin saunasi, jakuzi (250 000 so'm)" },
-      "105": { "name": "Sog'lomlashtiruvchi massaj (60 daq)", "desc": "Tana uchun to'liq sog'lomlashtiruvchi massaj (450 000 so'm)" },
-      "106": { "name": "Aromaterapiya (60 daq)", "desc": "Aromatik yog'lar bilan tinchlantiruvchi massaj (500 000 so'm)" },
-      "107": { "name": "Sport massaji (45 daq)", "desc": "Mushaklarni tiklash uchun intensiv sport massaji (400 000 so'm)" },
-      "108": { "name": "Olovli massaj (50 daq)", "desc": "Maxsus olov texnikasi bilan davolovchi massaj (400 000 so'm)" },
-      "109": { "name": "Bel massaji (30 daq)", "desc": "Bel va umurtqani bo'shashtirish (250 000 so'm)" },
-      "110": { "name": "Asalli massaj (40 daq)", "desc": "Tabiiy asal bilan tozalovchi massaj (400 000 so'm)" },
-      "111": { "name": "Shokoladli massaj (40 daq)", "desc": "Tana uchun oziqlantiruvchi shokoladli massaj (400 000 so'm)" },
-      "112": { "name": "Piling + Skrab + Yuvinish (30 daq)", "desc": "Terini chuqur tozalash (400 000 so'm)" },
-      "113": { "name": "Ko'pikli yuvinish (30 daq)", "desc": "Hammomda an'anaviy ko'pikli yuvinish (250 000 so'm)" },
-      "114": { "name": "Kompleks massaj (90 daq)", "desc": "To'liq VIP massaj va parvarish majmuasi (850 000 so'm)" },
-      "115": { "name": "Bolalar suzishi (12 ta mashg'ulot)", "desc": "4–12 yoshli bolalar uchun abonement (600 000 so'm)" },
-      "116": { "name": "SPA-abonement (1 oy)", "desc": "Bir oylik to'liq SPA-abonement (1 600 000 so'm)" },
-      "201": { "name": "Meva savati (xush kelibsiz)", "desc": "Xonaga joylashganda mevalar va shirinliklar (≈ 50 000 so'm)" },
-      "202": { "name": "Bepul nonushta (1 kishi)", "desc": "Mavi restoranida bir kishilik to'liq nonushta (≈ 80 000 so'm)" },
-      "203": { "name": "Ikki kishilik kechki ovqat", "desc": "Mavi restoranida ikki kishi uchun romantik kechki ovqat (≈ 400 000 so'm)" },
-      "301": { "name": "Kech ketish (Late checkout)", "desc": "Standart vaqtdan 3 soat kechroq chiqish (≈ 100 000 so'm)" },
-      "302": { "name": "Kiyim yuvish", "desc": "Yashash davomida bir marta bepul kiyim yuvish va dalmollash (≈ 60 000 so'm)" },
+      "101": { "name": "Fitnes zali (1 kun)", "desc": "Fitnes zaliga kunlik kirish (100 000 so'm)" },
+      "102": { "name": "Basseyn (1 kun)", "desc": "Basseyn va dam olish zonasiga kunlik kirish (140 000 so'm)" },
+      "103": { "name": "Fitnes + Basseyn (1 kun)", "desc": "1 kun zal va basseyn (200 000 so'm)" },
+      "104": { "name": "To'liq SPA kompleksi", "desc": "Fitnes, basseyn, hammom, fin saunasi, jakuzi (250 000 so'm)" },
+      "105": { "name": "Sog'lomlashtiruvchi massaj (60 daq.)", "desc": "To'liq tana sog'lomlashtiruvchi massaji (450 000 so'm)" },
+      "106": { "name": "Aromaterapiya (60 daq.)", "desc": "Aromatik moylar bilan bo'shashtiruvchi massaj (500 000 so'm)" },
+      "107": { "name": "Sport massaji (45 daq.)", "desc": "Mushaklarni tiklovchi intensiv sport massaji (400 000 so'm)" },
+      "108": { "name": "Olov massaji (50 daq.)", "desc": "Maxsus olov texnikasi bilan davolovchi massaj (400 000 so'm)" },
+      "109": { "name": "Orqa massaji (30 daq.)", "desc": "Orqa va umurtqa pog'onasini bo'shashtirish (250 000 so'm)" },
+      "110": { "name": "Asalli massaj (40 daq.)", "desc": "Tabiiy asal bilan tozalovchi massaj (400 000 so'm)" },
+      "111": { "name": "Shokoladli massaj (40 daq.)", "desc": "Tana uchun ozuqaviy shokoladli massaj (400 000 so'm)" },
+      "112": { "name": "Piling + Skrab + Yuvish (30 daq.)", "desc": "Terini chuqur tozalash (400 000 so'm)" },
+      "113": { "name": "Ko'pikli yuvish (30 daq.)", "desc": "Hammomda an'anaviy ko'pikli yuvish (250 000 so'm)" },
+      "114": { "name": "Kompleks massaj (90 daq.)", "desc": "To'liq VIP massaj va parvarish kompleksi (850 000 so'm)" },
+      "115": { "name": "Bolalar suzishi (12 mashg'ulot)", "desc": "4–12 yosh bolalar uchun abonement (600 000 so'm)" },
+      "116": { "name": "SPA-abonement (1 oy)", "desc": "To'liq oylik SPA-abonement (1 600 000 so'm)" },
+      "201": { "name": "Xush kelibsiz mevali savati", "desc": "Joylashishda xonada meva va shirinliklar (≈ 50 000 so'm)" },
+      "202": { "name": "Bepul nonushta (1 kishi)", "desc": "Mavi restoranida bir kishi uchun to'liq nonushta (≈ 80 000 so'm)" },
+      "203": { "name": "Ikki kishilik kechki ovqat", "desc": "Mavi restoranida romantik kechki ovqat (≈ 400 000 so'm)" },
+      "301": { "name": "Kech chiqish (Late checkout)", "desc": "Standart vaqtdan 3 soat kech chiqish (≈ 100 000 so'm)" },
+      "302": { "name": "Kir yuvish", "desc": "Turar joy davomida bir marta bepul kir yuvish va dazmollash (≈ 60 000 so'm)" },
       "303": { "name": "Aeroportdan transfer", "desc": "Aeroportdan mehmonxonagacha shaxsiy transfer (≈ 250 000 so'm)" },
-      "304": { "name": "Xona toifasini oshirish", "desc": "Keyingi band qilishda bepul yuqori toifaga oshirish (≈ 500 000 so'm)" },
-      "305": { "name": "1 kecha bepul yashash", "desc": "Standart xonada bir kecha bepul yashash (≈ 900 000 so'm)" },
-      "306": { "name": "Presidential Suite — 1 kecha", "desc": "Presidential Suite xonasida bir kecha bepul yashash (≈ 5 000 000 so'm)" }
+      "304": { "name": "Xona toifasini oshirish", "desc": "Keyingi bron qilishda bir toifa yuqoriga bepul upgrade (≈ 500 000 so'm)" },
+      "305": { "name": "1 kecha bepul turar joy", "desc": "Standart xonada bir kecha bepul (≈ 900 000 so'm)" },
+      "306": { "name": "Presidential Suite — 1 kecha", "desc": "Presidential Suite'da bir kecha (≈ 5 000 000 so'm)" }
     }
   },
   "karta": {
@@ -267,31 +267,37 @@
       "home": "Bosh sahifa",
       "settings": "Sozlamalar",
       "logout": "Chiqish",
-      "korzinka": "Savat"
+      "korzinka": "Savat",
+      "balance": "Balans",
+      "levels": "Darajalar",
+      "menu": "Menyu",
+      "more": "Ko'proq"
     },
     "card": {
       "number": "KARTA RAQAMI",
-      "hint": "💡 Raqamli chekni ko'rish uchun kartaga bosing"
+      "hint": "💡 Raqamli chekni ko'rish uchun kartaga bosing",
+      "showDetails": "Rekvizitlarni ko'rsatish"
     },
     "coins": {
-      "your": "Coinlaringiz",
-      "currentLevel": "Hozirgi daraja",
+      "your": "Sizning coin'laringiz",
+      "currentLevel": "Joriy daraja",
       "unlocked": "Ochildi!",
-      "highest": "Maksimal",
+      "highest": "Maksimum",
       "maxLevel": "Maksimal daraja — VIP",
       "totalSpent": "Jami sarflangan",
-      "som": "so'm"
+      "som": "so'm",
+      "needToNext": "{level} uchun {coins} coin kerak"
     },
     "wheel": {
       "title": "Kunlik baraban",
-      "desc": "Kunda 1 marta bepul aylantiring — 0, 5, 10 yoki 15 coin!",
+      "desc": "Kuniga 1 marta bepul aylantiring — 0, 5, 10 yoki 15 coin!",
       "checking": "Tekshirilmoqda...",
       "spin": "Aylantirish",
       "spinning": "Aylanmoqda...",
       "win": "Tabriklaymiz! +{prize} coin 🎉",
-      "lose": "Bu safar omadingiz kelmadi. Ertaga yana urinib ko'ring!",
-      "tomorrow": "Ertaga yana bepul aylantirishingiz mumkin.",
-      "already": "Bugun barabanni aylantirib bo'ldingiz.",
+      "lose": "Bu safar yutuqsiz. Ertaga urinib ko'ring!",
+      "tomorrow": "Ertaga yana bepul aylantirish mumkin.",
+      "already": "Siz bugun barabanni allaqachon aylantirdingiz.",
       "todayPrize": "Bugungi yutuq",
       "noPrize": "yutuqsiz",
       "tryTomorrow": "Ertaga urinib ko'ring.",
@@ -301,37 +307,38 @@
       "seg15": "15 coin"
     },
     "levelsTitle": "Darajalar",
-    "current": "HOZIRGI",
+    "current": "JORIY",
     "showLess": "Kamroq ko'rsatish",
     "showMore": "Yana {n} ta imtiyoz",
     "needCoins": "{coins} coin kerak",
+    "swipeHint": "Suring →",
     "levels": {
       "standard": {
-        "1": "Ilovan o'rnatganda 50 000 so'm chegirma (Husma Fit, Mavi restorani)",
-        "2": "Har bir xariddan 1% coin sifatida keshbek (1 coin = 1 so'm)"
+        "1": "Ilovani o'rnatganda 50 000 so'mlik chegirma (Husma Fit, Mavi restorani)",
+        "2": "Har bir xariddan 1% coin qaytimi (1 coin = 1 so'm)"
       },
       "bronze": {
-        "1": "Xonaga joylashganda VIP 1 meva savati",
-        "2": "Kiyim yuvish xizmatiga 5% chegirma",
-        "3": "Husma Spa va Fitness-da 5% chegirma",
-        "gift": "Xush kelibsiz meva savati (VIP 1)"
+        "1": "Kirishda xonada VIP 1 mevali savat",
+        "2": "Kir yuvishga 5% chegirma",
+        "3": "Husma Spa va Fitnessda 5% chegirma",
+        "gift": "Xush kelibsiz mevali savati (VIP 1)"
       },
       "silver": {
-        "1": "Mavjud bo'lsa xonani bepul upgrade qilish",
+        "1": "Mavjud bo'lsa bepul upgrade",
         "2": "Xonalarga 5% chegirma",
         "3": "Mavi restoranida 5% chegirma",
-        "4": "Xonada VIP 2 meva savati",
-        "gift": "Xush kelibsiz meva savati (VIP 2)"
+        "4": "Xonada VIP 2 mevali savat",
+        "gift": "Xush kelibsiz mevali savati (VIP 2)"
       },
       "gold": {
         "1": "Mavjud bo'lsa bepul erta check-in",
         "2": "Mavjud bo'lsa bepul kech check-out",
         "3": "Aeroport/vokzalga bepul transfer",
         "4": "Xonalarga 10% chegirma",
-        "5": "Kiyim yuvishga 10% chegirma",
+        "5": "Kir yuvishga 10% chegirma",
         "6": "Mavi restoranida 10% chegirma",
-        "7": "Xonada VIP 3 meva savati",
-        "gift": "Xush kelibsiz meva savati (VIP 3)"
+        "7": "Xonada VIP 3 mevali savat",
+        "gift": "Xush kelibsiz mevali savati (VIP 3)"
       },
       "platinum": {
         "1": "Bepul erta check-in",
@@ -339,49 +346,50 @@
         "3": "Bepul xona upgrade",
         "4": "Aeroport/vokzalga biznes-klass transfer",
         "5": "Xonalarga 10% chegirma",
-        "6": "Kiyim yuvishga 20% chegirma",
+        "6": "Kir yuvishga 20% chegirma",
         "7": "Mavi restoranida 10% chegirma",
-        "8": "Xonada VIP 4 meva savati",
-        "9": "Chiqishda 1-darajali sovg'a 🎁",
-        "gift": "Xush kelibsiz meva savati (VIP 4)"
+        "8": "Xonada VIP 4 mevali savat",
+        "9": "Chiqishda 1-daraja sovg'asi 🎁",
+        "gift": "Xush kelibsiz mevali savati (VIP 4)"
       },
       "diamond": {
         "1": "Bepul erta check-in",
         "2": "Bepul kech check-out",
-        "3": "Mavjud bo'lsa Suite xonasigacha bepul upgrade",
+        "3": "Mavjud bo'lsa Suite'gacha bepul upgrade",
         "4": "Aeroport/vokzalga biznes-klass transfer",
         "5": "Xonalarga 15% chegirma",
-        "6": "Kuniga 2 marta bepul kiyim yuvish",
+        "6": "Kuniga 2 marta bepul kir yuvish",
         "7": "Mavi restoranida 10% chegirma",
-        "8": "VIP 5 meva savati (har kuni yangilanadi)",
-        "9": "Chiqishda 2-darajali sovg'a 🎁",
-        "gift": "Xush kelibsiz meva savati (VIP 5)"
+        "8": "VIP 5 mevali savat (har kuni yangilanadi)",
+        "9": "Chiqishda 2-daraja sovg'asi 🎁",
+        "gift": "Xush kelibsiz mevali savati (VIP 5)"
       },
       "vip": {
         "1": "Bepul erta check-in",
         "2": "Bepul kech check-out",
-        "3": "Mavjud bo'lsa Suite xonasigacha bepul upgrade",
+        "3": "Mavjud bo'lsa Suite'gacha bepul upgrade",
         "4": "Aeroport/vokzalga biznes-klass transfer",
         "5": "Xonalarga 15% chegirma",
-        "6": "To'liq bepul kiyim yuvish",
+        "6": "To'liq bepul kir yuvish",
         "7": "Mavi restoranida 15% chegirma",
-        "8": "VIP 6 meva savati (har kuni yangilanadi)",
-        "9": "Chiqishda 3-darajali sovg'a 🎁",
-        "gift": "Xush kelibsiz meva savati (VIP 6)"
+        "8": "VIP 6 mevali savat (har kuni yangilanadi)",
+        "9": "Chiqishda 3-daraja sovg'asi 🎁",
+        "gift": "Xush kelibsiz mevali savati (VIP 6)"
       }
     },
     "quick": {
       "orders": "Mening buyurtmalarim",
-      "ordersDesc": "Almashtirilgan sovg'alar va daraja sovg'alari",
+      "ordersDesc": "Almashtirilgan va daraja sovg'alari",
       "gifts": "Sovg'alarga almashtirish",
-      "giftsDesc": "Coinlarni sovg'alarga almashtiring",
+      "giftsDesc": "Coin'larni sovg'alarga almashtiring",
       "rooms": "Xonalarni ko'rish",
-      "roomsDesc": "Band qiling va coin yiging"
+      "roomsDesc": "Bron qiling va coin to'plang",
+      "cta": "Batafsil"
     },
     "history": {
       "title": "Almashtirilgan sovg'alar",
       "loading": "Tarix yuklanmoqda...",
-      "empty": "Hali hech narsa almashtirilmadi",
+      "empty": "Hozircha hech narsa almashtirilmagan",
       "seeGifts": "Sovg'alarni ko'rish →",
       "gift": "Sovg'a"
     },
@@ -391,18 +399,19 @@
       "cancelled": "Bekor qilindi"
     },
     "feedback": {
-      "title": "Fikr-mulohazalar va takliflar",
-      "desc": "Xizmat sifati bo'yicha o'z fikr yoki taklifingizni qoldiring.",
+      "title": "Fikr va takliflar",
+      "desc": "Xizmat sifati bo'yicha fikr yoki taklif qoldiring.",
       "placeholder": "Fikringizni yozing...",
       "send": "Yuborish",
       "sending": "Yuborilmoqda...",
-      "sent": "Fikringiz muvaffaqiyatli yuborildi!"
+      "sent": "Fikringiz muvaffaqiyatli yuborildi!",
+      "ratingLabel": "Xizmatni qanday baholaysiz?"
     },
     "receipt": {
       "title": "Raqamli chek",
       "client": "Mijoz:",
       "card": "Karta raqami:",
-      "level": "Hozirgi daraja:",
+      "level": "Joriy daraja:",
       "balance": "Balans:",
       "spent": "Jami sarflangan:",
       "close": "Yopish"
@@ -412,8 +421,8 @@
       "desc": "Bu yerda login va parolingizni yangilashingiz mumkin.",
       "loginLabel": "Login / Telefon raqami",
       "loginPlaceholder": "Login yoki telefon raqami",
-      "passwordTitle": "Parolni o'zgartirish",
-      "currentPassword": "Hozirgi parol",
+      "passwordTitle": "Parolni almashtirish",
+      "currentPassword": "Joriy parol",
       "newPassword": "Yangi parol",
       "confirmPassword": "Yangi parolni tasdiqlang",
       "passwordHint": "Parolni o'zgartirmoqchi bo'lmasangiz — bu maydonlarni bo'sh qoldiring.",
@@ -421,29 +430,29 @@
       "save": "Saqlash",
       "saving": "Saqlanmoqda...",
       "success": "Sozlamalar muvaffaqiyatli saqlandi!",
-      "errCurrent": "Hozirgi parolni kiriting",
-      "errMin": "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak",
+      "errCurrent": "Joriy parolni kiriting",
+      "errMin": "Yangi parol kamida 6 belgidan iborat bo'lishi kerak",
       "errMatch": "Yangi parollar mos kelmadi",
       "errLogin": "Login bo'sh bo'lishi mumkin emas",
-      "strength0": "Juda kuchsiz",
-      "strength1": "Kuchsiz",
+      "strength0": "Juda zaif",
+      "strength1": "Zaif",
       "strength2": "O'rtacha",
       "strength3": "Yaxshi",
       "strength4": "Kuchli"
     },
     "msg": {
       "error": "Xatolik yuz berdi",
-      "network": "Server bilan ulanishda xatolik"
+      "network": "Server bilan aloqa xatoligi"
     }
   },
   "korzinka": {
     "badge": "Buyurtmalar",
     "title": "Sizning buyurtmalaringiz",
-    "desc": "Almashtirilgan sovg'alar va daraja sovg'alari shu yerda ko'rinadi.",
+    "desc": "Almashtirilgan va daraja sovg'alari shu yerda ko'rsatiladi.",
     "loading": "Yuklanmoqda...",
     "needLogin": "Buyurtmalarni ko'rish uchun tizimga kiring",
     "login": "Kirish",
-    "empty": "Hali hech narsa almashtirilmadi",
+    "empty": "Hozircha hech narsa almashtirilmagan",
     "goGifts": "Sovg'alarni ko'rish",
     "gift": "Sovg'a",
     "status": {

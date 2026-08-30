@@ -1,0 +1,9 @@
+{
+  "appId": "husmaloyality.uz",
+  "appName": "HUSMA Loyality",
+  "webDir": "public",
+  "server": {
+    "url": "https://husma-loyality.vercel.app",
+    "cleartext": false
+  }
+}
