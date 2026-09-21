@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n' // yo'lni o'zingizga moslang
 import {
@@ -83,6 +83,7 @@ const cards = [
 export default function HeroSection() {
   const { t } = useI18n()
   const [activeIndex, setActiveIndex] = useState(0)
+  const dragState = useRef({ startX: 0, dragging: false })
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -90,6 +91,31 @@ export default function HeroSection() {
     }, 4000)
     return () => clearInterval(timer)
   }, [])
+
+  // Butun blokni (telefon + kartalar) qo'l bilan siljitib (swipe) boshqarish
+  const handlePointerDown = (e) => {
+    dragState.current = { startX: e.clientX, dragging: true }
+  }
+
+  const handlePointerMove = (e) => {
+    if (!dragState.current.dragging) return
+  }
+
+  const handlePointerUp = (e) => {
+    if (!dragState.current.dragging) return
+    const deltaX = e.clientX - dragState.current.startX
+    const SWIPE_THRESHOLD = 40
+
+    if (deltaX > SWIPE_THRESHOLD) {
+      // O'ngga surildi -> oldingi kartaga o'tish
+      setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length)
+    } else if (deltaX < -SWIPE_THRESHOLD) {
+      // Chapga surildi -> keyingi kartaga o'tish
+      setActiveIndex((prev) => (prev + 1) % cards.length)
+    }
+
+    dragState.current = { startX: 0, dragging: false }
+  }
 
   // Oldingi va keyingi indexlarni hisoblash
   const getCardStyle = (index) => {
@@ -193,7 +219,8 @@ export default function HeroSection() {
                 <div className="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-wider">{t('hero.stats.level')}</div>
               </div>
               <div>
-                <div className="text-xl font-semibold text-amber-400">50</div>
+                {/* Welcome bonus: karta ochganda 50 000 coin beriladi */}
+                <div className="text-xl font-semibold text-amber-400">50 000</div>
                 <div className="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-wider">{t('hero.stats.welcomeCoin')}</div>
               </div>
               <div>
@@ -205,7 +232,13 @@ export default function HeroSection() {
 
           {/* Right – Phone + 3D Carousel */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end items-center pt-6 lg:pt-0">
-            <div className="relative w-[220px] mt-20 mb-12">
+            <div
+              className="relative w-[220px] mt-20 mb-12 touch-pan-y cursor-grab active:cursor-grabbing select-none"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            >
 
               {/* Phone */}
               <div className="relative w-[220px] h-[440px] rounded-[32px] bg-gradient-to-b from-[#2D1B24] to-[#140A10] border-[5px] border-[#0A0508] shadow-2xl overflow-hidden">

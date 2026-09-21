@@ -203,6 +203,17 @@ export default function Home() {
     },
   ];
 
+  // ---------------------------------------------------------------
+  // YANGILANGAN DARAJA TIZIMI:
+  // 💰 1 000 so'm = 1 coin
+  // 🎁 Karta ochish = 10 000 so'm Welcome bonus
+  // 🟤 Bronze = 5 000 coin
+  // ⚪ Silver = 15 000 coin
+  // 🟡 Gold = 30 000 coin
+  // 🔵 Platinum = 60 000 coin
+  // 💎 Diamond = 120 000 coin
+  // 👑 VIP = 250 000 coin
+  // ---------------------------------------------------------------
   const LEVELS = [
     {
       name: "Standard",
@@ -219,7 +230,7 @@ export default function Home() {
     },
     {
       name: "Bronze",
-      coinsReq: "99 000 coin",
+      coinsReq: "5 000 coin",
       color: "from-amber-800/30 to-amber-950/10",
       border: "border-amber-700/40",
       text: "text-amber-400",
@@ -232,7 +243,7 @@ export default function Home() {
     },
     {
       name: "Silver",
-      coinsReq: "199 000 coin",
+      coinsReq: "15 000 coin",
       color: "from-slate-400/20 to-slate-800/10",
       border: "border-slate-400/40",
       text: "text-slate-300",
@@ -246,7 +257,7 @@ export default function Home() {
     },
     {
       name: "Gold",
-      coinsReq: "399 000 coin",
+      coinsReq: "30 000 coin",
       color: "from-yellow-600/25 to-yellow-900/10",
       border: "border-yellow-500/40",
       text: "text-yellow-300",
@@ -261,7 +272,7 @@ export default function Home() {
     },
     {
       name: "Platinum",
-      coinsReq: "599 000 coin",
+      coinsReq: "60 000 coin",
       color: "from-cyan-600/20 to-cyan-900/10",
       border: "border-cyan-500/40",
       text: "text-cyan-300",
@@ -277,7 +288,7 @@ export default function Home() {
     },
     {
       name: "Diamond",
-      coinsReq: "799 000 coin",
+      coinsReq: "120 000 coin",
       color: "from-sky-600/20 to-sky-950/10",
       border: "border-sky-400/50",
       text: "text-sky-300",
@@ -294,7 +305,7 @@ export default function Home() {
     },
     {
       name: "VIP",
-      coinsReq: "999 000 coin",
+      coinsReq: "250 000 coin",
       color: "from-rose-600/25 to-purple-950/20",
       border: "border-rose-500/50",
       text: "text-rose-300",

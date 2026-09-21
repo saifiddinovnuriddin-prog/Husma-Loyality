@@ -18,10 +18,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await getUserById(session.id);   // ← await qo‘shildi
+    const user = await getUserById(session.id);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const rawCard = user.card_number || user.cardNumber || user.card;
+    const formattedCard = rawCard ? formatCardNumber(rawCard) : null;
 
     return NextResponse.json({
       id: user.id,
@@ -31,10 +34,10 @@ export async function GET() {
       role: user.role,
       coins: user.coins || 0,
       tier: user.tier || "Bronza",
-      totalSpent: user.total_spent || user.totalSpent || 0,  // snake_case ham qo‘llab-quvvatlanadi
-      cardNumber: user.card_number || user.cardNumber
-        ? formatCardNumber(user.card_number || user.cardNumber)
-        : null,
+      totalSpent: user.total_spent || user.totalSpent || 0,
+      // Frontendda u.card ham, u.cardNumber ham ishlayverishi uchun ikkalasini beramiz:
+      card: formattedCard || rawCard,
+      cardNumber: formattedCard,
     });
   } catch (err) {
     console.error("ME ERROR:", err);

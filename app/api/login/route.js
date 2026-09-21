@@ -16,6 +16,8 @@ export async function POST(req) {
     const phoneInput = body.phone;
     const password = body.password;
 
+    console.log("--> LOGIN BOSHLANDI:", { phoneInput, passwordLength: password?.length });
+
     if (!phoneInput || !password) {
       return NextResponse.json(
         { error: "Telefon va parol kerak" },
@@ -24,6 +26,8 @@ export async function POST(req) {
     }
 
     const phoneCheck = validateFullPhone(phoneInput);
+    console.log("--> PHONE CHECK RESULT:", phoneCheck);
+
     if (!phoneCheck.valid) {
       return NextResponse.json(
         { error: "Telefon raqam formati noto'g'ri" },
@@ -31,11 +35,23 @@ export async function POST(req) {
       );
     }
 
+    // Supabase'dan foydalanuvchini olish
     const user = await getUserByPhone(phoneCheck.e164);
+    console.log("--> BAZADAN TOPILGAN USER:", user);
 
-    // Xavfsizlik: "raqam topilmadi" va "parol noto'g'ri" holatlarini
-    // bir xil xabar bilan qaytaramiz.
-    if (!user || !verifyPassword(password, user.password)) {
+    if (!user) {
+      console.log("--> XATO: Ushbu raqam bazada topilmadi!");
+      return NextResponse.json(
+        { error: "Telefon raqam yoki parol noto'g'ri" },
+        { status: 401 }
+      );
+    }
+
+    // Parolni tekshirish
+    const isValidPassword = verifyPassword(password, user.password);
+    console.log("--> PAROL MOSLIGI:", isValidPassword);
+
+    if (!isValidPassword) {
       return NextResponse.json(
         { error: "Telefon raqam yoki parol noto'g'ri" },
         { status: 401 }
@@ -43,7 +59,6 @@ export async function POST(req) {
     }
 
     const token = createSessionToken(user);
-
     const res = NextResponse.json({
       success: true,
       role: user.role,
@@ -52,8 +67,13 @@ export async function POST(req) {
 
     res.cookies.set(SESSION_COOKIE, token, getSessionCookieOptions());
     return res;
+
   } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    return NextResponse.json({ error: "Server xatosi" }, { status: 500 });
+    // Har qanday kutilmagan server xatoligi shu yerga tushadi
+    console.error("--> DETAILED LOGIN ERROR:", err);
+    return NextResponse.json(
+      { error: `Server xatosi: ${err.message}` }, 
+      { status: 500 }
+    );
   }
 }
